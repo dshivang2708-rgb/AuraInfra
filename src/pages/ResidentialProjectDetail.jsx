@@ -1,0 +1,82 @@
+import { useState } from "react";
+import { Link, useParams } from "@tanstack/react-router";
+import PageNavbar from "../components/PageNavbar.jsx";
+import ProjectHero from "../components/residential-detail/ProjectHero.jsx";
+import TabsNav from "../components/residential-detail/TabsNav.jsx";
+import ProjectOverview from "../components/residential-detail/ProjectOverview.jsx";
+import FloorPlans from "../components/residential-detail/FloorPlans.jsx";
+import Amenities from "../components/residential-detail/Amenities.jsx";
+import PricingSidebar from "../components/residential-detail/PricingSidebar.jsx";
+import { getResidentialProperty } from "../data/residentialProperties.js";
+
+export default function ResidentialProjectDetail() {
+  const { slug } = useParams({ strict: false });
+  const property = getResidentialProperty(slug);
+  const [activeTab, setActiveTab] = useState("Overview");
+
+  if (!property) {
+    return (
+      <>
+        <PageNavbar />
+        <main className="pt-14 min-h-[60vh] flex flex-col items-center justify-center gap-4 text-center px-4">
+          <h1 className="text-2xl font-bold text-gray-900">Property not found</h1>
+          <p className="text-sm text-gray-500">
+            This residential listing may have been removed or the link is incorrect.
+          </p>
+          <Link to="/properties/residential" className="text-[#1a6b32] font-semibold hover:underline">
+            Back to Residential Properties
+          </Link>
+        </main>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <PageNavbar />
+      <main className="pt-14 bg-slate-50 text-slate-800" style={{ fontFamily: "Inter, sans-serif" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
+            <Link className="hover:text-[#1a6b32]" to="/">
+              Home
+            </Link>
+            <i className="fa-solid fa-chevron-right text-[10px]" />
+            <Link className="hover:text-[#1a6b32]" to="/properties/residential">
+              Projects
+            </Link>
+            <i className="fa-solid fa-chevron-right text-[10px]" />
+            <span className="text-gray-900 font-medium">{property.name}</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left column */}
+            <div className="lg:col-span-2 space-y-8">
+              <ProjectHero property={property} />
+              <TabsNav activeTab={activeTab} onChange={setActiveTab} />
+
+              {activeTab === "Overview" && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <ProjectOverview property={property} />
+                    <FloorPlans property={property} />
+                  </div>
+                  <Amenities />
+                </>
+              )}
+              {activeTab === "Amenities" && <Amenities />}
+              {activeTab === "Floor Plans" && <FloorPlans property={property} />}
+              {!["Overview", "Amenities", "Floor Plans"].includes(activeTab) && (
+                <div className="bg-white rounded-xl shadow-sm p-6 text-center text-sm text-gray-500">
+                  {activeTab} details coming soon — reach out to us for the full breakdown.
+                </div>
+              )}
+            </div>
+
+            {/* Right column */}
+            <PricingSidebar property={property} />
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
