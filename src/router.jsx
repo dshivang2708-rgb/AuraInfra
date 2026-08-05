@@ -5,9 +5,13 @@ import Contact from "./pages/Contact.jsx";
 import ResidentialProperties from "./pages/ResidentialProperties.jsx";
 import ResidentialProjectDetail from "./pages/ResidentialProjectDetail.jsx";
 import CommercialProperties from "./pages/CommercialProperties.jsx";
+import CommercialProjectDetail from "./pages/CommercialProjectDetail.jsx";
 import AgricultureProperties from "./pages/AgricultureProperties.jsx";
 import AgricultureProjectDetail from "./pages/AgricultureProjectDetail.jsx";
 import PremiumProjects from "./pages/PremiumProjects.jsx";
+import AdminSignIn from "./pages/admin/AdminSignIn.jsx";
+import AdminSignUp from "./pages/admin/AdminSignUp.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import Footer from "./components/Footer.jsx";
 
 const rootRoute = createRootRoute({
@@ -55,6 +59,12 @@ const commercialRoute = createRoute({
   component: CommercialProperties,
 });
 
+const commercialDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/properties/commercial/$slug",
+  component: CommercialProjectDetail,
+});
+
 const agricultureRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/agriculture",
@@ -73,6 +83,24 @@ const premiumProjectsRoute = createRoute({
   component: PremiumProjects,
 });
 
+const adminSignInRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/login",
+  component: AdminSignIn,
+});
+
+const adminSignUpRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/signup",
+  component: AdminSignUp,
+});
+
+const adminDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/dashboard",
+  component: AdminDashboard,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   aboutRoute,
@@ -80,9 +108,13 @@ const routeTree = rootRoute.addChildren([
   residentialRoute,
   residentialDetailRoute,
   commercialRoute,
+  commercialDetailRoute,
   agricultureRoute,
   agricultureDetailRoute,
   premiumProjectsRoute,
+  adminSignInRoute,
+  adminSignUpRoute,
+  adminDashboardRoute,
 ]);
 
 export const router = createRouter({ routeTree });
