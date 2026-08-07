@@ -2,14 +2,51 @@ import { supabaseAdmin } from "../config/supabaseAdmin.js";
 
 const VALID_CATEGORIES = ["residential", "commercial", "agriculture", "premium"];
 
+// Canonical cities we do business in. Used as a fallback to derive a project's
+// city from its free-text `location` for rows where the `city` column was
+// never explicitly set (e.g. content migrated from the old hardcoded data).
+const KNOWN_CITIES = [
+  "Mohali",
+  "Chandigarh",
+  "Zirakpur",
+  "Kharar",
+  "Panchkula",
+  "Derabassi",
+  "Rajpura",
+  "Ropar",
+  "Anandpur Sahib",
+  "Noida",
+  "Gurgaon",
+  "Delhi",
+  "Pune",
+  "Jaipur",
+  "Lucknow",
+];
+
 function isValidCategory(category) {
   return VALID_CATEGORIES.includes(category);
+}
+
+// PostgREST .or() filter strings are comma-separated, so a raw comma in the
+// value would be misread as a second condition. Strip anything that isn't
+// safe inside an ilike pattern.
+function sanitizeForFilter(value) {
+  return String(value).replace(/[,()%]/g, "").trim();
+}
+
+// Matches a project's `city` column OR its free-text `location` field, so
+// filtering by city works for both explicitly-tagged rows and older rows
+// that only ever had a location string.
+function applyCityFilter(query, city) {
+  const safe = sanitizeForFilter(city);
+  if (!safe) return query;
+  return query.or(`city.ilike.%${safe}%,location.ilike.%${safe}%`);
 }
 
 // ---------- Public (no auth required) ----------
 
 export async function listPublicProjects(req, res) {
-  const { category, sector } = req.query;
+  const { category, sector, city } = req.query;
 
   let query = supabaseAdmin.from("projects").select("*").eq("is_published", true);
 
@@ -19,8 +56,11 @@ export async function listPublicProjects(req, res) {
     }
     query = query.eq("category", category);
   }
+  if (city) {
+    query = applyCityFilter(query, city);
+  }
   if (sector) {
-    query = query.ilike("sector", `%${sector}%`);
+    query = query.ilike("sector", `%${sanitizeForFilter(sector)}%`);
   }
 
   const { data, error } = await query.order("created_at", { ascending: false });
@@ -47,17 +87,44 @@ export async function getPublicProject(req, res) {
 }
 
 // Returns all distinct sectors that have at least one published project —
-// powers the location filter dropdown on the homepage hero.
+// powers the sector dropdown on the homepage hero and the listing sidebars.
+// Pass ?city=... to scope sectors to just that city (sector-level-in-a-city
+// filtering).
 export async function listSectors(req, res) {
-  const { data, error } = await supabaseAdmin
-    .from("projects")
-    .select("sector")
-    .eq("is_published", true)
-    .not("sector", "is", null);
+  const { city } = req.query;
 
+  let query = supabaseAdmin.from("projects").select("sector").eq("is_published", true).not("sector", "is", null);
+  if (city) {
+    query = applyCityFilter(query, city);
+  }
+
+  const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
   const sectors = [...new Set(data.map((row) => row.sector).filter(Boolean))].sort();
   res.json(sectors);
+}
+
+// Returns all distinct cities that have at least one published project —
+// powers the city dropdown on the homepage hero and the listing sidebars.
+// Derives a city from `location` for rows that don't have the `city` column
+// explicitly set, so older/migrated content is still filterable.
+export async function listCities(req, res) {
+  const { data, error } = await supabaseAdmin.from("projects").select("city, location").eq("is_published", true);
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const found = new Set();
+  for (const row of data) {
+    if (row.city && row.city.trim()) {
+      found.add(row.city.trim());
+      continue;
+    }
+    const match = KNOWN_CITIES.find(
+      (c) => row.location && row.location.toLowerCase().includes(c.toLowerCase())
+    );
+    if (match) found.add(match);
+  }
+  res.json([...found].sort());
 }
 
 // ---------- Admin (requireAdmin middleware runs before all of these) ----------

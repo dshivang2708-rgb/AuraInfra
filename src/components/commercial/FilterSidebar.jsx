@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { SlidersHorizontal, ChevronDown, Search } from "lucide-react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
+import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
 
 const PROPERTY_TYPES = ["Office Space", "Retail Space", "Showroom", "Warehouse / Industrial", "Co-working Space"];
-const LOCATIONS = ["Mohali", "Zirakpur", "Panchkula", "Chandigarh", "Kharar"];
 const CARPET_AREAS = ["0 - 1000 sq ft", "1000 - 5000 sq ft", "5000 - 10000 sq ft", "10000+ sq ft"];
 
 function CheckboxList({ options }) {
@@ -20,6 +21,21 @@ function CheckboxList({ options }) {
 
 export default function FilterSidebar() {
   const [showMore, setShowMore] = useState(false);
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
+
+  const cities = useCities();
+  const sectors = useSectors(city);
+
+  function updateSearch(next) {
+    navigate({
+      to: "/properties/commercial",
+      search: cleanSearch({ ...search, ...next }),
+      replace: true,
+    });
+  }
 
   return (
     <aside className="w-full md:w-72 flex-shrink-0">
@@ -29,7 +45,12 @@ export default function FilterSidebar() {
             <SlidersHorizontal size={18} />
             Filters
           </div>
-          <button className="text-xs text-[#1a6b32] font-semibold">Clear All</button>
+          <button
+            onClick={() => updateSearch({ city: "", sector: "" })}
+            className="text-xs text-[#1a6b32] font-semibold"
+          >
+            Clear All
+          </button>
         </div>
 
         {/* Property Type */}
@@ -41,21 +62,42 @@ export default function FilterSidebar() {
           <CheckboxList options={PROPERTY_TYPES} />
         </div>
 
-        {/* Location */}
+        {/* City */}
+        <div className="mb-6">
+          <h4 className="text-sm font-bold text-gray-700 mb-4">City</h4>
+          <select
+            value={city}
+            onChange={(e) => updateSearch({ city: e.target.value, sector: "" })}
+            className="w-full text-sm border-gray-200 rounded-lg py-2 focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          >
+            <option value="">All Cities</option>
+            {cities.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sector — scoped to the selected city */}
         <div className="mb-8">
-          <h4 className="text-sm font-bold text-gray-700 mb-4">Location</h4>
-          <div className="relative mb-4">
-            <input
-              className="w-full text-sm border-gray-200 rounded-lg pr-8 py-2"
-              placeholder="Search location"
-              type="text"
-            />
-            <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          </div>
-          <div className="space-y-3">
-            <CheckboxList options={LOCATIONS} />
-            <button className="text-xs text-[#1a6b32] font-bold mt-1">View More</button>
-          </div>
+          <h4 className="text-sm font-bold text-gray-700 mb-4">Sector</h4>
+          <select
+            value={sector}
+            onChange={(e) => updateSearch({ sector: e.target.value })}
+            disabled={sectors.length === 0}
+            className="w-full text-sm border-gray-200 rounded-lg py-2 focus:ring-[#1a6b32] focus:border-[#1a6b32] disabled:bg-gray-50 disabled:text-gray-400"
+          >
+            <option value="">All Sectors</option>
+            {sectors.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          {city && sectors.length === 0 && (
+            <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {city} yet.</p>
+          )}
         </div>
 
         {/* Carpet Area */}

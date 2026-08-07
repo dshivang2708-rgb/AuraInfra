@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useCities, cleanSearch } from "../../lib/locationFilter.js";
 
 const STATS = [
   { icon: "workspace_premium", value: "12+", label: "Premium Projects" },
@@ -8,6 +9,19 @@ const STATS = [
 ];
 
 export default function PremiumProjectsHero() {
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const cities = useCities();
+
+  function handleCityChange(e) {
+    navigate({
+      to: "/properties/premium-projects",
+      search: cleanSearch({ ...search, city: e.target.value }),
+      replace: true,
+    });
+  }
+
   return (
     <section
       className="min-h-[500px] flex flex-col justify-center items-center px-4 pt-12 pb-24 text-white relative"
@@ -60,9 +74,18 @@ export default function PremiumProjectsHero() {
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-7xl px-4">
         <div className="bg-white rounded-xl shadow-2xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-7 gap-4 items-end text-slate-800">
           <div>
-            <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location</label>
-            <select className="w-full border-none bg-slate-50 rounded-lg text-sm font-semibold focus:ring-0">
-              <option>All Locations</option>
+            <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">City</label>
+            <select
+              value={city}
+              onChange={handleCityChange}
+              className="w-full border-none bg-slate-50 rounded-lg text-sm font-semibold focus:ring-0"
+            >
+              <option value="">All Cities</option>
+              {cities.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -99,10 +122,6 @@ export default function PremiumProjectsHero() {
             <button className="flex-1 border border-slate-200 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 hover:bg-slate-50">
               <span className="material-symbols-outlined text-base">tune</span>
               More Filters
-            </button>
-            <button className="bg-[#00703C] hover:bg-green-800 text-white p-2 rounded-lg flex items-center justify-center w-12 md:w-full gap-2 transition-colors">
-              <span className="material-symbols-outlined text-lg">search</span>
-              <span className="hidden md:inline font-semibold">Search</span>
             </button>
           </div>
         </div>

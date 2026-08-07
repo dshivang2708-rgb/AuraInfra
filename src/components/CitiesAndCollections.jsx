@@ -1,4 +1,7 @@
-const CITIES = ["Mohali", "Chandigarh", "Delhi", "Noida", "Gurgaon", "Pune", "Jaipur", "Lucknow"];
+import { Link } from "@tanstack/react-router";
+import { useCities } from "../lib/locationFilter.js";
+
+const FALLBACK_CITIES = ["Mohali", "Chandigarh", "Delhi", "Noida", "Gurgaon", "Pune", "Jaipur", "Lucknow"];
 
 const COLLECTIONS = [
   { key: "villas", icon: "home_work", label: "Luxury Villas" },
@@ -112,6 +115,9 @@ const COLLECTION_ICONS = {
 };
 
 export default function CitiesAndCollections() {
+  const fetchedCities = useCities();
+  const CITIES = fetchedCities.length > 0 ? fetchedCities : FALLBACK_CITIES;
+
   return (
     <section className="py-8 bg-[#f9f9ff]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-7xl mx-auto px-8">
@@ -122,12 +128,14 @@ export default function CitiesAndCollections() {
             <p className="text-sm text-[#45464e] mb-5">Explore top locations</p>
             <div className="flex flex-wrap mb-6 gap-1.5">
               {CITIES.map((city) => (
-                <button
+                <Link
                   key={city}
+                  to="/properties/residential"
+                  search={{ city }}
                   className="px-3 py-1 rounded-lg border border-[#c5c6cf] text-xs text-[#151c27] hover:bg-[#e7eefe] transition-colors"
                 >
                   {city}
-                </button>
+                </Link>
               ))}
             </div>
             <a

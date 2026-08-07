@@ -1,26 +1,89 @@
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
+
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
 const POSSESSION_OPTIONS = ["Ready to Move", "Under Construction", "New Launch"];
 
 export default function SidebarFilters() {
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
+
+  const cities = useCities();
+  const sectors = useSectors(city);
+
+  function updateSearch(next) {
+    navigate({
+      to: "/properties/residential",
+      search: cleanSearch({ ...search, ...next }),
+      replace: true,
+    });
+  }
+
+  function handleCityChange(e) {
+    // Changing city clears sector — sectors only make sense within a city.
+    updateSearch({ city: e.target.value, sector: "" });
+  }
+
+  function handleSectorChange(e) {
+    updateSearch({ sector: e.target.value });
+  }
+
+  function clearAll() {
+    updateSearch({ city: "", sector: "" });
+  }
+
   return (
     <aside className="w-full lg:w-72 flex-shrink-0">
       <div className="bg-white p-5 rounded-lg border border-gray-200 lg:sticky lg:top-32">
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-bold text-lg">Filter Properties</h2>
-          <button className="text-[#1a6b32] text-xs font-semibold uppercase">Clear All</button>
+          <button onClick={clearAll} className="text-[#1a6b32] text-xs font-semibold uppercase">
+            Clear All
+          </button>
         </div>
 
-        {/* Location Filter */}
+        {/* City Filter */}
         <div className="mb-6">
           <label className="block text-xs font-bold text-gray-700 uppercase mb-2">
-            <i className="fa-solid fa-location-dot mr-1" /> Location
+            <i className="fa-solid fa-location-dot mr-1" /> City
           </label>
-          <select className="w-full border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]">
-            <option>All Locations</option>
-            <option>Mohali</option>
-            <option>Chandigarh</option>
-            <option>Zirakpur</option>
+          <select
+            value={city}
+            onChange={handleCityChange}
+            className="w-full border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          >
+            <option value="">All Cities</option>
+            {cities.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
           </select>
+        </div>
+
+        {/* Sector Filter — scoped to the selected city */}
+        <div className="mb-6">
+          <label className="block text-xs font-bold text-gray-700 uppercase mb-2">
+            <i className="fa-solid fa-map-pin mr-1" /> Sector
+          </label>
+          <select
+            value={sector}
+            onChange={handleSectorChange}
+            disabled={sectors.length === 0}
+            className="w-full border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32] disabled:bg-gray-50 disabled:text-gray-400"
+          >
+            <option value="">All Sectors</option>
+            {sectors.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          {city && sectors.length === 0 && (
+            <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {city} yet.</p>
+          )}
         </div>
 
         {/* Price Range */}
@@ -81,10 +144,16 @@ export default function SidebarFilters() {
           </div>
         </div>
 
-        <button className="w-full bg-[#1a6b32] text-white py-3 rounded-md font-bold text-sm flex items-center justify-center gap-2 mb-3">
+        <button
+          onClick={() => updateSearch({ city, sector })}
+          className="w-full bg-[#1a6b32] text-white py-3 rounded-md font-bold text-sm flex items-center justify-center gap-2 mb-3"
+        >
           <i className="fa-solid fa-sliders" /> Apply Filters
         </button>
-        <button className="w-full text-gray-500 text-xs font-bold py-1 flex items-center justify-center gap-2">
+        <button
+          onClick={clearAll}
+          className="w-full text-gray-500 text-xs font-bold py-1 flex items-center justify-center gap-2"
+        >
           <i className="fa-solid fa-rotate-left" /> Reset All
         </button>
       </div>

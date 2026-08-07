@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
 
 const PROPERTY_TYPES = ["Agricultural Land", "Farmhouse Land", "Plantation", "Horticulture Land", "Dairy / Farm Land"];
-const LOCATIONS = ["Mohali", "Zirakpur", "Kharar", "Derabassi", "Rajpura"];
 
 function CheckboxList({ options }) {
   return (
@@ -18,6 +19,21 @@ function CheckboxList({ options }) {
 
 export default function FilterSidebar() {
   const [showMore, setShowMore] = useState(false);
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
+
+  const cities = useCities();
+  const sectors = useSectors(city);
+
+  function updateSearch(next) {
+    navigate({
+      to: "/properties/agriculture",
+      search: cleanSearch({ ...search, ...next }),
+      replace: true,
+    });
+  }
 
   return (
     <aside className="w-full lg:w-64 flex-shrink-0">
@@ -26,7 +42,12 @@ export default function FilterSidebar() {
           <span className="material-symbols-outlined text-xl">filter_alt</span>
           Filters
         </h2>
-        <button className="text-[#1a6b32] text-xs font-bold uppercase">Clear All</button>
+        <button
+          onClick={() => updateSearch({ city: "", sector: "" })}
+          className="text-[#1a6b32] text-xs font-bold uppercase"
+        >
+          Clear All
+        </button>
       </div>
 
       {/* Property Type */}
@@ -38,23 +59,42 @@ export default function FilterSidebar() {
         <CheckboxList options={PROPERTY_TYPES} />
       </div>
 
-      {/* Location */}
+      {/* City */}
+      <div className="mb-6">
+        <h3 className="text-sm font-bold mb-4">City</h3>
+        <select
+          value={city}
+          onChange={(e) => updateSearch({ city: e.target.value, sector: "" })}
+          className="w-full text-sm border-gray-200 rounded-lg focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+        >
+          <option value="">All Cities</option>
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Sector — scoped to the selected city */}
       <div className="mb-8">
-        <h3 className="text-sm font-bold mb-4">Location</h3>
-        <div className="relative mb-4">
-          <input
-            className="w-full text-sm border-gray-200 rounded-lg pr-10 focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-            placeholder="Search location"
-            type="text"
-          />
-          <span className="material-symbols-outlined text-base absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-            search
-          </span>
-        </div>
-        <div className="space-y-2">
-          <CheckboxList options={LOCATIONS} />
-          <button className="text-[#1a6b32] text-xs font-bold mt-2">View More</button>
-        </div>
+        <h3 className="text-sm font-bold mb-4">Sector</h3>
+        <select
+          value={sector}
+          onChange={(e) => updateSearch({ sector: e.target.value })}
+          disabled={sectors.length === 0}
+          className="w-full text-sm border-gray-200 rounded-lg focus:ring-[#1a6b32] focus:border-[#1a6b32] disabled:bg-gray-50 disabled:text-gray-400"
+        >
+          <option value="">All Sectors</option>
+          {sectors.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        {city && sectors.length === 0 && (
+          <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {city} yet.</p>
+        )}
       </div>
 
       {/* Land Area */}

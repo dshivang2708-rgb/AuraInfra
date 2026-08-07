@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
 import { toAgricultureCard } from "../../lib/adapters.js";
 
@@ -50,24 +50,30 @@ export default function ResultsGrid() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
     api
-      .listProjects({ category: "agriculture" })
+      .listProjects({ category: "agriculture", ...(city && { city }), ...(sector && { sector }) })
       .then((rows) => active && setProperties(rows.map(toAgricultureCard)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
-  }, []);
+  }, [city, sector]);
 
   return (
     <section className="flex-1">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-lg font-bold">
-          {loading ? "Loading..." : `Showing ${properties.length} Properties`}
+          {loading
+            ? "Loading..."
+            : `Showing ${properties.length} Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
         </h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -105,7 +111,7 @@ export default function ResultsGrid() {
 
       {!loading && !error && properties.length === 0 && (
         <div className="bg-white border border-gray-100 rounded-xl p-10 text-center text-sm text-gray-500">
-          No agriculture properties published yet.
+          No agriculture properties found{sector ? ` in ${sector}` : city ? ` in ${city}` : ""}.
         </div>
       )}
 

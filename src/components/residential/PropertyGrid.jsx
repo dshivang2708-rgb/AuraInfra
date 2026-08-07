@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
 
 const BADGE_STYLES = {
@@ -79,11 +79,15 @@ export default function PropertyGrid() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
     api
-      .listProjects({ category: "residential" })
+      .listProjects({ category: "residential", ...(city && { city }), ...(sector && { sector }) })
       .then((rows) => {
         if (active) setProperties(rows.map(toCardProps));
       })
@@ -92,14 +96,16 @@ export default function PropertyGrid() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [city, sector]);
 
   return (
     <div className="flex-1">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h3 className="text-sm font-semibold text-gray-600">
-          {loading ? "Loading..." : `Showing ${properties.length} Residential Properties`}
+          {loading
+            ? "Loading..."
+            : `Showing ${properties.length} Residential Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">Sort by:</span>
@@ -137,7 +143,7 @@ export default function PropertyGrid() {
 
       {!loading && !error && properties.length === 0 && (
         <div className="bg-white border border-gray-100 rounded-xl p-10 text-center text-sm text-gray-500">
-          No residential properties published yet.
+          No residential properties found{sector ? ` in ${sector}` : city ? ` in ${city}` : ""}.
         </div>
       )}
 

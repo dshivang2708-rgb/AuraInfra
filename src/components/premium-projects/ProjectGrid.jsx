@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
 import { toPremiumCard } from "../../lib/adapters.js";
 
@@ -58,24 +58,30 @@ export default function ProjectGrid() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
     api
-      .listProjects({ category: "premium" })
+      .listProjects({ category: "premium", ...(city && { city }), ...(sector && { sector }) })
       .then((rows) => active && setProjects(rows.map(toPremiumCard)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
-  }, []);
+  }, [city, sector]);
 
   return (
     <>
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <p className="text-sm font-medium text-slate-500">
-          {loading ? "Loading..." : `Showing ${projects.length} Premium Projects`}
+          {loading
+            ? "Loading..."
+            : `Showing ${projects.length} Premium Projects${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
         </p>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -111,7 +117,7 @@ export default function ProjectGrid() {
 
       {!loading && !error && projects.length === 0 && (
         <div className="bg-white border border-slate-100 rounded-xl p-10 text-center text-sm text-slate-500 mb-4">
-          No premium projects published yet.
+          No premium projects found{sector ? ` in ${sector}` : city ? ` in ${city}` : ""}.
         </div>
       )}
 

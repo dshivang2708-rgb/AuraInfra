@@ -36,7 +36,11 @@ export const api = {
     return request(`/api/projects${query ? `?${query}` : ""}`);
   },
   getProject: (category, slug) => request(`/api/projects/${category}/${slug}`),
-  listSectors: () => request("/api/projects/sectors"),
+  listSectors: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/api/projects/sectors${query ? `?${query}` : ""}`);
+  },
+  listCities: () => request("/api/projects/cities"),
 
   // Admin — all require an authenticated admin session
   adminListProjects: (category) =>
