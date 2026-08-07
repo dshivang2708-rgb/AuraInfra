@@ -1,16 +1,46 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import PageNavbar from "../components/PageNavbar.jsx";
 import DetailHero from "../components/agriculture-detail/DetailHero.jsx";
 import DetailTabs from "../components/agriculture-detail/DetailTabs.jsx";
 import LocationAndInvest from "../components/agriculture-detail/LocationAndInvest.jsx";
 import PricingSidebar from "../components/agriculture-detail/PricingSidebar.jsx";
-import { getAgricultureProperty } from "../data/agricultureProperties.js";
+import { api } from "../lib/api.js";
+import { toAgricultureDetail } from "../lib/adapters.js";
 
 export default function AgricultureProjectDetail() {
   const { slug } = useParams({ strict: false });
-  const property = getAgricultureProperty(slug);
+  const [property, setProperty] = useState(null);
+  const [status, setStatus] = useState("loading");
 
-  if (!property) {
+  useEffect(() => {
+    let active = true;
+    api
+      .getProject("agriculture", slug)
+      .then((row) => {
+        if (active) {
+          setProperty(toAgricultureDetail(row));
+          setStatus("found");
+        }
+      })
+      .catch(() => active && setStatus("not-found"));
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  if (status === "loading") {
+    return (
+      <>
+        <PageNavbar />
+        <main className="pt-14 min-h-[60vh] flex items-center justify-center">
+          <p className="text-sm text-[#45464e]">Loading...</p>
+        </main>
+      </>
+    );
+  }
+
+  if (status === "not-found") {
     return (
       <>
         <PageNavbar />

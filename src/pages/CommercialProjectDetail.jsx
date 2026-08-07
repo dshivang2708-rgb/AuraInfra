@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import PageNavbar from "../components/PageNavbar.jsx";
 import ProjectHero from "../components/commercial-detail/ProjectHero.jsx";
@@ -8,14 +8,43 @@ import FloorPlans from "../components/commercial-detail/FloorPlans.jsx";
 import Amenities from "../components/commercial-detail/Amenities.jsx";
 import WhyThisProject from "../components/commercial-detail/WhyThisProject.jsx";
 import PricingSidebar from "../components/commercial-detail/PricingSidebar.jsx";
-import { getCommercialProperty } from "../data/commercialProperties.js";
+import { api } from "../lib/api.js";
+import { toCommercialDetail } from "../lib/adapters.js";
 
 export default function CommercialProjectDetail() {
   const { slug } = useParams({ strict: false });
-  const property = getCommercialProperty(slug);
+  const [property, setProperty] = useState(null);
+  const [status, setStatus] = useState("loading");
   const [activeTab, setActiveTab] = useState("Overview");
 
-  if (!property) {
+  useEffect(() => {
+    let active = true;
+    api
+      .getProject("commercial", slug)
+      .then((row) => {
+        if (active) {
+          setProperty(toCommercialDetail(row));
+          setStatus("found");
+        }
+      })
+      .catch(() => active && setStatus("not-found"));
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  if (status === "loading") {
+    return (
+      <>
+        <PageNavbar />
+        <main className="pt-14 min-h-[60vh] flex items-center justify-center">
+          <p className="text-sm text-gray-500">Loading...</p>
+        </main>
+      </>
+    );
+  }
+
+  if (status === "not-found") {
     return (
       <>
         <PageNavbar />

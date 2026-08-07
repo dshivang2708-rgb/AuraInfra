@@ -1,43 +1,37 @@
-import { supabaseAdmin } from "../config/supabaseAdmin.js";
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useAdminAuth } from "../../context/AdminAuthContext.jsx";
 
 /**
- * Verifies the Supabase access token sent by the frontend (Authorization: Bearer <token>),
- * then checks the user has role = 'admin' in the profiles table.
- * Attaches the verified user to req.user on success.
+ * Client-side route guard for admin pages.
+ * Uses the AdminAuthContext (backed by Supabase auth + the `profiles` table)
+ * to confirm the visitor is signed in AND has role = 'admin'.
+ * Redirects to /admin/login otherwise. Actual authorization is still
+ * enforced server-side by requireAdmin middleware / RLS — this only
+ * gates the UI.
  */
-export async function requireAdmin(req, res, next) {
-  try {
-    const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+export default function RequireAdmin({ children }) {
+  const { session, profile, isAdmin, loading } = useAdminAuth();
+  const navigate = useNavigate();
 
-    if (!token) {
-      return res.status(401).json({ error: "Missing Authorization header" });
+  useEffect(() => {
+    if (loading) return;
+    if (!session) {
+      navigate({ to: "/admin/login" });
+      return;
     }
-
-    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
-    if (userError || !userData?.user) {
-      return res.status(401).json({ error: "Invalid or expired session" });
+    if (profile && !isAdmin) {
+      navigate({ to: "/admin/login" });
     }
+  }, [loading, session, profile, isAdmin, navigate]);
 
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("profiles")
-      .select("role")
-      .eq("id", userData.user.id)
-      .single();
-
-    if (profileError || !profile) {
-      return res.status(403).json({ error: "No profile found for this account" });
-    }
-
-    if (profile.role !== "admin") {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    req.user = userData.user;
-    req.userRole = profile.role;
-    next();
-  } catch (err) {
-    console.error("requireAdmin error:", err);
-    res.status(500).json({ error: "Authentication check failed" });
+  if (loading || !session || !isAdmin) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#f9f9ff]">
+        <p className="text-sm text-[#45464e]">Checking access…</p>
+      </main>
+    );
   }
+
+  return children;
 }

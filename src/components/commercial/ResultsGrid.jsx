@@ -1,15 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { MapPin, Square, Heart, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
-import { COMMERCIAL_PROPERTIES } from "../../data/commercialProperties.js";
+import { MapPin, Square, Heart, LayoutGrid, List } from "lucide-react";
+import { api } from "../../lib/api.js";
+import { toCommercialCard } from "../../lib/adapters.js";
 
 const BADGE_STYLES = {
   Premium: "bg-[#1a6b32]",
   Featured: "bg-blue-600",
   New: "bg-gray-800",
 };
-
-const PAGE_NUMBERS = [1, 2, 3, "…", 6];
 
 function PropertyCard({ property }) {
   return (
@@ -19,7 +18,7 @@ function PropertyCard({ property }) {
         {property.badge && (
           <span
             className={`absolute top-3 left-3 text-white text-[10px] font-bold px-2 py-1 rounded ${
-              BADGE_STYLES[property.badge]
+              BADGE_STYLES[property.badge] || "bg-[#1a6b32]"
             }`}
           >
             {property.badge}
@@ -48,7 +47,6 @@ function PropertyCard({ property }) {
         <div className="flex items-center justify-between border-t border-gray-100 pt-4">
           <div>
             <span className="text-[#1a6b32] font-bold text-lg">{property.priceRange}</span>
-            <span className="block text-[10px] text-gray-400">{property.priceNote || "\u00A0"}</span>
           </div>
           <Link
             to="/properties/commercial/$slug"
@@ -65,13 +63,29 @@ function PropertyCard({ property }) {
 
 export default function ResultsGrid() {
   const [gridView, setGridView] = useState(true);
-  const [activePage, setActivePage] = useState(1);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    api
+      .listProjects({ category: "commercial" })
+      .then((rows) => active && setProperties(rows.map(toCommercialCard)))
+      .catch((err) => active && setError(err.message))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="flex-1">
       {/* Grid Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h2 className="text-xl font-bold">Showing 48 Properties</h2>
+        <h2 className="text-xl font-bold">
+          {loading ? "Loading..." : `Showing ${properties.length} Properties`}
+        </h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-gray-500">Sort By:</span>
@@ -100,46 +114,23 @@ export default function ResultsGrid() {
         </div>
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+          Couldn't load properties: {error}
+        </div>
+      )}
+
+      {!loading && !error && properties.length === 0 && (
+        <div className="bg-white border border-gray-100 rounded-xl p-10 text-center text-sm text-gray-500">
+          No commercial properties published yet.
+        </div>
+      )}
+
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {COMMERCIAL_PROPERTIES.map((property) => (
+        {properties.map((property) => (
           <PropertyCard key={property.key} property={property} />
         ))}
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-12 flex justify-center items-center gap-2">
-        <button
-          className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-[#1a6b32] hover:text-[#1a6b32] transition-colors"
-          aria-label="Previous page"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        {PAGE_NUMBERS.map((num, i) =>
-          num === "…" ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-gray-400">
-              …
-            </span>
-          ) : (
-            <button
-              key={num}
-              onClick={() => setActivePage(num)}
-              className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold ${
-                activePage === num
-                  ? "bg-[#1a6b32] text-white"
-                  : "border border-gray-200 text-gray-500 font-medium hover:border-[#1a6b32] hover:text-[#1a6b32]"
-              }`}
-            >
-              {num}
-            </button>
-          )
-        )}
-        <button
-          className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-[#1a6b32] hover:text-[#1a6b32] transition-colors"
-          aria-label="Next page"
-        >
-          <ChevronRight size={18} />
-        </button>
       </div>
     </div>
   );

@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { AGRICULTURE_PROPERTIES } from "../../data/agricultureProperties.js";
-
-const PAGE_NUMBERS = [1, 2, 3, "…", 6];
+import { api } from "../../lib/api.js";
+import { toAgricultureCard } from "../../lib/adapters.js";
 
 function PropertyCard({ property }) {
   return (
     <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group">
       <div className="relative h-48">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
-        <span className="absolute top-3 left-3 bg-[#1a6b32]/80 text-white text-[10px] px-2 py-1 rounded font-bold">
-          {property.badge}
-        </span>
+        {property.badge && (
+          <span className="absolute top-3 left-3 bg-[#1a6b32]/80 text-white text-[10px] px-2 py-1 rounded font-bold">
+            {property.badge}
+          </span>
+        )}
         <button className="absolute top-3 right-3 text-white hover:text-red-400" aria-label="Save property">
           <span className="material-symbols-outlined text-xl">favorite</span>
         </button>
@@ -46,12 +47,28 @@ function PropertyCard({ property }) {
 
 export default function ResultsGrid() {
   const [gridView, setGridView] = useState(true);
-  const [activePage, setActivePage] = useState(1);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    api
+      .listProjects({ category: "agriculture" })
+      .then((rows) => active && setProperties(rows.map(toAgricultureCard)))
+      .catch((err) => active && setError(err.message))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <section className="flex-1">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className="text-lg font-bold">Showing 36 Properties</h2>
+        <h2 className="text-lg font-bold">
+          {loading ? "Loading..." : `Showing ${properties.length} Properties`}
+        </h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 font-bold whitespace-nowrap">Sort By:</span>
@@ -80,37 +97,22 @@ export default function ResultsGrid() {
         </div>
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+          Couldn't load properties: {error}
+        </div>
+      )}
+
+      {!loading && !error && properties.length === 0 && (
+        <div className="bg-white border border-gray-100 rounded-xl p-10 text-center text-sm text-gray-500">
+          No agriculture properties published yet.
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {AGRICULTURE_PROPERTIES.map((property) => (
+        {properties.map((property) => (
           <PropertyCard key={property.key} property={property} />
         ))}
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-12 flex justify-center items-center gap-2">
-        <button className="p-2 text-gray-400 hover:text-[#1a6b32]" aria-label="Previous page">
-          <span className="material-symbols-outlined text-xl block">chevron_left</span>
-        </button>
-        {PAGE_NUMBERS.map((num, i) =>
-          num === "…" ? (
-            <span key={`ellipsis-${i}`} className="text-gray-400">
-              …
-            </span>
-          ) : (
-            <button
-              key={num}
-              onClick={() => setActivePage(num)}
-              className={`w-8 h-8 flex items-center justify-center rounded text-sm font-bold ${
-                activePage === num ? "bg-[#1a6b32] text-white" : "hover:bg-gray-100 font-normal"
-              }`}
-            >
-              {num}
-            </button>
-          )
-        )}
-        <button className="p-2 text-gray-400 hover:text-[#1a6b32]" aria-label="Next page">
-          <span className="material-symbols-outlined text-xl block">chevron_right</span>
-        </button>
       </div>
     </section>
   );

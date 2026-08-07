@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import PageNavbar from "../components/PageNavbar.jsx";
 import ProjectHero from "../components/residential-detail/ProjectHero.jsx";
@@ -7,14 +7,43 @@ import ProjectOverview from "../components/residential-detail/ProjectOverview.js
 import FloorPlans from "../components/residential-detail/FloorPlans.jsx";
 import Amenities from "../components/residential-detail/Amenities.jsx";
 import PricingSidebar from "../components/residential-detail/PricingSidebar.jsx";
-import { getResidentialProperty } from "../data/residentialProperties.js";
+import { api } from "../lib/api.js";
+import { toResidentialDetail } from "../lib/adapters.js";
 
 export default function ResidentialProjectDetail() {
   const { slug } = useParams({ strict: false });
-  const property = getResidentialProperty(slug);
+  const [property, setProperty] = useState(null);
+  const [status, setStatus] = useState("loading"); // loading | found | not-found
   const [activeTab, setActiveTab] = useState("Overview");
 
-  if (!property) {
+  useEffect(() => {
+    let active = true;
+    api
+      .getProject("residential", slug)
+      .then((row) => {
+        if (active) {
+          setProperty(toResidentialDetail(row));
+          setStatus("found");
+        }
+      })
+      .catch(() => active && setStatus("not-found"));
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  if (status === "loading") {
+    return (
+      <>
+        <PageNavbar />
+        <main className="pt-14 min-h-[60vh] flex items-center justify-center">
+          <p className="text-sm text-gray-500">Loading...</p>
+        </main>
+      </>
+    );
+  }
+
+  if (status === "not-found") {
     return (
       <>
         <PageNavbar />

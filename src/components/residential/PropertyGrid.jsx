@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { RESIDENTIAL_PROPERTIES } from "../../data/residentialProperties.js";
+import { api } from "../../lib/api.js";
 
 const BADGE_STYLES = {
   Premium: "bg-[#1a6b32]",
@@ -8,20 +8,34 @@ const BADGE_STYLES = {
   "Ready to Move": "bg-yellow-500",
 };
 
-const PAGE_NUMBERS = [1, 2, 3, 4, "…", 18];
+function toCardProps(row) {
+  return {
+    key: row.slug,
+    name: row.name,
+    image: row.main_image,
+    badge: row.badge,
+    location: row.location,
+    beds: row.details?.beds,
+    area: row.area_display,
+    price: row.price_display,
+    priceNote: null,
+  };
+}
 
 function PropertyCard({ property }) {
   return (
     <div className="property-card bg-white rounded-xl overflow-hidden border border-gray-100 transition-all duration-300 shadow-sm">
       <div className="relative h-48 overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
-        <span
-          className={`absolute top-3 left-3 text-white text-[10px] px-2 py-1 rounded font-bold uppercase ${
-            BADGE_STYLES[property.badge]
-          }`}
-        >
-          {property.badge}
-        </span>
+        {property.badge && (
+          <span
+            className={`absolute top-3 left-3 text-white text-[10px] px-2 py-1 rounded font-bold uppercase ${
+              BADGE_STYLES[property.badge] || "bg-[#1a6b32]"
+            }`}
+          >
+            {property.badge}
+          </span>
+        )}
         <button
           className="absolute top-3 right-3 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-gray-700 hover:text-red-500"
           aria-label="Save property"
@@ -36,10 +50,10 @@ function PropertyCard({ property }) {
         </div>
         <div className="flex justify-between items-center text-xs text-gray-600 pb-4 border-b border-gray-100">
           <span className="flex items-center gap-1">
-            <i className="fa-solid fa-bed" /> {property.beds}
+            <i className="fa-solid fa-bed" /> {property.beds || "—"}
           </span>
           <span className="flex items-center gap-1">
-            <i className="fa-solid fa-chart-area" /> {property.area}
+            <i className="fa-solid fa-chart-area" /> {property.area || "—"}
           </span>
         </div>
         <div className="flex justify-between items-center mt-4">
@@ -62,13 +76,31 @@ function PropertyCard({ property }) {
 
 export default function PropertyGrid() {
   const [gridView, setGridView] = useState(true);
-  const [activePage, setActivePage] = useState(1);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    api
+      .listProjects({ category: "residential" })
+      .then((rows) => {
+        if (active) setProperties(rows.map(toCardProps));
+      })
+      .catch((err) => active && setError(err.message))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="flex-1">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h3 className="text-sm font-semibold text-gray-600">Showing 1 – 12 of 215 Properties</h3>
+        <h3 className="text-sm font-semibold text-gray-600">
+          {loading ? "Loading..." : `Showing ${properties.length} Residential Properties`}
+        </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">Sort by:</span>
           <select className="border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32] py-1.5 pl-3 pr-8">
@@ -97,46 +129,23 @@ export default function PropertyGrid() {
         </div>
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+          Couldn't load properties: {error}
+        </div>
+      )}
+
+      {!loading && !error && properties.length === 0 && (
+        <div className="bg-white border border-gray-100 rounded-xl p-10 text-center text-sm text-gray-500">
+          No residential properties published yet.
+        </div>
+      )}
+
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {RESIDENTIAL_PROPERTIES.map((property) => (
+        {properties.map((property) => (
           <PropertyCard key={property.key} property={property} />
         ))}
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center items-center mt-12 gap-2">
-        <button
-          className="w-10 h-10 border border-gray-200 rounded-md flex items-center justify-center text-gray-400 hover:border-[#1a6b32] hover:text-[#1a6b32]"
-          aria-label="Previous page"
-        >
-          <i className="fa-solid fa-chevron-left text-xs" />
-        </button>
-        {PAGE_NUMBERS.map((num, i) =>
-          num === "…" ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-gray-400">
-              …
-            </span>
-          ) : (
-            <button
-              key={num}
-              onClick={() => setActivePage(num)}
-              className={`w-10 h-10 rounded-md flex items-center justify-center font-bold ${
-                activePage === num
-                  ? "bg-[#1a6b32] text-white"
-                  : "border border-gray-200 text-gray-600 hover:border-[#1a6b32] hover:text-[#1a6b32] font-normal"
-              }`}
-            >
-              {num}
-            </button>
-          )
-        )}
-        <button
-          className="w-10 h-10 border border-gray-200 rounded-md flex items-center justify-center text-gray-600 hover:border-[#1a6b32] hover:text-[#1a6b32]"
-          aria-label="Next page"
-        >
-          <i className="fa-solid fa-chevron-right text-xs" />
-        </button>
       </div>
     </div>
   );

@@ -1,0 +1,144 @@
+// Maps a `projects` table row (snake_case columns + a flexible `details` JSONB
+// blob) into the prop shape each category's existing detail-page components
+// expect. Keeps the detail-page components themselves unchanged.
+
+export function toResidentialDetail(row) {
+  const d = row.details || {};
+  return {
+    key: row.slug,
+    name: row.name,
+    tagline: row.tagline,
+    badge: row.badge,
+    location: row.location,
+    beds: d.beds,
+    area: row.area_display,
+    price: row.price_display,
+    priceRange: row.price_range,
+    possession: row.possession,
+    totalArea: d.totalArea,
+    totalUnits: d.totalUnits,
+    configurations: d.configurations,
+    tags: row.tags || [],
+    description: row.description,
+    overviewSummary: d.overviewSummary || row.description,
+    floorPlans: d.floorPlans || [],
+    image: row.main_image,
+  };
+}
+
+export function toCommercialDetail(row) {
+  const d = row.details || {};
+  return {
+    key: row.slug,
+    name: row.name,
+    tagline: row.tagline,
+    type: d.type,
+    badge: row.badge,
+    location: row.location,
+    area: row.area_display,
+    priceRange: row.price_range,
+    priceNote: d.priceNote,
+    possession: row.possession,
+    totalArea: d.totalArea,
+    totalUnits: d.totalUnits,
+    configurations: d.configurations,
+    tags: row.tags || [],
+    description: row.description,
+    overviewSummary: d.overviewSummary || row.description,
+    floorPlans: d.floorPlans || [],
+    whyInvest: d.whyInvest || [],
+    image: row.main_image,
+  };
+}
+
+export function toAgricultureDetail(row) {
+  const d = row.details || {};
+  return {
+    key: row.slug,
+    name: row.name,
+    tagline: row.tagline,
+    badge: row.badge,
+    location: row.location,
+    area: row.area_display,
+    price: row.price_display,
+    priceRange: row.price_range,
+    priceNote: d.priceNote,
+    soilType: d.soilType,
+    possession: row.possession,
+    tags: row.tags || [],
+    description: row.description,
+    areaOptions: d.areaOptions || [],
+    nearby: d.nearby || [],
+    whyInvest: d.whyInvest || [],
+    image: row.main_image,
+  };
+}
+
+export function toPremiumDetail(row) {
+  const d = row.details || {};
+  return {
+    key: row.slug,
+    name: row.name,
+    builder: d.builder,
+    location: row.location,
+    tags: row.tags || [],
+    price: row.price_display,
+    image: row.main_image,
+  };
+}
+
+// Card-listing shapes (simpler, used by the grid pages)
+
+export function toResidentialCard(row) {
+  return {
+    key: row.slug,
+    name: row.name,
+    image: row.main_image,
+    badge: row.badge,
+    location: row.location,
+    beds: row.details?.beds,
+    area: row.area_display,
+    price: row.price_display,
+    priceNote: null,
+  };
+}
+
+export function toCommercialCard(row) {
+  const d = row.details || {};
+  return {
+    key: row.slug,
+    name: row.name,
+    type: d.type,
+    badge: row.badge,
+    location: row.location,
+    area: row.area_display,
+    priceRange: row.price_range,
+    image: row.main_image,
+  };
+}
+
+export function toAgricultureCard(row) {
+  return {
+    key: row.slug,
+    name: row.name,
+    badge: row.badge,
+    location: row.location,
+    area: row.area_display,
+    price: row.price_display,
+    priceNote: row.details?.priceNote,
+    image: row.main_image,
+  };
+}
+
+export function toPremiumCard(row) {
+  const d = row.details || {};
+  return {
+    key: row.slug,
+    name: row.name,
+    builder: d.builder,
+    location: row.location,
+    tags: row.tags || [],
+    price: row.price_display,
+    image: row.main_image,
+  };
+}

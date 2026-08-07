@@ -4,9 +4,10 @@ Node.js + Express backend, backed by Supabase (Postgres + Auth).
 
 ## Setup
 
-1. **Run the SQL migration** — open your Supabase project's SQL Editor and run
-   `sql/001_profiles_and_admin_roles.sql` once. This creates the `profiles`
-   table that tracks who's an admin.
+1. **Run the SQL migrations**, in order, in your Supabase SQL Editor:
+   - `sql/001_profiles_and_admin_roles.sql`
+   - `sql/002_projects_and_storage.sql` — creates the `projects` table and the
+     `project-images` storage bucket.
 
 2. **Install dependencies**
    ```bash
@@ -21,7 +22,15 @@ Node.js + Express backend, backed by Supabase (Postgres + Auth).
    - `SUPABASE_SERVICE_ROLE_KEY` — server-only, never expose this to the browser
    - `SUPABASE_ANON_KEY`
 
-4. **Run the server**
+4. **Seed existing site content into Supabase** (one-time, safe to re-run):
+   ```bash
+   node scripts/seed.js
+   ```
+   This migrates the property data that was previously hardcoded in the
+   frontend's `src/data/*.js` files into the `projects` table, so the site
+   doesn't lose any content when it switches to fetching live data.
+
+5. **Run the server**
    ```bash
    npm run dev
    ```
@@ -45,12 +54,34 @@ Node.js + Express backend, backed by Supabase (Postgres + Auth).
 
 ## Current endpoints
 
+Public (no auth):
 - `GET /api/health` — health check
-- `GET /api/auth/me` — returns the current admin's id/email/role if the
-  request has a valid admin session token, else 401/403
+- `GET /api/projects?category=residential&sector=Sector%2082` — list published
+  projects, optionally filtered by category and/or sector
+- `GET /api/projects/:category/:slug` — a single published project (powers
+  the detail pages)
+- `GET /api/projects/sectors` — distinct list of sectors with published
+  projects (powers the homepage's location filter)
 
-Project CRUD endpoints (list/create/update/delete properties per category,
-description editor content) come in the next step.
+Admin (require a valid admin session token):
+- `GET /api/auth/me` — confirms the session + admin role
+- `GET /api/admin/projects?category=residential` — list all projects (incl.
+  drafts) for the admin dashboard
+- `GET /api/admin/projects/:id` — single project by id
+- `POST /api/admin/projects` — create
+- `PUT /api/admin/projects/:id` — update
+- `DELETE /api/admin/projects/:id` — delete
+- `POST /api/admin/upload` — upload an image (multipart, field name `image`),
+  returns its public URL in Supabase Storage
+
+## Data model
+
+Rather than a separate table per category, `projects` has a small set of
+shared columns (name, location, price, images, etc.) plus a flexible
+`details` JSONB column for whatever's specific to that category — floor
+plans, soil type, "why invest" bullets, and so on. See
+`sql/002_projects_and_storage.sql` and `src/lib/adapters.js` (frontend) for
+the exact shape each category's detail page expects.
 
 ## Security notes
 
