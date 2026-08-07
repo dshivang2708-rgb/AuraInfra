@@ -7,21 +7,41 @@ export default function AdminSignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false);
+  const [resendStatus, setResendStatus] = useState("idle"); // idle | sending | sent
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setUnconfirmed(false);
+    setResendStatus("idle");
     setLoading(true);
 
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     setLoading(false);
     if (signInError) {
+      // Supabase returns this specific message when the account exists but
+      // the confirmation link hasn't been clicked yet.
+      if (signInError.message?.toLowerCase().includes("email not confirmed")) {
+        setUnconfirmed(true);
+      }
       setError(signInError.message);
       return;
     }
     navigate({ to: "/admin/dashboard" });
+  };
+
+  const handleResend = async () => {
+    setResendStatus("sending");
+    const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
+    if (resendError) {
+      setError(resendError.message);
+      setResendStatus("idle");
+      return;
+    }
+    setResendStatus("sent");
   };
 
   return (
@@ -35,6 +55,22 @@ export default function AdminSignIn() {
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
             {error}
+            {unconfirmed && (
+              <div className="mt-2">
+                {resendStatus === "sent" ? (
+                  <p className="text-green-700 text-sm">Confirmation email resent — check your inbox (and spam folder).</p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendStatus === "sending"}
+                    className="text-red-800 font-semibold underline text-sm disabled:opacity-60"
+                  >
+                    {resendStatus === "sending" ? "Resending..." : "Resend confirmation email"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 

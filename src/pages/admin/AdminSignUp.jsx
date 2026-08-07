@@ -39,6 +39,17 @@ export default function AdminSignUp() {
             Note: new accounts don't have admin access by default. An existing admin needs to grant it to
             you separately.
           </p>
+          <p className="text-xs text-[#75777f] mb-6">
+            Didn't get it within a minute? Check spam, or{" "}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="text-[#1a6b32] font-semibold hover:underline"
+            >
+              try sending again
+            </button>
+            .
+          </p>
           <Link to="/admin/login" className="text-[#1a6b32] font-semibold hover:underline text-sm">
             Go to Sign In
           </Link>
