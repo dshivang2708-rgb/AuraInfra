@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.routes.js";
 import projectsRoutes from "./routes/projects.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import enquiriesRoutes from "./routes/enquiries.routes.js";
+import contactRoutes from "./routes/contact.routes.js";
 
 dotenv.config();
 
@@ -55,6 +56,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/enquiries", enquiryLimiter, enquiriesRoutes);
+app.use("/api/contact", enquiryLimiter, contactRoutes);
 
 // Fallback error handler
 app.use((err, req, res, next) => {

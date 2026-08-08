@@ -45,6 +45,9 @@ export const api = {
   // "Enquire About This Project" forms — public, no auth required.
   submitEnquiry: (payload) => request("/api/enquiries", { method: "POST", body: payload }),
 
+  // "Send Us a Message" contact page form — public, no auth required.
+  submitContactMessage: (payload) => request("/api/contact", { method: "POST", body: payload }),
+
   // Admin — all require an authenticated admin session
   adminListProjects: (category) =>
     request(`/api/admin/projects${category ? `?category=${category}` : ""}`, { auth: true }),

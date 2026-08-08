@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { api } from "../../lib/api.js";
 
 const CONTACT_CARDS = [
   {
@@ -19,16 +20,28 @@ const SOCIAL_ICONS = ["public", "photo_camera", "work", "smart_display"];
 
 const SUBJECTS = ["Property Inquiry", "Business Partnership", "Legal Support", "Other"];
 
-export default function ConnectSection() {
-  const [status, setStatus] = useState("idle"); // idle | sending | sent
+const EMPTY_FORM = { name: "", phone: "", email: "", subject: "", message: "" };
 
-  const handleSubmit = (e) => {
+export default function ConnectSection() {
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleChange = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("sending");
-    setTimeout(() => {
+    setErrorMsg("");
+    try {
+      await api.submitContactMessage(form);
       setStatus("sent");
-      setTimeout(() => setStatus("idle"), 2000);
-    }, 1200);
+      setForm(EMPTY_FORM);
+      setTimeout(() => setStatus("idle"), 3000);
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err.message || "Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -102,6 +115,8 @@ export default function ConnectSection() {
                     className="w-full px-3 py-2 rounded-lg border border-[#c5c6cf] bg-[#f9f9ff] focus:ring-2 focus:ring-[#005ac1]/20 focus:border-[#005ac1] outline-none transition-all placeholder:text-[#75777f] text-sm"
                     placeholder="Enter your full name"
                     type="text"
+                    value={form.name}
+                    onChange={handleChange("name")}
                     required
                   />
                 </div>
@@ -113,6 +128,8 @@ export default function ConnectSection() {
                     className="w-full px-3 py-2 rounded-lg border border-[#c5c6cf] bg-[#f9f9ff] focus:ring-2 focus:ring-[#005ac1]/20 focus:border-[#005ac1] outline-none transition-all placeholder:text-[#75777f] text-sm"
                     placeholder="Enter your phone number"
                     type="tel"
+                    value={form.phone}
+                    onChange={handleChange("phone")}
                     required
                   />
                 </div>
@@ -127,6 +144,8 @@ export default function ConnectSection() {
                     className="w-full px-3 py-2 rounded-lg border border-[#c5c6cf] bg-[#f9f9ff] focus:ring-2 focus:ring-[#005ac1]/20 focus:border-[#005ac1] outline-none transition-all placeholder:text-[#75777f] text-sm"
                     placeholder="Enter your email address"
                     type="email"
+                    value={form.email}
+                    onChange={handleChange("email")}
                     required
                   />
                 </div>
@@ -136,14 +155,17 @@ export default function ConnectSection() {
                   </label>
                   <select
                     className="w-full px-3 py-2 rounded-lg border border-[#c5c6cf] bg-[#f9f9ff] focus:ring-2 focus:ring-[#005ac1]/20 focus:border-[#005ac1] outline-none transition-all text-sm"
-                    defaultValue=""
+                    value={form.subject}
+                    onChange={handleChange("subject")}
                     required
                   >
                     <option disabled value="">
                       Select a subject
                     </option>
                     {SUBJECTS.map((subject) => (
-                      <option key={subject}>{subject}</option>
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -157,6 +179,8 @@ export default function ConnectSection() {
                   className="w-full px-3 py-2 rounded-lg border border-[#c5c6cf] bg-[#f9f9ff] focus:ring-2 focus:ring-[#005ac1]/20 focus:border-[#005ac1] outline-none transition-all placeholder:text-[#75777f] text-sm resize-none"
                   placeholder="Type your message here..."
                   rows={4}
+                  value={form.message}
+                  onChange={handleChange("message")}
                   required
                 />
               </div>
@@ -181,11 +205,13 @@ export default function ConnectSection() {
                 </label>
               </div>
 
+              {status === "error" && <p className="text-sm text-[#ba1a1a]">{errorMsg}</p>}
+
               <div className="flex justify-end">
                 <button
                   className="bg-[#1e2d4d] text-white px-6 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-[#071837] transition-all shadow-md active:scale-95 disabled:opacity-70"
                   type="submit"
-                  disabled={status !== "idle"}
+                  disabled={status === "sending"}
                 >
                   {status === "idle" && (
                     <>
@@ -203,6 +229,12 @@ export default function ConnectSection() {
                     <>
                       <span className="material-symbols-outlined text-[20px]">check_circle</span>
                       Sent!
+                    </>
+                  )}
+                  {status === "error" && (
+                    <>
+                      Try Again
+                      <span className="material-symbols-outlined text-[20px]">send</span>
                     </>
                   )}
                 </button>
