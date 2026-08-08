@@ -179,6 +179,7 @@ export async function createProject(req, res) {
       possession: body.possession ?? null,
       description: body.description ?? null,
       main_image: body.main_image ?? null,
+      main_images: body.main_images ?? [],
       gallery_images: body.gallery_images ?? [],
       tags: body.tags ?? [],
       details: body.details ?? {},
@@ -208,7 +209,7 @@ export async function updateProject(req, res) {
   const updatable = [
     "category", "slug", "name", "tagline", "badge", "location", "city", "sector",
     "price_display", "price_range", "area_display", "possession", "description",
-    "main_image", "gallery_images", "tags", "details", "is_published",
+    "main_image", "main_images", "gallery_images", "tags", "details", "is_published",
   ];
   const updates = {};
   for (const key of updatable) {

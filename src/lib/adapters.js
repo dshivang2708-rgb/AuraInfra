@@ -54,6 +54,7 @@ export function toCommercialDetail(row) {
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],
     image: row.main_image,
+    images: row.main_images?.length ? row.main_images : row.main_image ? [row.main_image] : [],
   };
 }
 

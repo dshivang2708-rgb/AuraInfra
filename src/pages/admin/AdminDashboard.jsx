@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useAdminAuth } from "../../context/AdminAuthContext.jsx";
 import RequireAdmin from "../../components/admin/RequireAdmin.jsx";
 import AdminProjectForm from "./AdminProjectForm.jsx";
+import ResidentialProjectForm from "./forms/ResidentialProjectForm.jsx";
+import CommercialProjectForm from "./forms/CommercialProjectForm.jsx";
+import AgricultureProjectForm from "./forms/AgricultureProjectForm.jsx";
 import { api } from "../../lib/api.js";
 
 const CATEGORIES = [
@@ -10,6 +13,21 @@ const CATEGORIES = [
   { key: "agriculture", label: "Agriculture" },
   { key: "premium", label: "Premium" },
 ];
+
+// Residential, Commercial, and Agriculture each have their own dedicated form
+// component (see ./forms/). Premium still uses the original generic form.
+function formComponentFor(category) {
+  switch (category) {
+    case "residential":
+      return ResidentialProjectForm;
+    case "commercial":
+      return CommercialProjectForm;
+    case "agriculture":
+      return AgricultureProjectForm;
+    default:
+      return AdminProjectForm;
+  }
+}
 
 function ProjectsManager() {
   const { profile, signOut } = useAdminAuth();
@@ -168,10 +186,15 @@ function ProjectsManager() {
             >
               <span className="material-symbols-outlined text-base">arrow_back</span> Back to list
             </button>
-            <AdminProjectForm
-              onSaved={() => setView({ mode: "list" })}
-              onCancel={() => setView({ mode: "list" })}
-            />
+            {(() => {
+              const FormComponent = formComponentFor(category);
+              return (
+                <FormComponent
+                  onSaved={() => setView({ mode: "list" })}
+                  onCancel={() => setView({ mode: "list" })}
+                />
+              );
+            })()}
           </>
         )}
 
@@ -183,11 +206,16 @@ function ProjectsManager() {
             >
               <span className="material-symbols-outlined text-base">arrow_back</span> Back to list
             </button>
-            <AdminProjectForm
-              project={view.project}
-              onSaved={() => setView({ mode: "list" })}
-              onCancel={() => setView({ mode: "list" })}
-            />
+            {(() => {
+              const FormComponent = formComponentFor(view.project.category);
+              return (
+                <FormComponent
+                  project={view.project}
+                  onSaved={() => setView({ mode: "list" })}
+                  onCancel={() => setView({ mode: "list" })}
+                />
+              );
+            })()}
           </>
         )}
       </div>
