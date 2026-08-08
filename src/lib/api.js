@@ -42,6 +42,9 @@ export const api = {
   },
   listCities: () => request("/api/projects/cities"),
 
+  // "Enquire About This Project" forms — public, no auth required.
+  submitEnquiry: (payload) => request("/api/enquiries", { method: "POST", body: payload }),
+
   // Admin — all require an authenticated admin session
   adminListProjects: (category) =>
     request(`/api/admin/projects${category ? `?category=${category}` : ""}`, { auth: true }),

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import PageNavbar from "../components/PageNavbar.jsx";
+import EnquiryForm from "../components/EnquiryForm.jsx";
 import { api } from "../lib/api.js";
 import { toPremiumDetail } from "../lib/adapters.js";
 
@@ -17,7 +18,6 @@ export default function PremiumProjectDetail() {
   const { slug } = useParams({ strict: false });
   const [project, setProject] = useState(null);
   const [loadStatus, setLoadStatus] = useState("loading");
-  const [status, setStatus] = useState("idle");
 
   useEffect(() => {
     let active = true;
@@ -61,15 +61,6 @@ export default function PremiumProjectDetail() {
   }
 
   const description = `${project.name} by ${project.builder} offers premium residences in ${project.location}, combining thoughtful design, quality construction, and a full suite of modern amenities.`;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus("sending");
-    setTimeout(() => {
-      setStatus("sent");
-      setTimeout(() => setStatus("idle"), 2500);
-    }, 1000);
-  };
 
   return (
     <>
@@ -162,20 +153,15 @@ export default function PremiumProjectDetail() {
 
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Enquire About This Project</h3>
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <input className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]" placeholder="Your Name" type="text" required />
-                  <input className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]" placeholder="Phone Number" type="tel" required />
-                  <input className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]" placeholder="Email Address" type="email" required />
-                  <button
-                    className="w-full bg-[#1a6b32] hover:bg-[#145126] text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-70"
-                    type="submit"
-                    disabled={status !== "idle"}
-                  >
-                    {status === "idle" && "Send Enquiry"}
-                    {status === "sending" && "Sending..."}
-                    {status === "sent" && "Enquiry Sent!"}
-                  </button>
-                </form>
+                <EnquiryForm
+                  projectName={project.name}
+                  projectSlug={project.key}
+                  category="premium"
+                  inputClassName="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                  textareaClassName="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                  buttonClassName="w-full bg-[#1a6b32] hover:bg-[#145126] text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-70"
+                  footNoteClassName="text-xs text-center text-gray-500 mt-2"
+                />
               </div>
             </aside>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import EnquiryForm from "../EnquiryForm.jsx";
 
 const PRICE_CHECKLIST = [
   "RERA Approved",
@@ -8,17 +8,6 @@ const PRICE_CHECKLIST = [
 ];
 
 export default function PricingSidebar({ property }) {
-  const [status, setStatus] = useState("idle");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus("sending");
-    setTimeout(() => {
-      setStatus("sent");
-      setTimeout(() => setStatus("idle"), 2500);
-    }, 1000);
-  };
-
   return (
     <div className="space-y-6">
       {/* Pricing Sidebar */}
@@ -37,10 +26,10 @@ export default function PricingSidebar({ property }) {
         </button>
         <div className="text-center">
           <p className="text-xs text-gray-500 mb-1">Or Call Us</p>
-          <a
+          
             className="text-lg font-bold text-[#1a6b32] flex items-center justify-center gap-2"
             href="tel:+919876543210"
-          >
+          <a>
             <i className="fa-solid fa-phone" /> +91 98765 43210
           </a>
         </div>
@@ -49,47 +38,17 @@ export default function PricingSidebar({ property }) {
       {/* Contact Form Sidebar */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Enquire About This Project</h3>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-            placeholder="Your Name"
-            type="text"
-            required
-          />
-          <input
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-            placeholder="Phone Number"
-            type="tel"
-            required
-          />
-          <input
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-            placeholder="Email Address"
-            type="email"
-            required
-          />
-          <select className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm text-gray-500 focus:ring-[#1a6b32] focus:border-[#1a6b32]">
-            <option>I'm interested in</option>
-            {property.floorPlans.map((plan) => (
-              <option key={plan.type}>{plan.type}</option>
-            ))}
-          </select>
-          <textarea
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-            placeholder="Message"
-            rows={3}
-          />
-          <button
-            className="w-full bg-[#1a6b32] text-white py-3 rounded-md font-medium hover:bg-green-700 transition disabled:opacity-70"
-            type="submit"
-            disabled={status !== "idle"}
-          >
-            {status === "idle" && "Send Enquiry"}
-            {status === "sending" && "Sending..."}
-            {status === "sent" && "Enquiry Sent!"}
-          </button>
-          <p className="text-xs text-center text-gray-500 mt-2">Our team will get in touch with you shortly.</p>
-        </form>
+        <EnquiryForm
+          projectName={property.name}
+          projectSlug={property.key}
+          category="residential"
+          interestOptions={property.floorPlans.map((plan) => plan.type)}
+          inputClassName="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          selectClassName="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm text-gray-500 focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          textareaClassName="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          buttonClassName="w-full bg-[#1a6b32] text-white py-3 rounded-md font-medium hover:bg-green-700 transition disabled:opacity-70"
+          footNoteClassName="text-xs text-center text-gray-500 mt-2"
+        />
       </div>
     </div>
   );

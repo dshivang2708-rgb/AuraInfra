@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
 import projectsRoutes from "./routes/projects.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import enquiriesRoutes from "./routes/enquiries.routes.js";
 
 dotenv.config();
 
@@ -36,6 +37,16 @@ app.use(
   })
 );
 
+// Enquiry submissions send real emails (limited daily quota on Resend), so
+// they get a tighter limit than the general API traffic above.
+const enquiryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many enquiries submitted. Please wait a while before trying again." },
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
@@ -43,6 +54,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/enquiries", enquiryLimiter, enquiriesRoutes);
 
 // Fallback error handler
 app.use((err, req, res, next) => {
