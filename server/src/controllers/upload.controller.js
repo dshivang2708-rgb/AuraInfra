@@ -2,8 +2,8 @@ import { randomUUID } from "crypto";
 import { supabaseAdmin } from "../config/supabaseAdmin.js";
 
 const BUCKET = "project-images";
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "application/pdf"];
+const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20MB — covers brochure PDFs as well as images
 
 export async function uploadImage(req, res) {
   const file = req.file;

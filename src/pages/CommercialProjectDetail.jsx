@@ -7,6 +7,10 @@ import ProjectOverview from "../components/commercial-detail/ProjectOverview.jsx
 import FloorPlans from "../components/commercial-detail/FloorPlans.jsx";
 import Amenities from "../components/commercial-detail/Amenities.jsx";
 import WhyThisProject from "../components/commercial-detail/WhyThisProject.jsx";
+import LocationSection from "../components/commercial-detail/LocationSection.jsx";
+import GallerySection from "../components/commercial-detail/GallerySection.jsx";
+import DeveloperSection from "../components/commercial-detail/DeveloperSection.jsx";
+import FAQsSection from "../components/commercial-detail/FAQsSection.jsx";
 import PricingSidebar from "../components/commercial-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toCommercialDetail } from "../lib/adapters.js";
@@ -96,11 +100,10 @@ export default function CommercialProjectDetail() {
               )}
               {activeTab === "Amenities" && <Amenities />}
               {activeTab === "Floor Plans" && <FloorPlans property={property} />}
-              {!["Overview", "Amenities", "Floor Plans"].includes(activeTab) && (
-                <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-gray-500">
-                  {activeTab} details coming soon — reach out to us for the full breakdown.
-                </div>
-              )}
+              {activeTab === "Location" && <LocationSection property={property} />}
+              {activeTab === "Gallery" && <GallerySection property={property} />}
+              {activeTab === "Developer" && <DeveloperSection />}
+              {activeTab === "FAQs" && <FAQsSection property={property} />}
             </div>
 
             {/* Right column */}

@@ -6,6 +6,10 @@ import TabsNav from "../components/residential-detail/TabsNav.jsx";
 import ProjectOverview from "../components/residential-detail/ProjectOverview.jsx";
 import FloorPlans from "../components/residential-detail/FloorPlans.jsx";
 import Amenities from "../components/residential-detail/Amenities.jsx";
+import LocationSection from "../components/residential-detail/LocationSection.jsx";
+import GallerySection from "../components/residential-detail/GallerySection.jsx";
+import DeveloperSection from "../components/residential-detail/DeveloperSection.jsx";
+import FAQsSection from "../components/residential-detail/FAQsSection.jsx";
 import PricingSidebar from "../components/residential-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toResidentialDetail } from "../lib/adapters.js";
@@ -94,11 +98,10 @@ export default function ResidentialProjectDetail() {
               )}
               {activeTab === "Amenities" && <Amenities />}
               {activeTab === "Floor Plans" && <FloorPlans property={property} />}
-              {!["Overview", "Amenities", "Floor Plans"].includes(activeTab) && (
-                <div className="bg-white rounded-xl shadow-sm p-6 text-center text-sm text-gray-500">
-                  {activeTab} details coming soon — reach out to us for the full breakdown.
-                </div>
-              )}
+              {activeTab === "Location" && <LocationSection property={property} />}
+              {activeTab === "Gallery" && <GallerySection property={property} />}
+              {activeTab === "Developer" && <DeveloperSection />}
+              {activeTab === "FAQs" && <FAQsSection property={property} />}
             </div>
 
             {/* Right column */}

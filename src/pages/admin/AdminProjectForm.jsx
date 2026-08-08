@@ -9,8 +9,7 @@ const DETAILS_PLACEHOLDER = {
   "totalArea": "5.8 Acres",
   "totalUnits": "280+",
   "configurations": "2 BHK, 3 BHK, 4 BHK",
-  "overviewSummary": "A short paragraph for the Overview tab...",
-  "floorPlans": [{ "type": "2 BHK", "area": "1200 Sq.ft" }]
+  "overviewSummary": "A short paragraph for the Overview tab..."
 }`,
   commercial: `{
   "type": "Office Space",
@@ -32,6 +31,12 @@ const DETAILS_PLACEHOLDER = {
 }`,
 };
 
+const DEFAULT_FLOOR_PLANS = () => [
+  { type: "2 BHK", area: "", image: "" },
+  { type: "3 BHK", area: "", image: "" },
+  { type: "4 BHK", area: "", image: "" },
+];
+
 const emptyForm = {
   category: "residential",
   slug: "",
@@ -50,20 +55,43 @@ const emptyForm = {
   gallery_images: [],
   tagsText: "",
   detailsText: "",
+  brochureUrl: "",
+  faqs: [],
+  floorPlans: DEFAULT_FLOOR_PLANS(),
   is_published: true,
 };
 
+// brochureUrl / faqs / (residential) floorPlans are managed by their own
+// dedicated controls now, so strip them out of the raw JSON textarea to
+// avoid editing the same data in two places at once.
+function detailsTextFor(details, category) {
+  if (!details) return "";
+  const { brochureUrl, faqs, floorPlans, ...rest } = details;
+  if (category !== "residential" && floorPlans) rest.floorPlans = floorPlans;
+  return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
+}
+
 export default function AdminProjectForm({ project, onSaved, onCancel }) {
-  const [form, setForm] = useState(() =>
-    project
-      ? {
-          ...emptyForm,
-          ...project,
-          tagsText: Array.isArray(project.tags) ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ") : "",
-          detailsText: project.details ? JSON.stringify(project.details, null, 2) : "",
-        }
-      : emptyForm
-  );
+  const [form, setForm] = useState(() => {
+    if (!project) return emptyForm;
+    const d = project.details || {};
+    return {
+      ...emptyForm,
+      ...project,
+      tagsText: Array.isArray(project.tags)
+        ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ")
+        : "",
+      detailsText: detailsTextFor(project.details, project.category),
+      brochureUrl: d.brochureUrl || "",
+      faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
+      floorPlans:
+        project.category === "residential"
+          ? Array.isArray(d.floorPlans) && d.floorPlans.length
+            ? d.floorPlans
+            : DEFAULT_FLOOR_PLANS()
+          : [],
+    };
+  });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -108,6 +136,71 @@ export default function AdminProjectForm({ project, onSaved, onCancel }) {
     update("gallery_images", form.gallery_images.filter((g) => g !== url));
   };
 
+  const handleBrochureUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      setError("Brochure must be a PDF file.");
+      return;
+    }
+    setUploading(true);
+    setError("");
+    try {
+      const { url } = await api.adminUploadFile(file);
+      update("brochureUrl", url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ---- Floor plans (residential only, uploaded one BHK type at a time) ----
+
+  const updateFloorPlan = (index, key, value) => {
+    setForm((f) => {
+      const next = [...f.floorPlans];
+      next[index] = { ...next[index], [key]: value };
+      return { ...f, floorPlans: next };
+    });
+  };
+
+  const handleFloorPlanImageUpload = async (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const { url } = await api.adminUploadImage(file);
+      updateFloorPlan(index, "image", url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const addFloorPlanRow = () => {
+    setForm((f) => ({ ...f, floorPlans: [...f.floorPlans, { type: "", area: "", image: "" }] }));
+  };
+
+  const removeFloorPlanRow = (index) => {
+    setForm((f) => ({ ...f, floorPlans: f.floorPlans.filter((_, i) => i !== index) }));
+  };
+
+  // ---- FAQs ----
+
+  const updateFaq = (index, key, value) => {
+    setForm((f) => {
+      const next = [...f.faqs];
+      next[index] = { ...next[index], [key]: value };
+      return { ...f, faqs: next };
+    });
+  };
+
+  const addFaq = () => setForm((f) => ({ ...f, faqs: [...f.faqs, { question: "", answer: "" }] }));
+  const removeFaq = (index) => setForm((f) => ({ ...f, faqs: f.faqs.filter((_, i) => i !== index) }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -120,6 +213,20 @@ export default function AdminProjectForm({ project, onSaved, onCancel }) {
         setError("Additional Details must be valid JSON — check the syntax.");
         return;
       }
+    }
+
+    if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
+
+    const cleanFaqs = form.faqs
+      .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
+      .filter((f) => f.question && f.answer);
+    if (cleanFaqs.length) details.faqs = cleanFaqs;
+
+    if (form.category === "residential") {
+      const cleanFloorPlans = form.floorPlans
+        .map((fp) => ({ type: fp.type.trim(), area: fp.area.trim(), image: fp.image }))
+        .filter((fp) => fp.type && fp.image);
+      if (cleanFloorPlans.length) details.floorPlans = cleanFloorPlans;
     }
 
     const tags = form.tagsText
@@ -175,7 +282,14 @@ export default function AdminProjectForm({ project, onSaved, onCancel }) {
           <select
             className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
             value={form.category}
-            onChange={(e) => update("category", e.target.value)}
+            onChange={(e) => {
+              const category = e.target.value;
+              setForm((f) => ({
+                ...f,
+                category,
+                floorPlans: category === "residential" && f.floorPlans.length === 0 ? DEFAULT_FLOOR_PLANS() : f.floorPlans,
+              }));
+            }}
             disabled={!!project}
           >
             {CATEGORIES.map((c) => (
@@ -338,6 +452,30 @@ export default function AdminProjectForm({ project, onSaved, onCancel }) {
         </div>
       </div>
 
+      {/* Brochure — PDF upload */}
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Project Brochure (PDF)</label>
+        <div className="flex items-center gap-4">
+          {form.brochureUrl && (
+            <a
+              href={form.brochureUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-[#1a6b32] border border-[#c5c6cf] rounded-lg px-3 py-2"
+            >
+              <i className="fa-solid fa-file-pdf" /> View current brochure
+            </a>
+          )}
+          <label className="cursor-pointer text-sm font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-4 py-2 hover:bg-[#eaf4ef] transition-colors">
+            {uploading ? "Uploading..." : form.brochureUrl ? "Replace Brochure" : "Upload Brochure"}
+            <input type="file" accept="application/pdf" className="hidden" onChange={handleBrochureUpload} disabled={uploading} />
+          </label>
+        </div>
+        <p className="text-[10px] text-[#75777f] mt-1">
+          Powers the "Download Brochure" button on the project's detail page.
+        </p>
+      </div>
+
       {/* Gallery images — multi upload */}
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Gallery Images</label>
@@ -360,6 +498,104 @@ export default function AdminProjectForm({ project, onSaved, onCancel }) {
           {uploading ? "Uploading..." : "Add Gallery Images"}
           <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryUpload} disabled={uploading} />
         </label>
+        <p className="text-[10px] text-[#75777f] mt-1">Powers the "Gallery" tab on the project's detail page.</p>
+      </div>
+
+      {/* Floor Plans — residential only, uploaded one BHK type at a time */}
+      {form.category === "residential" && (
+        <div>
+          <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Floor Plans (by BHK)</label>
+          <p className="text-[10px] text-[#75777f] mb-3">
+            Upload one floor plan image per configuration — e.g. 2 BHK, 3 BHK, 4 BHK. Powers the "Floor Plans" tab.
+          </p>
+          <div className="space-y-3">
+            {form.floorPlans.map((plan, index) => (
+              <div
+                key={index}
+                className="flex flex-col sm:flex-row sm:items-center gap-3 border border-[#c5c6cf] rounded-lg p-3"
+              >
+                <input
+                  className="w-full sm:w-32 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                  value={plan.type}
+                  onChange={(e) => updateFloorPlan(index, "type", e.target.value)}
+                  placeholder="e.g. 2 BHK"
+                />
+                <input
+                  className="w-full sm:w-36 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                  value={plan.area}
+                  onChange={(e) => updateFloorPlan(index, "area", e.target.value)}
+                  placeholder="e.g. 1200 Sq.ft"
+                />
+                <div className="flex items-center gap-3 flex-1">
+                  {plan.image && (
+                    <img src={plan.image} alt={plan.type} className="w-14 h-14 object-cover rounded-lg border border-[#c5c6cf]" />
+                  )}
+                  <label className="cursor-pointer text-xs font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-3 py-2 hover:bg-[#eaf4ef] transition-colors whitespace-nowrap">
+                    {plan.image ? "Replace Image" : "Upload Image"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFloorPlanImageUpload(index, e)}
+                      disabled={uploading}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => removeFloorPlanRow(index)}
+                    className="text-[#ba1a1a] text-xs font-semibold ml-auto"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addFloorPlanRow}
+            className="mt-3 text-sm font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-4 py-2 hover:bg-[#eaf4ef] transition-colors"
+          >
+            + Add Another Configuration
+          </button>
+        </div>
+      )}
+
+      {/* FAQs */}
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">FAQs</label>
+        <p className="text-[10px] text-[#75777f] mb-3">Powers the "FAQs" tab on the project's detail page.</p>
+        <div className="space-y-3">
+          {form.faqs.map((faq, index) => (
+            <div key={index} className="border border-[#c5c6cf] rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  className="flex-1 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                  value={faq.question}
+                  onChange={(e) => updateFaq(index, "question", e.target.value)}
+                  placeholder="Question"
+                />
+                <button type="button" onClick={() => removeFaq(index)} className="text-[#ba1a1a] text-xs font-semibold">
+                  Remove
+                </button>
+              </div>
+              <textarea
+                className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                rows={2}
+                value={faq.answer}
+                onChange={(e) => updateFaq(index, "answer", e.target.value)}
+                placeholder="Answer"
+              />
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addFaq}
+          className="mt-3 text-sm font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-4 py-2 hover:bg-[#eaf4ef] transition-colors"
+        >
+          + Add FAQ
+        </button>
       </div>
 
       {/* Category-specific extras */}
@@ -376,6 +612,7 @@ export default function AdminProjectForm({ project, onSaved, onCancel }) {
         />
         <p className="text-[10px] text-[#75777f] mt-1">
           Leave blank to skip. Expected fields for "{form.category}" shown as placeholder above.
+          {form.category === "residential" && " Floor plans, brochure and FAQs are managed by the dedicated fields above — no need to repeat them here."}
         </p>
       </div>
 

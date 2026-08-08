@@ -56,4 +56,11 @@ export const api = {
     formData.append("image", file);
     return request("/api/admin/upload", { method: "POST", body: formData, auth: true, isFormData: true });
   },
+
+  // Same endpoint — the backend now accepts PDFs too (brochures) alongside images.
+  async adminUploadFile(file) {
+    const formData = new FormData();
+    formData.append("image", file);
+    return request("/api/admin/upload", { method: "POST", body: formData, auth: true, isFormData: true });
+  },
 };

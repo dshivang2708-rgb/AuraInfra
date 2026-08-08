@@ -22,6 +22,9 @@ export function toResidentialDetail(row) {
     description: row.description,
     overviewSummary: d.overviewSummary || row.description,
     floorPlans: d.floorPlans || [],
+    gallery: row.gallery_images || [],
+    brochureUrl: d.brochureUrl || null,
+    faqs: d.faqs || [],
     image: row.main_image,
   };
 }
@@ -47,6 +50,9 @@ export function toCommercialDetail(row) {
     overviewSummary: d.overviewSummary || row.description,
     floorPlans: d.floorPlans || [],
     whyInvest: d.whyInvest || [],
+    gallery: row.gallery_images || [],
+    brochureUrl: d.brochureUrl || null,
+    faqs: d.faqs || [],
     image: row.main_image,
   };
 }
@@ -70,6 +76,9 @@ export function toAgricultureDetail(row) {
     areaOptions: d.areaOptions || [],
     nearby: d.nearby || [],
     whyInvest: d.whyInvest || [],
+    gallery: row.gallery_images || [],
+    brochureUrl: d.brochureUrl || null,
+    faqs: d.faqs || [],
     image: row.main_image,
   };
 }
@@ -83,6 +92,9 @@ export function toPremiumDetail(row) {
     location: row.location,
     tags: row.tags || [],
     price: row.price_display,
+    gallery: row.gallery_images || [],
+    brochureUrl: d.brochureUrl || null,
+    faqs: d.faqs || [],
     image: row.main_image,
   };
 }

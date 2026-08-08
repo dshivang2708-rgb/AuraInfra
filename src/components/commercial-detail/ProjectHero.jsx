@@ -51,9 +51,25 @@ export default function ProjectHero({ property }) {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button className="flex-1 bg-[#006D32] hover:bg-[#005a29] text-white text-sm font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <i className="fa-solid fa-download" /> Download Brochure
-          </button>
+          {property.brochureUrl ? (
+            <a
+              href={property.brochureUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 bg-[#006D32] hover:bg-[#005a29] text-white text-sm font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <i className="fa-solid fa-download" /> Download Brochure
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="flex-1 bg-gray-200 text-gray-400 text-sm font-semibold py-3 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+              title="Brochure not uploaded yet"
+            >
+              <i className="fa-solid fa-download" /> Brochure Unavailable
+            </button>
+          )}
           <button className="flex-1 border border-[#006D32] text-[#006D32] hover:bg-[#E6F4EC] text-sm font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
             <i className="fa-regular fa-calendar-check" /> Schedule Site Visit
           </button>
