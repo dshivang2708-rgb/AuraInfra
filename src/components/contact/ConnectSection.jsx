@@ -4,25 +4,15 @@ const CONTACT_CARDS = [
   {
     icon: "location_on",
     title: "Visit Our Office",
-    lines: ["Aura Infra Private Limited", "Sector 82, Mohali, Punjab 140306, India"],
+    lines: ["SCO 16, 1st Floor, Sector 82-A, JLPL, SAS Nagar, Mohali, Punjab  140306 India"],
   },
-  {
-    icon: "call",
-    title: "Call Us",
-    lines: ["+91 98765 43210"],
-    note: "Mon - Sat: 9:00 AM - 7:00 PM",
-  },
+  
   {
     icon: "mail",
     title: "Email Us",
-    lines: ["info@aurainfra.com", "support@aurainfra.com"],
+    lines: ["aurainfraadmin@gmail.com"],
   },
-  {
-    icon: "chat",
-    title: "WhatsApp Us",
-    lines: ["+91 98765 43210"],
-    note: "Chat with us on WhatsApp",
-  },
+  
 ];
 
 const SOCIAL_ICONS = ["public", "photo_camera", "work", "smart_display"];

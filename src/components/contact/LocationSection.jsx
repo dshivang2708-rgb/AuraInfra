@@ -59,7 +59,7 @@ export default function LocationSection() {
                   <p className="text-xs font-bold mb-0.5 text-[#151c27]">Google Maps</p>
                   <a
                     className="inline-flex items-center gap-1 text-[#071837] text-xs font-semibold hover:text-[#005ac1] transition-colors group"
-                    href="https://www.google.com/maps/search/?api=1&query=Sector+82,+Mohali,+Punjab+140306,+India"
+                    href="https://maps.app.goo.gl/gtAs5w5BsuDZ3j7y5"
                     target="_blank"
                     rel="noreferrer"
                   >

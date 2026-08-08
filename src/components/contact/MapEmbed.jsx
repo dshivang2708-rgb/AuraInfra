@@ -3,7 +3,10 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 // Approximate coordinates for Sector 82, Mohali, Punjab — adjust if you have the exact address pin.
-const OFFICE_LOCATION = { lat: 30.6942, lng: 76.7304 };
+const OFFICE_LOCATION = {
+  lat: 30.6491102,
+  lng: 76.7394671,
+};
 
 const PIN_ICON = L.divIcon({
   className: "",

@@ -33,7 +33,7 @@ export default function PageNavbar() {
       <div className="max-w-[1440px] mx-auto px-8 h-full flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <img src={LOGO_IMAGE} alt="Aura Infra Logo" className="h-9 w-auto object-contain" />
+          <img src={LOGO_IMAGE} alt="Aura Infra Logo" className="h-14 w-auto object-contain" />
         </Link>
 
         {/* Nav links */}
