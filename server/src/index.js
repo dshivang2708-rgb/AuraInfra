@@ -15,14 +15,30 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+
+// CLIENT_ORIGIN supports a comma-separated list, e.g.:
+// "https://aurainfra.co.in,https://www.aurainfra.co.in,https://aura-infra.vercel.app"
+// Trailing slashes are stripped so a stray "/" in the env var can't break CORS.
+const ALLOWED_ORIGINS = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
 
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "2mb" }));
 app.use(
   cors({
-    origin: CLIENT_ORIGIN,
+    origin(requestOrigin, callback) {
+      // Allow non-browser requests (no Origin header, e.g. curl/health checks).
+      if (!requestOrigin) return callback(null, true);
+      const normalized = requestOrigin.replace(/\/+$/, "");
+      if (ALLOWED_ORIGINS.includes(normalized)) {
+        return callback(null, true);
+      }
+      console.warn(`CORS blocked request from origin: ${requestOrigin}`);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
