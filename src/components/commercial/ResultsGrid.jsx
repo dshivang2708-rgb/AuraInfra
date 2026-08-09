@@ -1,16 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
-import { MapPin, Square, Heart, LayoutGrid, List } from "lucide-react";
+import { MapPin, Square, LayoutGrid, List, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { firstNumber, matchesCategory, parseListParam } from "../../lib/propertyFilters.js";
 import { CARPET_AREA_BUCKETS } from "../../lib/commercialFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
-const BADGE_STYLES = {
-  Premium: "bg-[#1a6b32]",
-  Featured: "bg-blue-600",
-  New: "bg-gray-800",
-};
+// Every badge now uses the same flat dark-green pill with white text, no
+// icon — matches the simplified tag design used on the Residential cards.
+const BADGE_STYLE = "bg-[#1a6b32] text-white";
 
 function toCardProps(row) {
   const d = row.details || {};
@@ -36,52 +34,53 @@ function toCardProps(row) {
 
 function PropertyCard({ property }) {
   return (
-    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
-      <div className="relative h-48">
+    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div className="relative h-40 overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
           <span
-            className={`absolute top-3 left-3 text-white text-[10px] font-bold px-2 py-1 rounded ${
-              BADGE_STYLES[property.badge] || "bg-[#1a6b32]"
-            }`}
+            className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm ${BADGE_STYLE}`}
           >
             {property.badge}
           </span>
         )}
-        <button
-          className="absolute top-3 right-3 bg-white/50 backdrop-blur text-white p-1.5 rounded-full hover:bg-white hover:text-red-500 transition-colors"
-          aria-label="Save property"
-        >
-          <Heart size={18} />
-        </button>
       </div>
-      <div className="p-4">
-        <span className="text-[10px] text-[#1a6b32] font-bold uppercase tracking-wider bg-[#eaf4ef] px-2 py-0.5 rounded">
-          {property.type}
-        </span>
-        <h3 className="font-bold text-lg mt-2 mb-1">{property.name}</h3>
-        <div className="flex items-center gap-1 text-gray-500 text-xs mb-3">
-          <MapPin size={12} /> {property.location}
+
+      <div className="px-4 pt-3 pb-4">
+        {property.type && (
+          <span className="inline-block text-[10px] text-[#1a6b32] font-bold uppercase tracking-wider bg-[#eaf4ef] px-2 py-0.5 rounded mb-2">
+            {property.type}
+          </span>
+        )}
+        <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{property.name}</h4>
+
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+          <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+            <MapPin size={13} className="text-[#1a6b32]" />
+          </span>
+          {property.location}
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-600 mb-4">
-          <span className="flex items-center gap-1">
-            <Square size={14} /> {property.area}
+
+        <div className="flex items-center gap-3 mb-3">
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+            <Square size={15} /> {property.area || "—"}
           </span>
         </div>
-        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-          <div>
-            <span className="text-[#1a6b32] font-bold text-lg">{property.priceRange}</span>
+
+        <div className="border-t border-gray-100 pt-3 flex justify-between items-center gap-3">
+          <div className="min-w-0">
+            <span className="text-[#1a6b32] font-extrabold text-sm">{property.priceRange}</span>
           </div>
           <Link
             to="/properties/commercial/$slug"
             params={{ slug: property.key }}
-            className="text-[#1a6b32] border border-[#1a6b32] px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-[#1a6b32] hover:text-white transition-colors"
+            className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
           >
-            View Details
+            View Details <ArrowRight size={14} />
           </Link>
         </div>
       </div>
-    </article>
+    </div>
   );
 }
 

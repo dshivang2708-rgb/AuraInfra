@@ -1,52 +1,56 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
+import { MapPin, Building2, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { toPremiumCard } from "../../lib/adapters.js";
 import { priceToLakh, withinRange, looselyMatches } from "../../lib/propertyFilters.js";
 
 function ProjectCard({ project }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow group">
-      <div className="relative h-56">
+    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div className="relative h-40 overflow-hidden">
         <img alt={project.name} className="w-full h-full object-cover" src={project.image} />
-        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-2 py-1 rounded shadow-sm">
-          <span className="text-[10px] font-bold text-slate-700">{project.builder}</span>
-        </div>
-        <div className="absolute top-4 right-4 flex gap-2">
-          <span className="bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded">Premium Project</span>
-          <button
-            className="bg-white/80 p-1.5 rounded-full text-slate-600 hover:text-red-500 transition-colors"
-            aria-label="Save project"
-          >
-            <span className="material-symbols-outlined text-base block">favorite</span>
-          </button>
-        </div>
+        <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm bg-[#1a6b32] text-white">
+          Premium Project
+        </span>
       </div>
-      <div className="p-5">
-        <h3 className="text-lg font-bold mb-1">{project.name}</h3>
-        <p className="text-xs text-slate-400 mb-4 flex items-center gap-1">
-          <span className="material-symbols-outlined text-sm">location_on</span>
+
+      <div className="px-4 pt-3 pb-4">
+        {project.builder && (
+          <span className="inline-flex items-center gap-1 text-[10px] text-[#1a6b32] font-bold uppercase tracking-wider bg-[#eaf4ef] px-2 py-0.5 rounded mb-2">
+            <Building2 size={11} /> {project.builder}
+          </span>
+        )}
+        <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{project.name}</h4>
+
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+          <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+            <MapPin size={13} className="text-[#1a6b32]" />
+          </span>
           {project.location}
-        </p>
-        <div className="grid grid-cols-2 gap-y-2 mb-6">
-          {project.tags.map((tag) => (
-            <div key={tag} className="text-[11px] flex items-center gap-1.5 text-slate-600">
-              {tag}
-            </div>
-          ))}
         </div>
-        <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-          <div>
-            <p className="text-[10px] text-slate-400 uppercase font-bold">Starting at</p>
-            <p className="text-lg font-bold text-green-700">{project.price}</p>
+
+        {project.tags?.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {project.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="border-t border-gray-100 pt-3 flex justify-between items-center gap-3">
+          <div className="min-w-0">
+            <p className="text-[9px] text-gray-400 uppercase font-bold tracking-wide">Starting at</p>
+            <span className="text-[#1a6b32] font-extrabold text-sm">{project.price}</span>
           </div>
           <Link
             to="/properties/premium-projects/$slug"
             params={{ slug: project.key }}
-            className="text-xs font-bold text-slate-500 hover:text-green-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+            className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
           >
-            View Project
-            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            View Details <ArrowRight size={14} />
           </Link>
         </div>
       </div>

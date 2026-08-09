@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
+import { MapPin, Ruler, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { firstNumber, matchesCategory, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
@@ -28,43 +29,47 @@ function toCardProps(row) {
 
 function PropertyCard({ property }) {
   return (
-    <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group">
-      <div className="relative h-48">
+    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div className="relative h-40 overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
-          <span className="absolute top-3 left-3 bg-[#1a6b32]/80 text-white text-[10px] px-2 py-1 rounded font-bold">
+          <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm bg-[#1a6b32] text-white">
             {property.badge}
           </span>
         )}
-        <button className="absolute top-3 right-3 text-white hover:text-red-400" aria-label="Save property">
-          <span className="material-symbols-outlined text-xl">favorite</span>
-        </button>
       </div>
-      <div className="p-4">
-        <h3 className="font-bold text-gray-900 mb-1">{property.name}</h3>
-        <p className="text-gray-500 text-xs flex items-center gap-1 mb-3">
-          <span className="material-symbols-outlined text-sm">location_on</span>
+
+      <div className="px-4 pt-3 pb-4">
+        <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{property.name}</h4>
+
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+          <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+            <MapPin size={13} className="text-[#1a6b32]" />
+          </span>
           {property.location}
-        </p>
-        <div className="flex items-center gap-2 text-xs text-gray-600 mb-4">
-          <span className="material-symbols-outlined text-base text-[#1a6b32]">aspect_ratio</span>
-          {property.area}
         </div>
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="text-[#1a6b32] font-bold text-lg">{property.price}</p>
-            <p className="text-[10px] text-gray-400">{property.priceNote}</p>
+
+        <div className="flex items-center gap-3 mb-3">
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+            <Ruler size={15} /> {property.area || "—"}
+          </span>
+        </div>
+
+        <div className="border-t border-gray-100 pt-3 flex justify-between items-center gap-3">
+          <div className="min-w-0">
+            <span className="text-[#1a6b32] font-extrabold text-sm">{property.price}</span>
+            {property.priceNote && <span className="text-gray-400 text-xs font-medium"> {property.priceNote}</span>}
           </div>
           <Link
             to="/properties/agriculture/$slug"
             params={{ slug: property.key }}
-            className="border border-[#1a6b32] text-[#1a6b32] hover:bg-[#1a6b32] hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+            className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
           >
-            View Details
+            View Details <ArrowRight size={14} />
           </Link>
         </div>
       </div>
-    </article>
+    </div>
   );
 }
 

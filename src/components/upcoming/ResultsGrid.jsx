@@ -1,16 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
-import { MapPin, Square } from "lucide-react";
+import { MapPin, Ruler, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { toFeaturedCard } from "../../lib/adapters.js";
 import { CATEGORY_DETAIL_ROUTES } from "../../lib/categoryRoutes.js";
 import { parseListParam } from "../../lib/propertyFilters.js";
-
-const CATEGORY_BADGE_STYLES = {
-  residential: "bg-[#1a6b32]",
-  commercial: "bg-[#4285f4]",
-  agriculture: "bg-[#558b2f]",
-};
 
 const CATEGORY_LABELS = {
   residential: "Residential",
@@ -20,42 +14,45 @@ const CATEGORY_LABELS = {
 
 function PropertyCard({ property }) {
   return (
-    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
-      <div className="relative h-48">
+    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div className="relative h-40 overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
-        <span
-          className={`absolute top-3 left-3 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide ${
-            CATEGORY_BADGE_STYLES[property.category] || "bg-[#1a6b32]"
-          }`}
-        >
+        <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm bg-[#1a6b32] text-white">
           {CATEGORY_LABELS[property.category] || property.category}
         </span>
-        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur text-[#071837] text-[10px] font-bold px-2 py-1 rounded">
+        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur text-[#071837] text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
           Upcoming
         </span>
       </div>
-      <div className="p-4">
-        <h3 className="font-bold text-lg mb-1">{property.name}</h3>
-        <div className="flex items-center gap-1 text-gray-500 text-xs mb-3">
-          <MapPin size={12} /> {property.location}
+
+      <div className="px-4 pt-3 pb-4">
+        <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{property.name}</h4>
+
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+          <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+            <MapPin size={13} className="text-[#1a6b32]" />
+          </span>
+          {property.location}
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-600 mb-4">
-          <span className="flex items-center gap-1">
-            <Square size={14} /> {property.area || "—"}
+
+        <div className="flex items-center gap-3 mb-3">
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+            <Ruler size={15} /> {property.area || "—"}
           </span>
         </div>
-        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-          <span className="text-[#1a6b32] font-bold text-lg">{property.price}</span>
+
+        <div className="border-t border-gray-100 pt-3 flex justify-between items-center gap-3">
+          <span className="text-[#1a6b32] font-extrabold text-sm min-w-0 truncate">{property.price}</span>
           <Link
             to={CATEGORY_DETAIL_ROUTES[property.category] || "/properties/residential/$slug"}
             params={{ slug: property.slug }}
-            className="text-[#1a6b32] border border-[#1a6b32] px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-[#1a6b32] hover:text-white transition-colors"
+            className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
           >
-            View Details
+            View Details <ArrowRight size={14} />
           </Link>
         </div>
       </div>
-    </article>
+    </div>
   );
 }
 
