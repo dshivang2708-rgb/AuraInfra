@@ -92,9 +92,9 @@ export default function Leadership() {
                       <h3 className="text-sm font-bold text-[#151c27] truncate">{member.name}</h3>
                       <p className="text-xs text-[#45464e] line-clamp-2">{member.role}</p>
                     </div>
-                    <div className="text-[#0077b5] shrink-0">
+                    {/* <div className="text-[#0077b5] shrink-0">
                       <LinkedinIcon />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               ))}
