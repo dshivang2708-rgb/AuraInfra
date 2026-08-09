@@ -45,6 +45,10 @@ export const api = {
   // "Enquire About This Project" forms — public, no auth required.
   submitEnquiry: (payload) => request("/api/enquiries", { method: "POST", body: payload }),
 
+  // Email OTP verification, used by the enquiry form before submission.
+  sendEnquiryOtp: (email) => request("/api/otp/send", { method: "POST", body: { email } }),
+  verifyEnquiryOtp: (email, otp) => request("/api/otp/verify", { method: "POST", body: { email, otp } }),
+
   // "Send Us a Message" contact page form — public, no auth required.
   submitContactMessage: (payload) => request("/api/contact", { method: "POST", body: payload }),
 

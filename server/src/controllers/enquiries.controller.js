@@ -1,5 +1,6 @@
 import { resend, FROM_EMAIL, ADMIN_NOTIFY_EMAIL } from "../config/resend.js";
 import { supabaseAdmin } from "../config/supabaseAdmin.js";
+import { verifyVerificationToken } from "../config/otp.js";
 
 const CATEGORY_LABELS = {
   residential: "Residential",
@@ -17,10 +18,17 @@ function escapeHtml(str = "") {
 }
 
 export async function createEnquiry(req, res) {
-  const { name, email, phone, message, interestedIn, projectName, projectSlug, category } = req.body || {};
+  const { name, email, phone, message, interestedIn, projectName, projectSlug, category, otpToken } =
+    req.body || {};
 
   if (!name || !email || !phone || !projectName) {
     return res.status(400).json({ error: "Name, email, phone and project are required." });
+  }
+
+  // The customer must have verified this exact email via the OTP flow
+  // (/api/otp/send + /api/otp/verify) before the enquiry can be sent.
+  if (!otpToken || !verifyVerificationToken(otpToken, email)) {
+    return res.status(401).json({ error: "Please verify your email address before sending the enquiry." });
   }
 
   const categoryLabel = CATEGORY_LABELS[category] || "Property";
@@ -55,13 +63,13 @@ export async function createEnquiry(req, res) {
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #151c27;">
           <h2 style="color:#1a6b32; margin-bottom: 4px;">New Project Enquiry</h2>
-          <p style="margin-top:0;">A customer submitted an enquiry through the website.</p>
+          <p style="margin-top:0;">A customer submitted an enquiry through the website. Their email was verified via OTP.</p>
           <table style="border-collapse: collapse; width: 100%; max-width: 480px;">
             <tr><td style="padding:6px 0; color:#45464e;">Project</td><td style="padding:6px 0;"><strong>${safeProject}</strong> (${categoryLabel})</td></tr>
             ${interestedIn ? `<tr><td style="padding:6px 0; color:#45464e;">Interested in</td><td style="padding:6px 0;">${safeInterest}</td></tr>` : ""}
             <tr><td style="padding:6px 0; color:#45464e;">Name</td><td style="padding:6px 0;">${safeName}</td></tr>
             <tr><td style="padding:6px 0; color:#45464e;">Phone</td><td style="padding:6px 0;"><a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></td></tr>
-            <tr><td style="padding:6px 0; color:#45464e;">Email</td><td style="padding:6px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+            <tr><td style="padding:6px 0; color:#45464e;">Email</td><td style="padding:6px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a> &nbsp;✅ verified</td></tr>
           </table>
           ${message ? `<p style="margin-top:16px; color:#45464e;">Message</p><p style="white-space:pre-wrap;">${safeMessage}</p>` : ""}
         </div>

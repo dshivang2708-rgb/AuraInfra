@@ -10,6 +10,7 @@ import projectsRoutes from "./routes/projects.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import enquiriesRoutes from "./routes/enquiries.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
+import otpRoutes from "./routes/otp.routes.js";
 
 dotenv.config();
 
@@ -64,6 +65,17 @@ const enquiryLimiter = rateLimit({
   message: { error: "Too many enquiries submitted. Please wait a while before trying again." },
 });
 
+// OTP endpoints send an email per request and guard the enquiry form, so
+// they get their own tighter, short-window limit to stop code-guessing
+// or inbox-spamming abuse.
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many verification attempts. Please wait a while before trying again." },
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
@@ -71,6 +83,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/otp", otpLimiter, otpRoutes);
 app.use("/api/enquiries", enquiryLimiter, enquiriesRoutes);
 app.use("/api/contact", enquiryLimiter, contactRoutes);
 
