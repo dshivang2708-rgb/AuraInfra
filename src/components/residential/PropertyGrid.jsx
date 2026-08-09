@@ -55,7 +55,7 @@ function PropertyCard({ property }) {
 
   return (
     <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 p-3">
-      <div className="relative h-52 rounded-2xl overflow-hidden">
+      <div className="relative h-40 rounded-2xl overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
           <span
@@ -75,36 +75,36 @@ function PropertyCard({ property }) {
         </button>
       </div>
 
-      <div className="px-2 pt-4 pb-2">
-        <h4 className="font-extrabold text-xl text-gray-900 mb-2">{property.name}</h4>
+      <div className="px-2 pt-3 pb-2">
+        <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{property.name}</h4>
 
-        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
           <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
             <MapPin size={13} className="text-[#1a6b32]" />
           </span>
           {property.location}
         </div>
 
-        <div className="flex items-center gap-3 mb-4">
-          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2.5">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
             <BedDouble size={15} /> {property.beds || "—"}
           </span>
-          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2.5">
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
             <Maximize2 size={15} /> {property.area || "—"}
           </span>
         </div>
 
-        <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
-          <div>
-            <span className="text-[#1a6b32] font-extrabold text-xl">{property.price}</span>{" "}
-            <span className="text-gray-400 text-sm font-medium">
+        <div className="border-t border-gray-100 pt-3 flex justify-between items-center gap-3">
+          <div className="min-w-0">
+            <span className="text-[#1a6b32] font-extrabold text-base">{property.price}</span>{" "}
+            <span className="text-gray-400 text-xs font-medium">
               {property.priceNote ? property.priceNote : "onwards"}
             </span>
           </div>
           <Link
             to="/properties/residential/$slug"
             params={{ slug: property.key }}
-            className="flex items-center gap-1.5 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
+            className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
           >
             View Details <ArrowRight size={14} />
           </Link>
@@ -209,7 +209,7 @@ export default function PropertyGrid() {
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {properties.map((property) => (
           <PropertyCard key={property.key} property={property} />
         ))}
