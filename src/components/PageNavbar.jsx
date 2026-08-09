@@ -6,7 +6,11 @@ const LOGO_IMAGE =
 
 const AURA_GREEN = "#0a5d34";
 
-const DROPDOWN_LINKS = ["Buy Property", "Commercial", "Agriculture"];
+const DROPDOWN_LINKS = [
+  { label: "Residential", to: "/properties/residential" },
+  { label: "Commercial", to: "/properties/commercial" },
+  { label: "Agriculture", to: "/properties/agriculture" },
+];
 const SIMPLE_LINKS = [
   { label: "Home", to: "/" },
   { label: "About Us", to: "/about" },
@@ -47,12 +51,15 @@ export default function PageNavbar() {
             Home
           </Link>
           {DROPDOWN_LINKS.map((link) => (
-            <div key={link} className="relative group cursor-pointer">
-              <div className="flex items-center gap-1 text-black group-hover:text-[#0a5d34] transition-colors font-semibold">
-                {link}
-                <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>
-              </div>
-            </div>
+            <Link
+              key={link.label}
+              to={link.to}
+              className="flex items-center gap-1 text-black hover:text-[#0a5d34] transition-colors font-semibold"
+              activeProps={{ style: { color: AURA_GREEN, borderBottom: `2px solid ${AURA_GREEN}`, paddingBottom: "4px", fontWeight: 700 } }}
+            >
+              {link.label}
+              <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+            </Link>
           ))}
           <Link
             to="/about"
@@ -106,8 +113,10 @@ export default function PageNavbar() {
             </li>
           ))}
           {DROPDOWN_LINKS.map((link) => (
-            <li key={link} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-              {link}
+            <li key={link.label} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+              <Link to={link.to} onClick={() => setMobileOpen(false)}>
+                {link.label}
+              </Link>
             </li>
           ))}
         </ul>

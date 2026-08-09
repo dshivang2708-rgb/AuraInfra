@@ -33,7 +33,13 @@ const BellIcon = () => (
   </svg>
 );
 
-const NAV_LINKS = ["Home", "Buy Property", "Commercial", "Agriculture", "About Us", "Contact"];
+// Category links that used to render as plain, non-clickable text with a
+// decorative chevron — now real links to each listing page.
+const CATEGORY_LINKS = [
+  { label: "Residential", to: "/properties/residential" },
+  { label: "Commercial", to: "/properties/commercial" },
+  { label: "Agriculture", to: "/properties/agriculture" },
+];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -57,33 +63,24 @@ export default function Navbar() {
               Home
             </Link>
           </li>
-          {NAV_LINKS.slice(1, 4).map((link) => (
-            <li key={link} className="flex items-center cursor-pointer hover:text-brand-green">
-              {link}
-              <ChevronDown />
+          {CATEGORY_LINKS.map((link) => (
+            <li key={link.label}>
+              <Link className="flex items-center hover:text-brand-green" to={link.to}>
+                {link.label}
+                <ChevronDown />
+              </Link>
             </li>
           ))}
-          {NAV_LINKS.slice(4).map((link) =>
-            link === "About Us" ? (
-              <li key={link}>
-                <Link className="hover:text-brand-green" to="/about">
-                  {link}
-                </Link>
-              </li>
-            ) : link === "Contact" ? (
-              <li key={link}>
-                <Link className="hover:text-brand-green" to="/contact">
-                  {link}
-                </Link>
-              </li>
-            ) : (
-              <li key={link}>
-                <a className="hover:text-brand-green" href="#">
-                  {link}
-                </a>
-              </li>
-            )
-          )}
+          <li>
+            <Link className="hover:text-brand-green" to="/about">
+              About Us
+            </Link>
+          </li>
+          <li>
+            <Link className="hover:text-brand-green" to="/contact">
+              Contact
+            </Link>
+          </li>
         </ul>
 
         <div className="flex items-center space-x-4">
@@ -117,31 +114,28 @@ export default function Navbar() {
 
       {mobileOpen && (
         <ul className="lg:hidden mt-4 bg-white rounded-xl shadow-lg p-4 space-y-3 text-gray-800 font-medium max-w-7xl mx-auto">
-          {NAV_LINKS.map((link) =>
-            link === "About Us" ? (
-              <li key={link} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                <Link to="/about" onClick={() => setMobileOpen(false)}>
-                  {link}
-                </Link>
-              </li>
-            ) : link === "Contact" ? (
-              <li key={link} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                <Link to="/contact" onClick={() => setMobileOpen(false)}>
-                  {link}
-                </Link>
-              </li>
-            ) : link === "Home" ? (
-              <li key={link} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                <Link to="/" onClick={() => setMobileOpen(false)}>
-                  {link}
-                </Link>
-              </li>
-            ) : (
-              <li key={link} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                {link}
-              </li>
-            )
-          )}
+          <li className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+            <Link to="/" onClick={() => setMobileOpen(false)}>
+              Home
+            </Link>
+          </li>
+          {CATEGORY_LINKS.map((link) => (
+            <li key={link.label} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+              <Link to={link.to} onClick={() => setMobileOpen(false)}>
+                {link.label}
+              </Link>
+            </li>
+          ))}
+          <li className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+            <Link to="/about" onClick={() => setMobileOpen(false)}>
+              About Us
+            </Link>
+          </li>
+          <li className="pb-2">
+            <Link to="/contact" onClick={() => setMobileOpen(false)}>
+              Contact
+            </Link>
+          </li>
         </ul>
       )}
     </header>
