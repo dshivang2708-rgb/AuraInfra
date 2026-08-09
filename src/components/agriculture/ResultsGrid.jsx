@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
 import { toAgricultureCard } from "../../lib/adapters.js";
+import { firstNumber, matchesAnySelectedInList, parseListParam, withinRange } from "../../lib/propertyFilters.js";
 
 function PropertyCard({ property }) {
   return (
@@ -47,25 +48,38 @@ function PropertyCard({ property }) {
 
 export default function ResultsGrid() {
   const [gridView, setGridView] = useState(true);
-  const [properties, setProperties] = useState([]);
+  const [rawProperties, setRawProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
+  const types = parseListParam(search.types);
+  const minArea = search.minArea ? parseFloat(search.minArea) : null;
+  const maxArea = search.maxArea ? parseFloat(search.maxArea) : null;
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     api
       .listProjects({ category: "agriculture", ...(city && { city }), ...(sector && { sector }) })
-      .then((rows) => active && setProperties(rows.map(toAgricultureCard)))
+      .then((rows) => active && setRawProperties(rows.map(toAgricultureCard)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
   }, [city, sector]);
+
+  // Property Type and Land Area are filtered client-side (no need to
+  // re-fetch — city/sector already narrowed things down on the server).
+  const properties = useMemo(() => {
+    return rawProperties.filter((property) => {
+      if (!matchesAnySelectedInList(property.tags, types)) return false;
+      if (!withinRange(firstNumber(property.area), minArea, maxArea)) return false;
+      return true;
+    });
+  }, [rawProperties, types, minArea, maxArea]);
 
   return (
     <section className="flex-1">

@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
+import { parseListParam } from "../../lib/propertyFilters.js";
 
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
 const POSSESSION_OPTIONS = ["Ready to Move", "Under Construction", "New Launch"];
@@ -9,6 +10,10 @@ export default function SidebarFilters() {
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
+  const bhk = parseListParam(search.bhk);
+  const possession = parseListParam(search.possession);
+  const minPrice = search.minPrice || "";
+  const maxPrice = search.maxPrice || "";
 
   const cities = useCities();
   const sectors = useSectors(city);
@@ -30,8 +35,27 @@ export default function SidebarFilters() {
     updateSearch({ sector: e.target.value });
   }
 
+  function toggleBhk(option) {
+    const next = bhk.includes(option) ? bhk.filter((b) => b !== option) : [...bhk, option];
+    updateSearch({ bhk: next.join(",") || undefined });
+  }
+
+  function togglePossession(option) {
+    const next = possession.includes(option)
+      ? possession.filter((p) => p !== option)
+      : [...possession, option];
+    updateSearch({ possession: next.join(",") || undefined });
+  }
+
   function clearAll() {
-    updateSearch({ city: "", sector: "" });
+    updateSearch({
+      city: "",
+      sector: "",
+      bhk: undefined,
+      possession: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+    });
   }
 
   return (
@@ -89,15 +113,29 @@ export default function SidebarFilters() {
         {/* Price Range */}
         <div className="mb-6">
           <label className="block text-xs font-bold text-gray-700 uppercase mb-2">
-            <i className="fa-solid fa-wallet mr-1" /> Price Range
+            <i className="fa-solid fa-wallet mr-1" /> Price Range (₹ Lakh)
           </label>
-          <input
-            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1a6b32]"
-            type="range"
-          />
+          <div className="flex gap-3">
+            <input
+              type="number"
+              min="0"
+              value={minPrice}
+              onChange={(e) => updateSearch({ minPrice: e.target.value })}
+              placeholder="Min"
+              className="w-full border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            />
+            <input
+              type="number"
+              min="0"
+              value={maxPrice}
+              onChange={(e) => updateSearch({ maxPrice: e.target.value })}
+              placeholder="Max"
+              className="w-full border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            />
+          </div>
           <div className="flex justify-between mt-2 text-[10px] font-bold text-gray-500">
             <span>₹ 10 Lakh</span>
-            <span>₹ 5 Cr+</span>
+            <span>₹ 5 Cr+ (500 Lakh)</span>
           </div>
         </div>
 
@@ -105,25 +143,21 @@ export default function SidebarFilters() {
         <div className="mb-6">
           <label className="block text-xs font-bold text-gray-700 uppercase mb-2">BHK</label>
           <div className="grid grid-cols-4 gap-1">
-            {BHK_OPTIONS.map((bhk) => (
+            {BHK_OPTIONS.map((option) => (
               <button
-                key={bhk}
-                className="border border-gray-200 py-2 rounded text-xs hover:bg-[#1a6b32] hover:text-white transition"
+                key={option}
+                type="button"
+                onClick={() => toggleBhk(option)}
+                className={`border py-2 rounded text-xs transition ${
+                  bhk.includes(option)
+                    ? "bg-[#1a6b32] text-white border-[#1a6b32]"
+                    : "border-gray-200 hover:bg-[#1a6b32] hover:text-white"
+                }`}
               >
-                {bhk}
+                {option}
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Budget */}
-        <div className="mb-6">
-          <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Budget</label>
-          <select className="w-full border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]">
-            <option>All Budget</option>
-            <option>Below 50 Lakh</option>
-            <option>50 Lakh - 1 Cr</option>
-          </select>
         </div>
 
         {/* Possession Status */}
@@ -133,9 +167,11 @@ export default function SidebarFilters() {
           </label>
           <div className="space-y-2">
             {POSSESSION_OPTIONS.map((status) => (
-              <label key={status} className="flex items-center gap-2 text-sm text-gray-600">
+              <label key={status} className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={possession.includes(status)}
+                  onChange={() => togglePossession(status)}
                   className="rounded border-gray-300 text-[#1a6b32] focus:ring-[#1a6b32]"
                 />
                 {status}
@@ -144,12 +180,6 @@ export default function SidebarFilters() {
           </div>
         </div>
 
-        <button
-          onClick={() => updateSearch({ city, sector })}
-          className="w-full bg-[#1a6b32] text-white py-3 rounded-md font-bold text-sm flex items-center justify-center gap-2 mb-3"
-        >
-          <i className="fa-solid fa-sliders" /> Apply Filters
-        </button>
         <button
           onClick={clearAll}
           className="w-full text-gray-500 text-xs font-bold py-1 flex items-center justify-center gap-2"

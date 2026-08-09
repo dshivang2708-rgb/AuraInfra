@@ -140,6 +140,7 @@ export function toAgricultureCard(row) {
     price: row.price_display,
     priceNote: row.details?.priceNote,
     image: row.main_image,
+    tags: row.tags || [],
   };
 }
 

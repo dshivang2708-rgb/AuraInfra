@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, Square, Heart, LayoutGrid, List } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { toCommercialCard } from "../../lib/adapters.js";
+import { firstNumber, matchesAnySelected, parseListParam } from "../../lib/propertyFilters.js";
+import { CARPET_AREA_BUCKETS } from "../../lib/commercialFilters.js";
 
 const BADGE_STYLES = {
   Premium: "bg-[#1a6b32]",
@@ -63,25 +65,44 @@ function PropertyCard({ property }) {
 
 export default function ResultsGrid() {
   const [gridView, setGridView] = useState(true);
-  const [properties, setProperties] = useState([]);
+  const [rawProperties, setRawProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
+  const types = parseListParam(search.types);
+  const areas = parseListParam(search.area);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     api
       .listProjects({ category: "commercial", ...(city && { city }), ...(sector && { sector }) })
-      .then((rows) => active && setProperties(rows.map(toCommercialCard)))
+      .then((rows) => active && setRawProperties(rows.map(toCommercialCard)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
   }, [city, sector]);
+
+  // Property Type and Carpet Area are filtered client-side (no need to
+  // re-fetch — city/sector already narrowed things down on the server).
+  const properties = useMemo(() => {
+    return rawProperties.filter((property) => {
+      if (!matchesAnySelected(property.type, types)) return false;
+      if (areas.length > 0) {
+        const num = firstNumber(property.area);
+        const inAnyBucket = areas.some((label) => {
+          const bucket = CARPET_AREA_BUCKETS.find((b) => b.label === label);
+          return bucket && num !== null && num >= bucket.min && num < bucket.max;
+        });
+        if (!inAnyBucket) return false;
+      }
+      return true;
+    });
+  }, [rawProperties, types, areas]);
 
   return (
     <div className="flex-1">

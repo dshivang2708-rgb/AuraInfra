@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
+import { matchesAnySelected, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
 
 const BADGE_STYLES = {
   Premium: "bg-[#1a6b32]",
@@ -16,10 +17,23 @@ function toCardProps(row) {
     badge: row.badge,
     location: row.location,
     beds: row.details?.beds,
+    floorPlanTypes: (row.details?.floorPlans || []).map((fp) => fp.type).filter(Boolean),
+    possession: row.possession,
     area: row.area_display,
     price: row.price_display,
     priceNote: null,
   };
+}
+
+// A property matches a selected BHK if either its "beds" summary text
+// mentions it (e.g. "2, 3 & 4 BHK") or one of its individual floor plans is
+// that exact configuration.
+function matchesBhk(property, selectedBhks) {
+  if (!selectedBhks.length) return true;
+  const beds = (property.beds || "").toLowerCase();
+  return selectedBhks.some(
+    (bhk) => beds.includes(bhk.toLowerCase()) || property.floorPlanTypes.some((t) => t.toLowerCase() === bhk.toLowerCase())
+  );
 }
 
 function PropertyCard({ property }) {
@@ -76,12 +90,16 @@ function PropertyCard({ property }) {
 
 export default function PropertyGrid() {
   const [gridView, setGridView] = useState(true);
-  const [properties, setProperties] = useState([]);
+  const [rawProperties, setRawProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
+  const bhk = parseListParam(search.bhk);
+  const possession = parseListParam(search.possession);
+  const minPrice = search.minPrice ? parseFloat(search.minPrice) : null;
+  const maxPrice = search.maxPrice ? parseFloat(search.maxPrice) : null;
 
   useEffect(() => {
     let active = true;
@@ -89,7 +107,7 @@ export default function PropertyGrid() {
     api
       .listProjects({ category: "residential", ...(city && { city }), ...(sector && { sector }) })
       .then((rows) => {
-        if (active) setProperties(rows.map(toCardProps));
+        if (active) setRawProperties(rows.map(toCardProps));
       })
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
@@ -97,6 +115,17 @@ export default function PropertyGrid() {
       active = false;
     };
   }, [city, sector]);
+
+  // BHK, Possession Status and Price Range are filtered client-side (no
+  // need to re-fetch — city/sector already narrowed things down server-side).
+  const properties = useMemo(() => {
+    return rawProperties.filter((property) => {
+      if (!matchesBhk(property, bhk)) return false;
+      if (!matchesAnySelected(property.possession, possession)) return false;
+      if (!withinRange(priceToLakh(property.price), minPrice, maxPrice)) return false;
+      return true;
+    });
+  }, [rawProperties, bhk, possession, minPrice, maxPrice]);
 
   return (
     <div className="flex-1">
