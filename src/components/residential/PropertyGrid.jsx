@@ -52,7 +52,7 @@ function PropertyCard({ property }) {
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
           <span
-            className={`absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide shadow-sm ${BADGE_STYLE}`}
+            className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm ${BADGE_STYLE}`}
           >
             {property.badge}
           </span>
