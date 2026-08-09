@@ -12,9 +12,7 @@ export default function AgricultureProperties() {
       <PageNavbar />
       <main className="pt-14 bg-gray-50">
         <AgricultureHero />
-        <div className="mt-16 md:mt-20">
-          <CategoryTabs />
-        </div>
+        <CategoryTabs />
         <div className="max-w-7xl mx-auto px-4 md:px-12 pt-10 pb-20">
           <div className="flex flex-col lg:flex-row gap-8">
             <FilterSidebar />

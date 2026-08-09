@@ -10,6 +10,8 @@ function draftFromSearch(search) {
     city: search.city || "",
     sector: search.sector || "",
     area: parseListParam(search.area),
+    minPrice: search.minPrice || "",
+    maxPrice: search.maxPrice || "",
   };
 }
 
@@ -27,7 +29,7 @@ export default function FilterSidebar() {
   useEffect(() => {
     setDraft(draftFromSearch(search));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search.city, search.sector, search.area]);
+  }, [search.city, search.sector, search.area, search.minPrice, search.maxPrice]);
 
   const cities = useCities();
   const sectors = useSectors(draft.city);
@@ -36,7 +38,9 @@ export default function FilterSidebar() {
   const isDirty =
     draft.city !== appliedDraft.city ||
     draft.sector !== appliedDraft.sector ||
-    draft.area.join(",") !== appliedDraft.area.join(",");
+    draft.area.join(",") !== appliedDraft.area.join(",") ||
+    draft.minPrice !== appliedDraft.minPrice ||
+    draft.maxPrice !== appliedDraft.maxPrice;
 
   function updateDraft(next) {
     setDraft((d) => ({ ...d, ...next }));
@@ -60,16 +64,18 @@ export default function FilterSidebar() {
         city: draft.city,
         sector: draft.sector,
         area: draft.area.join(",") || undefined,
+        minPrice: draft.minPrice || undefined,
+        maxPrice: draft.maxPrice || undefined,
       }),
       replace: true,
     });
   }
 
   function clearAll() {
-    setDraft({ city: "", sector: "", area: [] });
+    setDraft({ city: "", sector: "", area: [], minPrice: "", maxPrice: "" });
     navigate({
       to: "/properties/commercial",
-      search: cleanSearch({ ...search, city: "", sector: "", area: undefined }),
+      search: cleanSearch({ ...search, city: "", sector: "", area: undefined, minPrice: undefined, maxPrice: undefined }),
       replace: true,
     });
   }
@@ -123,6 +129,29 @@ export default function FilterSidebar() {
           {draft.city && sectors.length === 0 && (
             <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {draft.city} yet.</p>
           )}
+        </div>
+
+        {/* Price Range */}
+        <div className="mb-8">
+          <h4 className="text-sm font-bold text-gray-700 mb-4">Price Range (₹ Lakh)</h4>
+          <div className="flex gap-3">
+            <input
+              type="number"
+              min="0"
+              value={draft.minPrice}
+              onChange={(e) => updateDraft({ minPrice: e.target.value })}
+              placeholder="Min"
+              className="w-full text-sm border-gray-200 rounded-lg focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            />
+            <input
+              type="number"
+              min="0"
+              value={draft.maxPrice}
+              onChange={(e) => updateDraft({ maxPrice: e.target.value })}
+              placeholder="Max"
+              className="w-full text-sm border-gray-200 rounded-lg focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            />
+          </div>
         </div>
 
         {/* Carpet Area */}

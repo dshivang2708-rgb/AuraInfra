@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, Ruler, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
-import { firstNumber, matchesCategory, withinRange } from "../../lib/propertyFilters.js";
+import { firstNumber, matchesCategory, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
 function toCardProps(row) {
@@ -84,6 +84,8 @@ export default function ResultsGrid() {
   const activeCategory = search.type || "all";
   const minArea = search.minArea ? parseFloat(search.minArea) : null;
   const maxArea = search.maxArea ? parseFloat(search.maxArea) : null;
+  const minPrice = search.minPrice ? parseFloat(search.minPrice) : null;
+  const maxPrice = search.maxPrice ? parseFloat(search.maxPrice) : null;
 
   useEffect(() => {
     let active = true;
@@ -98,16 +100,17 @@ export default function ResultsGrid() {
     };
   }, [city, sector]);
 
-  // Property Type (via the tabs above) and Land Area are filtered
-  // client-side (no need to re-fetch — city/sector already narrowed things
-  // down on the server).
+  // Property Type (via the tabs above), Land Area, and Price Range are
+  // filtered client-side (no need to re-fetch — city/sector already
+  // narrowed things down on the server).
   const properties = useMemo(() => {
     return rawProperties.filter((property) => {
       if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (!withinRange(firstNumber(property.area), minArea, maxArea)) return false;
+      if (!withinRange(priceToLakh(property.price), minPrice, maxPrice)) return false;
       return true;
     });
-  }, [rawProperties, activeCategory, minArea, maxArea]);
+  }, [rawProperties, activeCategory, minArea, maxArea, minPrice, maxPrice]);
 
   return (
     <section className="flex-1">

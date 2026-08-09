@@ -9,6 +9,8 @@ function draftFromSearch(search) {
     sector: search.sector || "",
     minArea: search.minArea || "",
     maxArea: search.maxArea || "",
+    minPrice: search.minPrice || "",
+    maxPrice: search.maxPrice || "",
   };
 }
 
@@ -26,7 +28,7 @@ export default function FilterSidebar() {
   useEffect(() => {
     setDraft(draftFromSearch(search));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search.city, search.sector, search.minArea, search.maxArea]);
+  }, [search.city, search.sector, search.minArea, search.maxArea, search.minPrice, search.maxPrice]);
 
   const cities = useCities();
   const sectors = useSectors(draft.city);
@@ -36,7 +38,9 @@ export default function FilterSidebar() {
     draft.city !== appliedDraft.city ||
     draft.sector !== appliedDraft.sector ||
     draft.minArea !== appliedDraft.minArea ||
-    draft.maxArea !== appliedDraft.maxArea;
+    draft.maxArea !== appliedDraft.maxArea ||
+    draft.minPrice !== appliedDraft.minPrice ||
+    draft.maxPrice !== appliedDraft.maxPrice;
 
   function updateDraft(next) {
     setDraft((d) => ({ ...d, ...next }));
@@ -56,16 +60,26 @@ export default function FilterSidebar() {
         sector: draft.sector,
         minArea: draft.minArea || undefined,
         maxArea: draft.maxArea || undefined,
+        minPrice: draft.minPrice || undefined,
+        maxPrice: draft.maxPrice || undefined,
       }),
       replace: true,
     });
   }
 
   function clearAll() {
-    setDraft({ city: "", sector: "", minArea: "", maxArea: "" });
+    setDraft({ city: "", sector: "", minArea: "", maxArea: "", minPrice: "", maxPrice: "" });
     navigate({
       to: "/properties/agriculture",
-      search: cleanSearch({ ...search, city: "", sector: "", minArea: undefined, maxArea: undefined }),
+      search: cleanSearch({
+        ...search,
+        city: "",
+        sector: "",
+        minArea: undefined,
+        maxArea: undefined,
+        minPrice: undefined,
+        maxPrice: undefined,
+      }),
       replace: true,
     });
   }
@@ -145,6 +159,35 @@ export default function FilterSidebar() {
               value={draft.maxArea}
               onChange={(e) => updateDraft({ maxArea: e.target.value })}
               placeholder="100"
+              className="w-full border border-gray-200 rounded p-2 text-center text-xs font-bold focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div className="mb-8">
+        <h3 className="text-sm font-bold mb-4">Price Range (₹ Lakh)</h3>
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <p className="text-[10px] text-gray-400 font-bold mb-1 uppercase">Min</p>
+            <input
+              type="number"
+              min="0"
+              value={draft.minPrice}
+              onChange={(e) => updateDraft({ minPrice: e.target.value })}
+              placeholder="10"
+              className="w-full border border-gray-200 rounded p-2 text-center text-xs font-bold focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            />
+          </div>
+          <div className="flex-1">
+            <p className="text-[10px] text-gray-400 font-bold mb-1 uppercase">Max</p>
+            <input
+              type="number"
+              min="0"
+              value={draft.maxPrice}
+              onChange={(e) => updateDraft({ maxPrice: e.target.value })}
+              placeholder="500"
               className="w-full border border-gray-200 rounded p-2 text-center text-xs font-bold focus:ring-[#1a6b32] focus:border-[#1a6b32]"
             />
           </div>
