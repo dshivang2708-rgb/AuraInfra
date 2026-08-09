@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
-import { matchesAnySelected, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
+import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
+import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
 const BADGE_STYLES = {
   Premium: "bg-[#1a6b32]",
@@ -10,6 +11,7 @@ const BADGE_STYLES = {
 };
 
 function toCardProps(row) {
+  const tagsText = (row.tags || []).map((t) => (typeof t === "string" ? t : t.label)).join(" ");
   return {
     key: row.slug,
     name: row.name,
@@ -22,6 +24,10 @@ function toCardProps(row) {
     area: row.area_display,
     price: row.price_display,
     priceNote: null,
+    // Lowercased blob of everything that might mention the property's
+    // category (Apartment / Villa / Plot / etc) so CategoryTabs' keyword
+    // matching (matchesCategory) has something to search against.
+    typeText: `${row.name || ""} ${tagsText} ${row.details?.configurations || ""} ${row.details?.beds || ""}`.toLowerCase(),
   };
 }
 
@@ -96,6 +102,7 @@ export default function PropertyGrid() {
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
+  const activeCategory = search.type || "all";
   const bhk = parseListParam(search.bhk);
   const possession = parseListParam(search.possession);
   const minPrice = search.minPrice ? parseFloat(search.minPrice) : null;
@@ -120,12 +127,13 @@ export default function PropertyGrid() {
   // need to re-fetch — city/sector already narrowed things down server-side).
   const properties = useMemo(() => {
     return rawProperties.filter((property) => {
+      if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (!matchesBhk(property, bhk)) return false;
       if (!matchesAnySelected(property.possession, possession)) return false;
       if (!withinRange(priceToLakh(property.price), minPrice, maxPrice)) return false;
       return true;
     });
-  }, [rawProperties, bhk, possession, minPrice, maxPrice]);
+  }, [rawProperties, activeCategory, bhk, possession, minPrice, maxPrice]);
 
   return (
     <div className="flex-1">
@@ -134,7 +142,11 @@ export default function PropertyGrid() {
         <h3 className="text-sm font-semibold text-gray-600">
           {loading
             ? "Loading..."
-            : `Showing ${properties.length} Residential Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
+            : `Showing ${properties.length} ${
+                activeCategory !== "all"
+                  ? CATEGORY_TABS.find((t) => t.key === activeCategory)?.label || "Residential"
+                  : "Residential"
+              } Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">Sort by:</span>

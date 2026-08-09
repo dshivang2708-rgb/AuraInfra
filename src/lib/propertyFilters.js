@@ -55,6 +55,17 @@ export function parseListParam(value) {
   return value ? String(value).split(",").filter(Boolean) : [];
 }
 
+// True if `property.typeText` (a lowercased blob of its name/tags/config
+// text — see toCardProps in PropertyGrid.jsx) contains any of the active
+// category tab's keywords. An "all"/unknown/keyword-less tab always matches.
+export function matchesCategory(property, activeKey, tabs) {
+  if (!activeKey || activeKey === "all") return true;
+  const tab = tabs.find((t) => t.key === activeKey);
+  if (!tab || !tab.keywords.length) return true;
+  const haystack = property.typeText || "";
+  return tab.keywords.some((k) => haystack.includes(k));
+}
+
 // True if `value` (a number, possibly null) falls within [min, max].
 // Missing min/max bounds are treated as "no limit" on that side. A null
 // value (couldn't be parsed) is excluded whenever any bound is set.
