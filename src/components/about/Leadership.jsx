@@ -5,7 +5,7 @@ import sarabjitDirectorImage from "../../assets/Sarabjit-director.png";
 const TEAM = [
   {
     key: "sarabjit",
-    name: "Sarabjeet Singh Gulati",
+    name: "Harmanjeet Singh Sachdeva",
     role: "Founder",
     image: sarabjitDirectorImage,
     alt: "sarabjit's Image",
