@@ -6,8 +6,8 @@ import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, withi
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
 // Every badge (New Launch, Premium, Ready to Move, etc) now uses the same
-// flat light-green pill, no icon — matches the simplified tag design.
-const BADGE_STYLE = "bg-green-100 text-[#1a6b32]";
+// flat dark-green pill with white text, no icon — matches the simplified tag design.
+const BADGE_STYLE = "bg-[#1a6b32] text-white";
 
 function toCardProps(row) {
   const tagsText = (row.tags || []).map((t) => (typeof t === "string" ? t : t.label)).join(" ");
