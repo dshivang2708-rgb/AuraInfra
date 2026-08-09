@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
+import { Heart, MapPin, BedDouble, Maximize2, ArrowRight, Rocket, Sparkles, CircleCheck } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
+// Pill style + icon for each badge value, matched to the reference design
+// ("New Launch" = blue gradient pill + rocket icon). Falls back to a plain
+// green pill with no icon for any badge text that isn't one of these three.
 const BADGE_STYLES = {
-  Premium: "bg-[#1a6b32]",
-  "New Launch": "bg-blue-600",
-  "Ready to Move": "bg-yellow-500",
+  "New Launch": { className: "bg-gradient-to-r from-blue-600 to-blue-500", Icon: Rocket },
+  Premium: { className: "bg-gradient-to-r from-[#1a6b32] to-[#238c42]", Icon: Sparkles },
+  "Ready to Move": { className: "bg-gradient-to-r from-amber-500 to-amber-400", Icon: CircleCheck },
 };
 
 function toCardProps(row) {
@@ -47,50 +51,62 @@ function matchesBhk(property, selectedBhks) {
 }
 
 function PropertyCard({ property }) {
+  const badge = BADGE_STYLES[property.badge];
+
   return (
-    <div className="property-card bg-white rounded-xl overflow-hidden border border-gray-100 transition-all duration-300 shadow-sm">
-      <div className="relative h-48 overflow-hidden">
+    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 p-3">
+      <div className="relative h-52 rounded-2xl overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
           <span
-            className={`absolute top-3 left-3 text-white text-[10px] px-2 py-1 rounded font-bold uppercase ${
-              BADGE_STYLES[property.badge] || "bg-[#1a6b32]"
+            className={`absolute top-4 left-4 flex items-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide shadow-md ${
+              badge?.className || "bg-[#1a6b32]"
             }`}
           >
+            {badge?.Icon ? <badge.Icon size={14} /> : null}
             {property.badge}
           </span>
         )}
         <button
-          className="absolute top-3 right-3 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-gray-700 hover:text-red-500"
+          className="absolute top-4 right-4 w-9 h-9 bg-white/95 rounded-full flex items-center justify-center text-gray-700 hover:text-red-500 shadow-md transition-colors"
           aria-label="Save property"
         >
-          <i className="fa-regular fa-heart" />
+          <Heart size={16} />
         </button>
       </div>
-      <div className="p-4">
-        <h4 className="font-bold text-lg text-[#1a1a1a]">{property.name}</h4>
-        <div className="flex items-center text-gray-500 text-xs mt-1 mb-3">
-          <i className="fa-solid fa-location-dot mr-1" /> {property.location}
-        </div>
-        <div className="flex justify-between items-center text-xs text-gray-600 pb-4 border-b border-gray-100">
-          <span className="flex items-center gap-1">
-            <i className="fa-solid fa-bed" /> {property.beds || "—"}
+
+      <div className="px-2 pt-4 pb-2">
+        <h4 className="font-extrabold text-xl text-gray-900 mb-2">{property.name}</h4>
+
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+          <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+            <MapPin size={13} className="text-[#1a6b32]" />
           </span>
-          <span className="flex items-center gap-1">
-            <i className="fa-solid fa-chart-area" /> {property.area || "—"}
+          {property.location}
+        </div>
+
+        <div className="flex items-center gap-3 mb-4">
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2.5">
+            <BedDouble size={15} /> {property.beds || "—"}
+          </span>
+          <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2.5">
+            <Maximize2 size={15} /> {property.area || "—"}
           </span>
         </div>
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-[#1a6b32] font-bold">
-            {property.price}{" "}
-            {property.priceNote && <span className="text-[10px] font-normal">{property.priceNote}</span>}
+
+        <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
+          <div>
+            <span className="text-[#1a6b32] font-extrabold text-xl">{property.price}</span>{" "}
+            <span className="text-gray-400 text-sm font-medium">
+              {property.priceNote ? property.priceNote : "onwards"}
+            </span>
           </div>
           <Link
             to="/properties/residential/$slug"
             params={{ slug: property.key }}
-            className="text-[#1a6b32] text-xs font-bold border-b border-[#1a6b32]"
+            className="flex items-center gap-1.5 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
           >
-            View Details <i className="fa-solid fa-arrow-right-long ml-1" />
+            View Details <ArrowRight size={14} />
           </Link>
         </div>
       </div>
