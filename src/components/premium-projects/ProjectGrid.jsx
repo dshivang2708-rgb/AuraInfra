@@ -8,14 +8,14 @@ import { priceToLakh, withinRange, looselyMatches } from "../../lib/propertyFilt
 function ProjectCard({ project }) {
   return (
     <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-32 overflow-hidden">
         <img alt={project.name} className="w-full h-full object-cover" src={project.image} />
         <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm bg-[#1a6b32] text-white">
           Premium Project
         </span>
       </div>
 
-      <div className="px-4 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-3">
         {project.builder && (
           <span className="inline-flex items-center gap-1 text-[10px] text-[#1a6b32] font-bold uppercase tracking-wider bg-[#eaf4ef] px-2 py-0.5 rounded mb-2">
             <Building2 size={11} /> {project.builder}
@@ -23,7 +23,7 @@ function ProjectCard({ project }) {
         )}
         <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{project.name}</h4>
 
-        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+        <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
           <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
             <MapPin size={13} className="text-[#1a6b32]" />
           </span>
@@ -31,9 +31,12 @@ function ProjectCard({ project }) {
         </div>
 
         {project.tags?.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-3">
+          <div className="flex items-center gap-1.5 mb-3">
             {project.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+              <span
+                key={tag}
+                className="bg-gray-100 text-gray-700 text-[10px] font-semibold rounded-full px-2 py-1 min-w-0 truncate"
+              >
                 {tag}
               </span>
             ))}
