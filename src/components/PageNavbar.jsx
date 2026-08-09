@@ -79,20 +79,6 @@ export default function PageNavbar() {
 
         {/* Action icons */}
         <div className="flex items-center gap-6">
-          <button className="hidden sm:block text-black hover:text-[#0a5d34] transition-colors">
-            <span className="material-symbols-outlined text-[24px]">favorite</span>
-          </button>
-          <div className="relative hidden sm:block">
-            <button className="text-black hover:text-[#0a5d34] transition-colors">
-              <span className="material-symbols-outlined text-[24px]">notifications</span>
-            </button>
-            <span
-              className="absolute -top-1 -right-1 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold"
-              style={{ backgroundColor: AURA_GREEN }}
-            >
-              3
-            </span>
-          </div>
           <button
             className="lg:hidden text-[#151c27]"
             onClick={() => setMobileOpen((v) => !v)}
