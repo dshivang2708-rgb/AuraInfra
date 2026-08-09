@@ -21,14 +21,14 @@ const FEATURE_POINTS = [
 export default function AgricultureHero() {
   return (
     <section
-      className="relative py-16 px-4 md:px-12"
+      className="relative pt-6 pb-20 px-4 md:px-12"
       style={{
         background:
-          "linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.3)) center center / cover no-repeat, url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0zCCGyf4F7rtqtdFFGopJXagqEJFDMdKVHMBYiWgQgzF6BmS1-ufOw75N2-hALEA7XMaqJ8vBD7CRjiCgd4lnZ1RSoNU_Bj1Y8c-y0R5T1k0vk44R66VGhaIQbgQNlidEIbHtzjguLKWgKNNP7i3DI_vMmKXwAFfuGkWjxYj3FtiSzJjmtbvp7ZogIcORizkOLja46nEIeGU5f-1h5AKk5sBbszi3wvaiX9WSKzEw9Y2_fFpsjttCfq3mQXFFtOhkJw=w2400')",
+          "linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.1)) center center / cover no-repeat, url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0zCCGyf4F7rtqtdFFGopJXagqEJFDMdKVHMBYiWgQgzF6BmS1-ufOw75N2-hALEA7XMaqJ8vBD7CRjiCgd4lnZ1RSoNU_Bj1Y8c-y0R5T1k0vk44R66VGhaIQbgQNlidEIbHtzjguLKWgKNNP7i3DI_vMmKXwAFfuGkWjxYj3FtiSzJjmtbvp7ZogIcORizkOLja46nEIeGU5f-1h5AKk5sBbszi3wvaiX9WSKzEw9Y2_fFpsjttCfq3mQXFFtOhkJw=w2400')",
       }}
     >
       <div className="max-w-7xl mx-auto">
-        <nav className="text-sm mb-6 text-gray-600">
+        <nav className="text-sm mb-4 text-gray-600">
           <Link className="hover:underline" to="/">
             Home
           </Link>
@@ -41,26 +41,28 @@ export default function AgricultureHero() {
             <br />
             <span className="text-[#1a6b32]">Harvest</span> the Future.
           </h1>
-          <p className="text-gray-600 text-lg mb-10">
+          <p className="text-gray-600 text-lg mb-6">
             Explore verified agricultural properties in prime locations and grow your tomorrow.
           </p>
-
-          <div className="flex flex-nowrap gap-6 mb-12 overflow-x-auto">
-            {FEATURE_POINTS.map((point) => (
-              <div key={point.title} className="flex items-start gap-3 flex-shrink-0">
-                <div className="p-2 bg-white rounded-full shadow-sm text-[#1a6b32]">
-                  <span className="material-symbols-outlined text-xl">{point.icon}</span>
-                </div>
-                <div>
-                  <p className="font-bold text-sm whitespace-nowrap">{point.title}</p>
-                  <p className="text-xs text-gray-500 whitespace-nowrap">{point.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* Search Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mb-8">
+          {FEATURE_POINTS.map((point) => (
+            <div key={point.title} className="flex items-start gap-3 sm:flex-1 sm:min-w-0">
+              <div className="p-2 bg-white rounded-full shadow-sm text-[#1a6b32] flex-shrink-0">
+                <span className="material-symbols-outlined text-xl">{point.icon}</span>
+              </div>
+              <div>
+                <p className="font-bold text-sm">{point.title}</p>
+                <p className="text-xs text-gray-500">{point.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Floating Search Bar */}
+      <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 px-4 md:px-12">
         <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-xl p-4 md:p-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div className="flex flex-col gap-1 border-r border-gray-100 pr-4">
             <label className="text-xs font-bold text-gray-500 flex items-center gap-2">
