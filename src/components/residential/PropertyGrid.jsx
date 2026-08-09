@@ -1,18 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
-import { Heart, MapPin, BedDouble, Ruler, ArrowRight, Rocket, Sparkles, CircleCheck } from "lucide-react";
+import { MapPin, BedDouble, Ruler, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
-// Pill style + icon for each badge value, matched to the reference design
-// ("New Launch" = blue gradient pill + rocket icon). Falls back to a plain
-// green pill with no icon for any badge text that isn't one of these three.
-const BADGE_STYLES = {
-  "New Launch": { className: "bg-gradient-to-r from-blue-600 to-blue-500", Icon: Rocket },
-  Premium: { className: "bg-gradient-to-r from-[#1a6b32] to-[#238c42]", Icon: Sparkles },
-  "Ready to Move": { className: "bg-gradient-to-r from-amber-500 to-amber-400", Icon: CircleCheck },
-};
+// Every badge (New Launch, Premium, Ready to Move, etc) now uses the same
+// flat light-green pill, no icon — matches the simplified tag design.
+const BADGE_STYLE = "bg-green-100 text-[#1a6b32]";
 
 function toCardProps(row) {
   const tagsText = (row.tags || []).map((t) => (typeof t === "string" ? t : t.label)).join(" ");
@@ -51,28 +46,17 @@ function matchesBhk(property, selectedBhks) {
 }
 
 function PropertyCard({ property }) {
-  const badge = BADGE_STYLES[property.badge];
-
   return (
     <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
       <div className="relative h-40 overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
           <span
-            className={`absolute top-4 left-4 flex items-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide shadow-md ${
-              badge?.className || "bg-[#1a6b32]"
-            }`}
+            className={`absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide shadow-sm ${BADGE_STYLE}`}
           >
-            {badge?.Icon ? <badge.Icon size={14} /> : null}
             {property.badge}
           </span>
         )}
-        <button
-          className="absolute top-4 right-4 w-9 h-9 bg-white/95 rounded-full flex items-center justify-center text-gray-700 hover:text-red-500 shadow-md transition-colors"
-          aria-label="Save property"
-        >
-          <Heart size={16} />
-        </button>
       </div>
 
       <div className="px-4 pt-3 pb-4">
@@ -96,10 +80,8 @@ function PropertyCard({ property }) {
 
         <div className="border-t border-gray-100 pt-3 flex justify-between items-center gap-3">
           <div className="min-w-0">
-            <span className="text-[#1a6b32] font-extrabold text-base">{property.price}</span>{" "}
-            <span className="text-gray-400 text-xs font-medium">
-              {property.priceNote ? property.priceNote : "onwards"}
-            </span>
+            <span className="text-[#1a6b32] font-extrabold text-sm">{property.price}</span>
+            {property.priceNote && <span className="text-gray-400 text-xs font-medium"> {property.priceNote}</span>}
           </div>
           <Link
             to="/properties/residential/$slug"
