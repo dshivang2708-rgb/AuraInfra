@@ -19,9 +19,8 @@ const RESOURCE_LINKS = ["Blog", "FAQs", "Legal", "Privacy Policy", "Terms & Cond
 const SOCIAL_ICONS = ["qr_code_2", "camera", "work", "play_circle"];
 
 const CONTACT_ITEMS = [
-  { icon: "call", text: "+91 98765 43210" },
-  { icon: "mail", text: "info@aurainfra.com" },
-  { icon: "location_on", text: "Sector 82, Mohali, Punjab, India" },
+  { icon: "mail", text: "aurainfraadmin@gmail.com" },
+  { icon: "location_on", text: "SCO 16, 1st Floor, Sector 82-A, JLPL, SAS Nagar, Mohali, Punjab 140306 India" },
 ];
 
 function FooterColumn({ title, children }) {
@@ -173,9 +172,9 @@ export default function Footer() {
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs">
           <p>© 2026 Aura Infra. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
+            {/* <div className="flex items-center gap-1">
               Made with <span className="text-[#ba1a1a]">❤️</span> for a better tomorrow
-            </div>
+            </div> */}
             <Link
               to="/admin/login"
               className="flex items-center gap-1.5 border border-white/15 rounded-full px-3 py-1 text-white/70 hover:text-white hover:border-white/30 transition-colors"
