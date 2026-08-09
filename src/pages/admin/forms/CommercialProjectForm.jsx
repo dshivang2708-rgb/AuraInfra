@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
+import { CATEGORY_TABS } from "../../../components/commercial/CategoryTabs.jsx";
+
+const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
 const CATEGORY = "commercial";
 
@@ -31,7 +34,7 @@ const emptyForm = {
   detailsText: "",
   brochureUrl: "",
   faqs: [],
-  commercialType: "",
+  propertyType: "",
   is_published: true,
   is_featured: false,
   is_upcoming: false,
@@ -43,7 +46,7 @@ const emptyForm = {
 // the JSON textarea since there's no dedicated UI for it here.
 function detailsTextFor(details) {
   if (!details) return "";
-  const { brochureUrl, faqs, type, ...rest } = details;
+  const { brochureUrl, faqs, type, propertyType, ...rest } = details;
   return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
 }
 
@@ -67,7 +70,7 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       detailsText: detailsTextFor(project.details),
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
-      commercialType: d.type || "",
+      propertyType: d.propertyType || "",
     };
   });
   const [uploading, setUploading] = useState(false);
@@ -175,7 +178,10 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       .filter((f) => f.question && f.answer);
     if (cleanFaqs.length) details.faqs = cleanFaqs;
 
-    if (form.commercialType.trim()) details.type = form.commercialType.trim();
+    if (form.propertyType) {
+      details.propertyType = form.propertyType;
+      details.type = PROPERTY_TYPE_OPTIONS.find((opt) => opt.key === form.propertyType)?.label || form.propertyType;
+    }
 
     const tags = form.tagsText
       .split(",")
@@ -259,24 +265,25 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Commercial Type</label>
-        <input
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Property Type</label>
+        <select
           className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-          value={form.commercialType}
-          onChange={(e) => update("commercialType", e.target.value)}
-          placeholder="e.g. Office Space, Retail Shop, Warehouse, Co-working, Showroom"
-          list="commercial-type-suggestions"
-        />
-        <datalist id="commercial-type-suggestions">
-          <option value="Office Space" />
-          <option value="Retail Shop" />
-          <option value="Showroom" />
-          <option value="Warehouse" />
-          <option value="Co-working Space" />
-          <option value="Mixed Use" />
-        </datalist>
-        <p className="text-[10px] text-[#75777f] mt-1">
-          Shown as the property type badge on the listing and detail pages.
+          value={form.propertyType}
+          onChange={(e) => update("propertyType", e.target.value)}
+          required
+        >
+          <option value="" disabled>
+            Select a category...
+          </option>
+          {PROPERTY_TYPE_OPTIONS.map((opt) => (
+            <option key={opt.key} value={opt.key}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-[11px] text-[#6b7280] mt-1">
+          Determines which tab (All / Office Space / Retail Shop / ...) this project shows up under on the
+          Commercial listing page, and the type badge shown on cards and the detail page.
         </p>
       </div>
 
@@ -509,7 +516,7 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
           placeholder={DETAILS_PLACEHOLDER}
         />
         <p className="text-[10px] text-[#75777f] mt-1">
-          Leave blank to skip. Commercial Type, brochure and FAQs are managed by the dedicated fields above — no need to repeat them here.
+          Leave blank to skip. Property Type, brochure and FAQs are managed by the dedicated fields above — no need to repeat them here.
         </p>
       </div>
 

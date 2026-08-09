@@ -2,15 +2,37 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, Square, Heart, LayoutGrid, List } from "lucide-react";
 import { api } from "../../lib/api.js";
-import { toCommercialCard } from "../../lib/adapters.js";
-import { firstNumber, matchesAnySelected, parseListParam } from "../../lib/propertyFilters.js";
+import { firstNumber, matchesCategory, parseListParam } from "../../lib/propertyFilters.js";
 import { CARPET_AREA_BUCKETS } from "../../lib/commercialFilters.js";
+import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
 const BADGE_STYLES = {
   Premium: "bg-[#1a6b32]",
   Featured: "bg-blue-600",
   New: "bg-gray-800",
 };
+
+function toCardProps(row) {
+  const d = row.details || {};
+  const tagsText = (row.tags || []).map((t) => (typeof t === "string" ? t : t.label)).join(" ");
+  return {
+    key: row.slug,
+    name: row.name,
+    image: row.main_image,
+    badge: row.badge,
+    location: row.location,
+    area: row.area_display,
+    priceRange: row.price_range,
+    type: d.type,
+    // Canonical category key selected by the admin on the listing form
+    // (e.g. "office-space") — the reliable way matchesCategory() decides
+    // which CategoryTabs tab this property belongs to.
+    propertyType: d.propertyType || null,
+    // Lowercased blob of everything that might mention the property's
+    // category — fallback for older rows saved before propertyType existed.
+    typeText: `${row.name || ""} ${tagsText} ${d.configurations || ""} ${d.type || ""}`.toLowerCase(),
+  };
+}
 
 function PropertyCard({ property }) {
   return (
@@ -71,7 +93,7 @@ export default function ResultsGrid() {
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
-  const types = parseListParam(search.types);
+  const activeCategory = search.type || "all";
   const areas = parseListParam(search.area);
 
   useEffect(() => {
@@ -79,7 +101,7 @@ export default function ResultsGrid() {
     setLoading(true);
     api
       .listProjects({ category: "commercial", ...(city && { city }), ...(sector && { sector }) })
-      .then((rows) => active && setRawProperties(rows.map(toCommercialCard)))
+      .then((rows) => active && setRawProperties(rows.map(toCardProps)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
@@ -87,11 +109,12 @@ export default function ResultsGrid() {
     };
   }, [city, sector]);
 
-  // Property Type and Carpet Area are filtered client-side (no need to
-  // re-fetch — city/sector already narrowed things down on the server).
+  // Property Type (via the tabs above) and Carpet Area are filtered
+  // client-side (no need to re-fetch — city/sector already narrowed things
+  // down on the server).
   const properties = useMemo(() => {
     return rawProperties.filter((property) => {
-      if (!matchesAnySelected(property.type, types)) return false;
+      if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (areas.length > 0) {
         const num = firstNumber(property.area);
         const inAnyBucket = areas.some((label) => {
@@ -102,7 +125,7 @@ export default function ResultsGrid() {
       }
       return true;
     });
-  }, [rawProperties, types, areas]);
+  }, [rawProperties, activeCategory, areas]);
 
   return (
     <div className="flex-1">
@@ -111,7 +134,11 @@ export default function ResultsGrid() {
         <h2 className="text-xl font-bold">
           {loading
             ? "Loading..."
-            : `Showing ${properties.length} Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
+            : `Showing ${properties.length} ${
+                activeCategory !== "all"
+                  ? CATEGORY_TABS.find((t) => t.key === activeCategory)?.label || "Commercial"
+                  : "Commercial"
+              } Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
         </h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">

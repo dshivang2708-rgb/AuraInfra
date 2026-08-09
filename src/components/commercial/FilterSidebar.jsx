@@ -1,60 +1,77 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { SlidersHorizontal, ChevronDown } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
 import { parseListParam } from "../../lib/propertyFilters.js";
-import { COMMERCIAL_PROPERTY_TYPES, CARPET_AREA_BUCKETS } from "../../lib/commercialFilters.js";
+import { CARPET_AREA_BUCKETS } from "../../lib/commercialFilters.js";
 
-function CheckboxList({ options, selected, onToggle }) {
-  return (
-    <div className="space-y-3">
-      {options.map((option) => (
-        <label key={option} className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer">
-          <input
-            type="checkbox"
-            className="rounded border-gray-300 text-[#1a6b32] focus:ring-[#1a6b32]"
-            checked={selected.includes(option)}
-            onChange={() => onToggle(option)}
-          />
-          {option}
-        </label>
-      ))}
-    </div>
-  );
+function draftFromSearch(search) {
+  return {
+    city: search.city || "",
+    sector: search.sector || "",
+    area: parseListParam(search.area),
+  };
 }
 
 export default function FilterSidebar() {
-  const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
   const search = useSearch({ strict: false });
-  const city = search.city || "";
-  const sector = search.sector || "";
-  const types = parseListParam(search.types);
-  const areas = parseListParam(search.area);
+
+  // These filters are staged locally and only pushed into the URL (which is
+  // what ResultsGrid actually reads from) when "Apply Filters" is clicked.
+  const [draft, setDraft] = useState(() => draftFromSearch(search));
+
+  // If the URL changes from outside this component (Clear All below,
+  // browser back/forward, a category tab reset, etc), re-sync the draft so
+  // it doesn't show stale selections.
+  useEffect(() => {
+    setDraft(draftFromSearch(search));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.city, search.sector, search.area]);
 
   const cities = useCities();
-  const sectors = useSectors(city);
+  const sectors = useSectors(draft.city);
 
-  function updateSearch(next) {
+  const appliedDraft = draftFromSearch(search);
+  const isDirty =
+    draft.city !== appliedDraft.city ||
+    draft.sector !== appliedDraft.sector ||
+    draft.area.join(",") !== appliedDraft.area.join(",");
+
+  function updateDraft(next) {
+    setDraft((d) => ({ ...d, ...next }));
+  }
+
+  function handleCityChange(e) {
+    // Changing city clears sector — sectors only make sense within a city.
+    updateDraft({ city: e.target.value, sector: "" });
+  }
+
+  function toggleArea(option) {
+    const next = draft.area.includes(option) ? draft.area.filter((a) => a !== option) : [...draft.area, option];
+    updateDraft({ area: next });
+  }
+
+  function applyFilters() {
     navigate({
       to: "/properties/commercial",
-      search: cleanSearch({ ...search, ...next }),
+      search: cleanSearch({
+        ...search,
+        city: draft.city,
+        sector: draft.sector,
+        area: draft.area.join(",") || undefined,
+      }),
       replace: true,
     });
   }
 
-  function toggleType(option) {
-    const next = types.includes(option) ? types.filter((t) => t !== option) : [...types, option];
-    updateSearch({ types: next.join(",") || undefined });
-  }
-
-  function toggleArea(option) {
-    const next = areas.includes(option) ? areas.filter((a) => a !== option) : [...areas, option];
-    updateSearch({ area: next.join(",") || undefined });
-  }
-
   function clearAll() {
-    updateSearch({ city: "", sector: "", types: undefined, area: undefined });
+    setDraft({ city: "", sector: "", area: [] });
+    navigate({
+      to: "/properties/commercial",
+      search: cleanSearch({ ...search, city: "", sector: "", area: undefined }),
+      replace: true,
+    });
   }
 
   return (
@@ -70,21 +87,12 @@ export default function FilterSidebar() {
           </button>
         </div>
 
-        {/* Property Type */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-sm font-bold text-gray-700">Property Type</h4>
-            <ChevronDown size={14} />
-          </div>
-          <CheckboxList options={COMMERCIAL_PROPERTY_TYPES} selected={types} onToggle={toggleType} />
-        </div>
-
         {/* City */}
         <div className="mb-6">
           <h4 className="text-sm font-bold text-gray-700 mb-4">City</h4>
           <select
-            value={city}
-            onChange={(e) => updateSearch({ city: e.target.value, sector: "" })}
+            value={draft.city}
+            onChange={handleCityChange}
             className="w-full text-sm border-gray-200 rounded-lg py-2 focus:ring-[#1a6b32] focus:border-[#1a6b32]"
           >
             <option value="">All Cities</option>
@@ -100,8 +108,8 @@ export default function FilterSidebar() {
         <div className="mb-8">
           <h4 className="text-sm font-bold text-gray-700 mb-4">Sector</h4>
           <select
-            value={sector}
-            onChange={(e) => updateSearch({ sector: e.target.value })}
+            value={draft.sector}
+            onChange={(e) => updateDraft({ sector: e.target.value })}
             disabled={sectors.length === 0}
             className="w-full text-sm border-gray-200 rounded-lg py-2 focus:ring-[#1a6b32] focus:border-[#1a6b32] disabled:bg-gray-50 disabled:text-gray-400"
           >
@@ -112,27 +120,46 @@ export default function FilterSidebar() {
               </option>
             ))}
           </select>
-          {city && sectors.length === 0 && (
-            <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {city} yet.</p>
+          {draft.city && sectors.length === 0 && (
+            <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {draft.city} yet.</p>
           )}
         </div>
 
         {/* Carpet Area */}
         <div className="mb-8">
           <h4 className="text-sm font-bold text-gray-700 mb-4">Carpet Area</h4>
-          <CheckboxList
-            options={CARPET_AREA_BUCKETS.map((b) => b.label)}
-            selected={areas}
-            onToggle={toggleArea}
-          />
+          <div className="space-y-3">
+            {CARPET_AREA_BUCKETS.map((bucket) => (
+              <label key={bucket.label} className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-[#1a6b32] focus:ring-[#1a6b32]"
+                  checked={draft.area.includes(bucket.label)}
+                  onChange={() => toggleArea(bucket.label)}
+                />
+                {bucket.label}
+              </label>
+            ))}
+          </div>
         </div>
 
+        {/* Apply — filters above are staged locally and only take effect
+            against the results once this is clicked. */}
         <button
-          onClick={() => setShowMore((v) => !v)}
-          className="w-full py-3 flex items-center justify-center gap-2 text-[#1a6b32] font-bold text-sm border-t border-gray-100 mt-4"
+          type="button"
+          onClick={applyFilters}
+          className={`w-full text-white text-sm font-bold py-2.5 rounded-lg mb-2 flex items-center justify-center gap-2 transition-colors ${
+            isDirty ? "bg-[#1a6b32] hover:bg-[#145528]" : "bg-[#1a6b32]/70"
+          }`}
         >
-          Show More Filters
-          <ChevronDown size={16} className={`transition-transform ${showMore ? "rotate-180" : ""}`} />
+          <SlidersHorizontal size={14} /> Apply Filters
+        </button>
+
+        <button
+          onClick={clearAll}
+          className="w-full text-gray-500 text-xs font-bold py-1 flex items-center justify-center gap-2"
+        >
+          Reset All
         </button>
       </div>
     </aside>
