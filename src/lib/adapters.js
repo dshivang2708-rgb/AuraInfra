@@ -159,6 +159,8 @@ export function toPremiumCard(row) {
     location: row.location,
     tags: row.tags || [],
     price: row.price_display,
+    priceRange: row.price_range,
+    possession: row.possession,
     image: row.main_image,
   };
 }

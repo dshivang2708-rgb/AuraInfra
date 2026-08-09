@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
 import { toPremiumCard } from "../../lib/adapters.js";
+import { priceToLakh, withinRange, looselyMatches } from "../../lib/propertyFilters.js";
 
 function ProjectCard({ project }) {
   return (
@@ -55,25 +56,42 @@ function ProjectCard({ project }) {
 
 export default function ProjectGrid() {
   const [gridView, setGridView] = useState(true);
-  const [projects, setProjects] = useState([]);
+  const [rawProjects, setRawProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
+  const minPrice = search.minPrice ? Number(search.minPrice) : null;
+  const maxPrice = search.maxPrice ? Number(search.maxPrice) : null;
+  const status = search.status || "";
+  const builder = search.builder || "";
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     api
       .listProjects({ category: "premium", ...(city && { city }), ...(sector && { sector }) })
-      .then((rows) => active && setProjects(rows.map(toPremiumCard)))
+      .then((rows) => active && setRawProjects(rows.map(toPremiumCard)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
   }, [city, sector]);
+
+  // Budget/status/builder are applied client-side once "Search" is clicked
+  // on the hero bar (mirrors how category filtering works on the Upcoming
+  // Projects page) — city/sector are the only params narrowed server-side.
+  const projects = useMemo(() => {
+    return rawProjects.filter((p) => {
+      const priceLakh = priceToLakh(p.priceRange) ?? priceToLakh(p.price);
+      if (!withinRange(priceLakh, minPrice, maxPrice)) return false;
+      if (status && !looselyMatches(p.possession, status)) return false;
+      if (builder && !looselyMatches(p.builder, builder)) return false;
+      return true;
+    });
+  }, [rawProjects, minPrice, maxPrice, status, builder]);
 
   return (
     <>
