@@ -33,6 +33,7 @@ const emptyForm = {
   faqs: [],
   commercialType: "",
   is_published: true,
+  is_featured: false,
 };
 
 // brochureUrl / faqs / type (Commercial Type) are managed by their own
@@ -200,6 +201,7 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       tags,
       details,
       is_published: form.is_published,
+      is_featured: form.is_featured,
     };
 
     setSaving(true);
@@ -517,6 +519,16 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
           className="rounded border-[#c5c6cf] text-[#1a6b32] focus:ring-[#1a6b32]"
         />
         Published (visible on the live site)
+      </label>
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={form.is_featured}
+          onChange={(e) => update("is_featured", e.target.checked)}
+          className="rounded border-[#c5c6cf] text-[#1a6b32] focus:ring-[#1a6b32]"
+        />
+        Featured Property (also shown in the "Featured Properties" section on the homepage)
       </label>
 
       <div className="flex gap-3 pt-2">

@@ -156,3 +156,31 @@ export function toPremiumCard(row) {
     image: row.main_image,
   };
 }
+
+const CATEGORY_TYPE_LABELS = {
+  residential: "Residential",
+  commercial: "Commercial",
+  agriculture: "Agriculture",
+  premium: "Premium",
+};
+
+// Converts a project row from ANY category into the shape the homepage's
+// "Featured Properties" section needs. Unlike the other adapters above,
+// this one is category-agnostic since a single featured list can mix
+// residential/commercial/agriculture properties together.
+export function toFeaturedCard(row) {
+  const d = row.details || {};
+  return {
+    key: `${row.category}-${row.slug}`,
+    category: row.category,
+    slug: row.slug,
+    name: row.name,
+    price: row.price_display,
+    // Best available short "type" label: Commercial Type, then BHK summary,
+    // then a generic fallback based on the category.
+    type: d.type || d.beds || CATEGORY_TYPE_LABELS[row.category] || row.category,
+    location: row.location,
+    area: row.area_display,
+    image: row.main_image,
+  };
+}
