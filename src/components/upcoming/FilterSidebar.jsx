@@ -1,0 +1,112 @@
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { SlidersHorizontal } from "lucide-react";
+import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
+import { parseListParam } from "../../lib/propertyFilters.js";
+
+const CATEGORY_OPTIONS = [
+  { value: "residential", label: "Residential" },
+  { value: "commercial", label: "Commercial" },
+  { value: "agriculture", label: "Agriculture" },
+];
+
+export default function FilterSidebar() {
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const city = search.city || "";
+  const sector = search.sector || "";
+  const categories = parseListParam(search.category);
+
+  const cities = useCities();
+  const sectors = useSectors(city);
+
+  function updateSearch(next) {
+    navigate({
+      to: "/properties/upcoming",
+      search: cleanSearch({ ...search, ...next }),
+      replace: true,
+    });
+  }
+
+  function toggleCategory(value) {
+    const next = categories.includes(value)
+      ? categories.filter((c) => c !== value)
+      : [...categories, value];
+    updateSearch({ category: next.join(",") || undefined });
+  }
+
+  function clearAll() {
+    updateSearch({ city: "", sector: "", category: undefined });
+  }
+
+  return (
+    <aside className="w-full md:w-72 flex-shrink-0">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:sticky md:top-20">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2 text-[#1a6b32] font-bold">
+            <SlidersHorizontal size={18} />
+            Filters
+          </div>
+          <button onClick={clearAll} className="text-xs text-[#1a6b32] font-semibold">
+            Clear All
+          </button>
+        </div>
+
+        {/* Category */}
+        <div className="mb-8">
+          <h4 className="text-sm font-bold text-gray-700 mb-4">Category</h4>
+          <div className="space-y-3">
+            {CATEGORY_OPTIONS.map((option) => (
+              <label key={option.value} className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-[#1a6b32] focus:ring-[#1a6b32]"
+                  checked={categories.includes(option.value)}
+                  onChange={() => toggleCategory(option.value)}
+                />
+                {option.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* City */}
+        <div className="mb-6">
+          <h4 className="text-sm font-bold text-gray-700 mb-4">City</h4>
+          <select
+            value={city}
+            onChange={(e) => updateSearch({ city: e.target.value, sector: "" })}
+            className="w-full text-sm border-gray-200 rounded-lg py-2 focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          >
+            <option value="">All Cities</option>
+            {cities.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sector — scoped to the selected city */}
+        <div>
+          <h4 className="text-sm font-bold text-gray-700 mb-4">Sector</h4>
+          <select
+            value={sector}
+            onChange={(e) => updateSearch({ sector: e.target.value })}
+            disabled={sectors.length === 0}
+            className="w-full text-sm border-gray-200 rounded-lg py-2 focus:ring-[#1a6b32] focus:border-[#1a6b32] disabled:bg-gray-50 disabled:text-gray-400"
+          >
+            <option value="">All Sectors</option>
+            {sectors.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          {city && sectors.length === 0 && (
+            <p className="text-[11px] text-gray-400 mt-1">No specific sectors listed for {city} yet.</p>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+}

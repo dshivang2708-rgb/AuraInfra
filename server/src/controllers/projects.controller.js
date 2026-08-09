@@ -46,7 +46,7 @@ function applyCityFilter(query, city) {
 // ---------- Public (no auth required) ----------
 
 export async function listPublicProjects(req, res) {
-  const { category, sector, city, featured } = req.query;
+  const { category, sector, city, featured, upcoming } = req.query;
 
   let query = supabaseAdmin.from("projects").select("*").eq("is_published", true);
 
@@ -64,6 +64,9 @@ export async function listPublicProjects(req, res) {
   }
   if (featured === "true" || featured === "1") {
     query = query.eq("is_featured", true);
+  }
+  if (upcoming === "true" || upcoming === "1") {
+    query = query.eq("is_upcoming", true);
   }
 
   const { data, error } = await query.order("created_at", { ascending: false });
@@ -188,6 +191,7 @@ export async function createProject(req, res) {
       details: body.details ?? {},
       is_published: body.is_published ?? true,
       is_featured: body.is_featured ?? false,
+      is_upcoming: body.is_upcoming ?? false,
       created_by: req.user.id,
     })
     .select()
@@ -213,7 +217,7 @@ export async function updateProject(req, res) {
   const updatable = [
     "category", "slug", "name", "tagline", "badge", "location", "city", "sector",
     "price_display", "price_range", "area_display", "possession", "description",
-    "main_image", "main_images", "gallery_images", "tags", "details", "is_published", "is_featured",
+    "main_image", "main_images", "gallery_images", "tags", "details", "is_published", "is_featured", "is_upcoming",
   ];
   const updates = {};
   for (const key of updatable) {

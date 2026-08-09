@@ -10,6 +10,7 @@ import AgricultureProperties from "./pages/AgricultureProperties.jsx";
 import AgricultureProjectDetail from "./pages/AgricultureProjectDetail.jsx";
 import PremiumProjects from "./pages/PremiumProjects.jsx";
 import PremiumProjectDetail from "./pages/PremiumProjectDetail.jsx";
+import UpcomingProjects from "./pages/UpcomingProjects.jsx";
 import AdminSignIn from "./pages/admin/AdminSignIn.jsx";
 import AdminSignUp from "./pages/admin/AdminSignUp.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -90,6 +91,12 @@ const premiumProjectDetailRoute = createRoute({
   component: PremiumProjectDetail,
 });
 
+const upcomingProjectsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/properties/upcoming",
+  component: UpcomingProjects,
+});
+
 const adminSignInRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin/login",
@@ -120,6 +127,7 @@ const routeTree = rootRoute.addChildren([
   agricultureDetailRoute,
   premiumProjectsRoute,
   premiumProjectDetailRoute,
+  upcomingProjectsRoute,
   adminSignInRoute,
   adminSignUpRoute,
   adminDashboardRoute,

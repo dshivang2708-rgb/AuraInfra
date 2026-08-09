@@ -40,6 +40,7 @@ const emptyForm = {
   floorPlans: DEFAULT_FLOOR_PLANS(),
   is_published: true,
   is_featured: false,
+  is_upcoming: false,
 };
 
 // brochureUrl / faqs / floorPlans are managed by their own dedicated
@@ -228,6 +229,7 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
       details,
       is_published: form.is_published,
       is_featured: form.is_featured,
+      is_upcoming: form.is_upcoming,
     };
 
     setSaving(true);
@@ -573,6 +575,16 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
           className="rounded border-[#c5c6cf] text-[#1a6b32] focus:ring-[#1a6b32]"
         />
         Featured Property (also shown in the "Featured Properties" section on the homepage)
+      </label>
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={form.is_upcoming}
+          onChange={(e) => update("is_upcoming", e.target.checked)}
+          className="rounded border-[#c5c6cf] text-[#1a6b32] focus:ring-[#1a6b32]"
+        />
+        Upcoming Project (also shown in the "Upcoming Projects" section)
       </label>
 
       <div className="flex gap-3 pt-2">

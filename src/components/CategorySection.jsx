@@ -59,9 +59,10 @@ const CATEGORIES = [
     alt: "Lush green agricultural landscape with misty mountains",
   },
   {
-    key: "new-projects",
+    key: "upcoming",
     icon: "engineering",
-    title: "New Projects",
+    title: "Upcoming Projects",
+    to: "/properties/upcoming",
     description: (
       <>
         Builder Projects • Ready

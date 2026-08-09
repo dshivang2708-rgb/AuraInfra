@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { api } from "../lib/api.js";
 import { toFeaturedCard } from "../lib/adapters.js";
+import { CATEGORY_DETAIL_ROUTES } from "../lib/categoryRoutes.js";
 
 const VerifiedIcon = () => (
   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -56,17 +57,10 @@ const ArrowForwardIcon = () => (
   </svg>
 );
 
-const CATEGORY_ROUTES = {
-  residential: "/properties/residential/$slug",
-  commercial: "/properties/commercial/$slug",
-  agriculture: "/properties/agriculture/$slug",
-  premium: "/properties/premium-projects/$slug",
-};
-
 function PropertyCard({ property }) {
   return (
     <Link
-      to={CATEGORY_ROUTES[property.category] || "/properties/residential/$slug"}
+      to={CATEGORY_DETAIL_ROUTES[property.category] || "/properties/residential/$slug"}
       params={{ slug: property.slug }}
       className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-[#c5c6cf]/30 flex flex-col h-full max-w-[275px] mx-auto w-full"
     >

@@ -32,6 +32,7 @@ const emptyForm = {
   faqs: [],
   is_published: true,
   is_featured: false,
+  is_upcoming: false,
 };
 
 // brochureUrl / faqs are managed by their own dedicated controls, so strip
@@ -181,6 +182,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
       details,
       is_published: form.is_published,
       is_featured: form.is_featured,
+      is_upcoming: form.is_upcoming,
     };
 
     setSaving(true);
@@ -468,6 +470,16 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
           className="rounded border-[#c5c6cf] text-[#1a6b32] focus:ring-[#1a6b32]"
         />
         Featured Property (also shown in the "Featured Properties" section on the homepage)
+      </label>
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={form.is_upcoming}
+          onChange={(e) => update("is_upcoming", e.target.checked)}
+          className="rounded border-[#c5c6cf] text-[#1a6b32] focus:ring-[#1a6b32]"
+        />
+        Upcoming Project (also shown in the "Upcoming Projects" section)
       </label>
 
       <div className="flex gap-3 pt-2">
