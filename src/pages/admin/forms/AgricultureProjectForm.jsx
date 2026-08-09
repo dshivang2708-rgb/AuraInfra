@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
+import { CATEGORY_TABS } from "../../../components/agriculture/CategoryTabs.jsx";
+
+const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
 const CATEGORY = "agriculture";
 
@@ -30,6 +33,7 @@ const emptyForm = {
   detailsText: "",
   brochureUrl: "",
   faqs: [],
+  propertyType: "",
   is_published: true,
   is_featured: false,
   is_upcoming: false,
@@ -40,7 +44,7 @@ const emptyForm = {
 // places at once.
 function detailsTextFor(details) {
   if (!details) return "";
-  const { brochureUrl, faqs, ...rest } = details;
+  const { brochureUrl, faqs, propertyType, ...rest } = details;
   return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
 }
 
@@ -58,6 +62,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
       detailsText: detailsTextFor(project.details),
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
+      propertyType: d.propertyType || "",
     };
   });
   const [uploading, setUploading] = useState(false);
@@ -151,6 +156,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
     }
 
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
+    if (form.propertyType) details.propertyType = form.propertyType;
 
     const cleanFaqs = form.faqs
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
@@ -235,6 +241,29 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
             onChange={(e) => update("tagline", e.target.value)}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Property Type</label>
+        <select
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          value={form.propertyType}
+          onChange={(e) => update("propertyType", e.target.value)}
+          required
+        >
+          <option value="" disabled>
+            Select a category...
+          </option>
+          {PROPERTY_TYPE_OPTIONS.map((opt) => (
+            <option key={opt.key} value={opt.key}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-[11px] text-[#6b7280] mt-1">
+          Determines which tab (All / Agricultural Land / Farmhouse Land / ...) this project shows up under on
+          the Agriculture listing page.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -448,7 +477,8 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
           placeholder={DETAILS_PLACEHOLDER}
         />
         <p className="text-[10px] text-[#75777f] mt-1">
-          Leave blank to skip. Brochure and FAQs are managed by the dedicated fields above — no need to repeat them here.
+          Leave blank to skip. Property Type, brochure and FAQs are managed by the dedicated fields above — no
+          need to repeat them here.
         </p>
       </div>
 

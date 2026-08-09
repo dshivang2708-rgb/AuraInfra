@@ -1,8 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
-import { toAgricultureCard } from "../../lib/adapters.js";
-import { firstNumber, matchesAnySelectedInList, parseListParam, withinRange } from "../../lib/propertyFilters.js";
+import { firstNumber, matchesCategory, withinRange } from "../../lib/propertyFilters.js";
+import { CATEGORY_TABS } from "./CategoryTabs.jsx";
+
+function toCardProps(row) {
+  const d = row.details || {};
+  const tagsText = (row.tags || []).map((t) => (typeof t === "string" ? t : t.label)).join(" ");
+  return {
+    key: row.slug,
+    name: row.name,
+    badge: row.badge,
+    location: row.location,
+    area: row.area_display,
+    price: row.price_display,
+    priceNote: d.priceNote,
+    image: row.main_image,
+    // Canonical category key selected by the admin on the listing form
+    // (e.g. "farmhouse-land") — the reliable way matchesCategory() decides
+    // which CategoryTabs tab this property belongs to.
+    propertyType: d.propertyType || null,
+    // Lowercased blob of everything that might mention the property's
+    // category — fallback for older rows saved before propertyType existed.
+    typeText: `${row.name || ""} ${tagsText}`.toLowerCase(),
+  };
+}
 
 function PropertyCard({ property }) {
   return (
@@ -54,7 +76,7 @@ export default function ResultsGrid() {
   const search = useSearch({ strict: false });
   const city = search.city || "";
   const sector = search.sector || "";
-  const types = parseListParam(search.types);
+  const activeCategory = search.type || "all";
   const minArea = search.minArea ? parseFloat(search.minArea) : null;
   const maxArea = search.maxArea ? parseFloat(search.maxArea) : null;
 
@@ -63,7 +85,7 @@ export default function ResultsGrid() {
     setLoading(true);
     api
       .listProjects({ category: "agriculture", ...(city && { city }), ...(sector && { sector }) })
-      .then((rows) => active && setRawProperties(rows.map(toAgricultureCard)))
+      .then((rows) => active && setRawProperties(rows.map(toCardProps)))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => {
@@ -71,15 +93,16 @@ export default function ResultsGrid() {
     };
   }, [city, sector]);
 
-  // Property Type and Land Area are filtered client-side (no need to
-  // re-fetch — city/sector already narrowed things down on the server).
+  // Property Type (via the tabs above) and Land Area are filtered
+  // client-side (no need to re-fetch — city/sector already narrowed things
+  // down on the server).
   const properties = useMemo(() => {
     return rawProperties.filter((property) => {
-      if (!matchesAnySelectedInList(property.tags, types)) return false;
+      if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (!withinRange(firstNumber(property.area), minArea, maxArea)) return false;
       return true;
     });
-  }, [rawProperties, types, minArea, maxArea]);
+  }, [rawProperties, activeCategory, minArea, maxArea]);
 
   return (
     <section className="flex-1">
@@ -87,7 +110,11 @@ export default function ResultsGrid() {
         <h2 className="text-lg font-bold">
           {loading
             ? "Loading..."
-            : `Showing ${properties.length} Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
+            : `Showing ${properties.length} ${
+                activeCategory !== "all"
+                  ? CATEGORY_TABS.find((t) => t.key === activeCategory)?.label || "Agriculture"
+                  : "Agriculture"
+              } Properties${sector ? ` in ${sector}` : city ? ` in ${city}` : ""}`}
         </h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
