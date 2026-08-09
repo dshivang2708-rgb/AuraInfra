@@ -1,11 +1,11 @@
 import EnquiryForm from "../EnquiryForm.jsx";
 
 const PRICE_CHECKLIST = [
-  "RERA Approved",
-  "Clear Title & Legal Verified",
-  "Fertile & Cultivable Land",
-  "Good Water Availability",
-  "High Appreciation Potential",
+  { label: "RERA Approved", icon: "verified" },
+  { label: "Clear Title & Legal Verified", icon: "gavel" },
+  { label: "Fertile & Cultivable Land", icon: "grass" },
+  { label: "Good Water Availability", icon: "water_drop" },
+  { label: "High Appreciation Potential", icon: "trending_up" },
 ];
 
 export default function PricingSidebar({ property }) {
@@ -20,28 +20,14 @@ export default function PricingSidebar({ property }) {
           </div>
           <ul className="flex flex-col gap-3 text-sm text-[#151c27]">
             {PRICE_CHECKLIST.map((item) => (
-              <li key={item} className="flex items-center gap-3">
+              <li key={item.label} className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-[#1a6b32] bg-[#1a6b32]/20 rounded-full p-1 text-[16px]">
-                  check
+                  {item.icon}
                 </span>
-                <span className="font-semibold">{item}</span>
+                <span className="font-semibold">{item.label}</span>
               </li>
             ))}
           </ul>
-          <div className="flex flex-col gap-3 pt-2">
-            <button className="w-full bg-[#1a6b32] hover:bg-[#1a6b32]/90 text-white text-sm font-bold py-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
-              Enquire Now <span className="material-symbols-outlined">arrow_forward</span>
-            </button>
-            <div className="text-center text-[10px] uppercase tracking-wider text-[#45464e] mt-2 mb-1 opacity-70">
-              Or Call Us
-            </div>
-            
-              className="flex items-center justify-center gap-1 text-[#151c27] text-sm hover:text-[#1a6b32] transition-colors"
-              href="tel:+919876543210"
-            <a>
-              <span className="material-symbols-outlined text-[#1a6b32] text-[16px]">call</span> +91 98765 43210
-            </a>
-          </div>
         </div>
 
         {/* Enquiry Form */}

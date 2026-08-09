@@ -14,6 +14,13 @@ const AMENITIES = [
   { icon: "groups", label: "Clubhouse" },
 ];
 
+const PRICE_CHECKLIST = [
+  { label: "RERA Approved", icon: "verified" },
+  { label: "Premium Quality Construction", icon: "apartment" },
+  { label: "Prime Location", icon: "location_on" },
+  { label: "High Appreciation Potential", icon: "trending_up" },
+];
+
 export default function PremiumProjectDetail() {
   const { slug } = useParams({ strict: false });
   const [project, setProject] = useState(null);
@@ -140,15 +147,16 @@ export default function PremiumProjectDetail() {
               <div className="bg-[#eaf4ef] rounded-2xl p-6 shadow-sm">
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">{project.price}</h2>
                 <p className="text-sm text-gray-500 mb-6">Starting Price</p>
-                <button className="w-full bg-[#1a6b32] hover:bg-[#145126] text-white py-3 rounded-lg font-semibold transition-colors mb-4 flex justify-center items-center gap-2">
-                  Enquire Now <span className="material-symbols-outlined text-base">arrow_forward</span>
-                </button>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Or Call Us</p>
-                  <a className="text-lg font-bold text-[#1a6b32] flex items-center justify-center gap-2" href="tel:+919876543210">
-                    <span className="material-symbols-outlined text-base">call</span> +91 98765 43210
-                  </a>
-                </div>
+                <ul className="space-y-3">
+                  {PRICE_CHECKLIST.map((item) => (
+                    <li key={item.label} className="flex items-center gap-2 text-sm text-gray-700">
+                      <span className="material-symbols-outlined text-[#1a6b32] bg-white p-1 rounded-full text-[16px] w-6 h-6 flex items-center justify-center">
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               <div className="bg-white rounded-2xl p-6 shadow-sm">
