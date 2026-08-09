@@ -27,7 +27,16 @@ const DETAILS_PLACEHOLDER = {
   "whyInvest": ["Prime location", "Excellent soil & water"]
 }`,
   premium: `{
-  "builder": "DLF"
+  "builder": "DLF",
+  "propertyType": "Luxury Apartments",
+  "totalArea": "8 Acres",
+  "totalUnits": "400+",
+  "configurations": "3 BHK, 4 BHK, Penthouses",
+  "priceNote": "Starting Price",
+  "overviewSummary": "A short paragraph for the Overview tab...",
+  "floorPlans": [{ "type": "3 BHK", "area": "1800 sq ft" }],
+  "whyInvest": ["Prime location", "Iconic developer", "High appreciation potential"],
+  "amenities": [{ "icon": "pool", "label": "Swimming Pool" }]
 }`,
 };
 

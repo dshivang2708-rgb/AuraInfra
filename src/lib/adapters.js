@@ -87,15 +87,36 @@ export function toAgricultureDetail(row) {
   };
 }
 
+// Premium projects use the same generic admin form as the other three
+// categories (name, tagline, badge, location, price fields, description,
+// gallery, brochure, FAQs, plus a free-form "details" JSON blob for the
+// rest) — so this adapter now surfaces every one of those fields, the same
+// way toResidentialDetail/toCommercialDetail/toAgricultureDetail do, instead
+// of dropping most of what the admin entered.
 export function toPremiumDetail(row) {
   const d = row.details || {};
   return {
     key: row.slug,
     name: row.name,
+    tagline: row.tagline,
+    badge: row.badge,
     builder: d.builder,
+    propertyType: d.propertyType,
     location: row.location,
-    tags: row.tags || [],
+    area: row.area_display,
     price: row.price_display,
+    priceRange: row.price_range,
+    priceNote: d.priceNote,
+    possession: row.possession,
+    totalArea: d.totalArea,
+    totalUnits: d.totalUnits,
+    configurations: d.configurations,
+    tags: row.tags || [],
+    description: row.description,
+    overviewSummary: d.overviewSummary || row.description,
+    floorPlans: d.floorPlans || [],
+    whyInvest: d.whyInvest || [],
+    amenities: d.amenities || [],
     gallery: row.gallery_images || [],
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],

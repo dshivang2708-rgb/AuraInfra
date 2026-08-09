@@ -1,30 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import PageNavbar from "../components/PageNavbar.jsx";
-import EnquiryForm from "../components/EnquiryForm.jsx";
+import ProjectHero from "../components/premium-detail/ProjectHero.jsx";
+import TabsNav from "../components/premium-detail/TabsNav.jsx";
+import ProjectOverview from "../components/premium-detail/ProjectOverview.jsx";
+import WhyThisProject from "../components/premium-detail/WhyThisProject.jsx";
+import FloorPlans from "../components/premium-detail/FloorPlans.jsx";
+import Amenities from "../components/premium-detail/Amenities.jsx";
+import LocationSection from "../components/premium-detail/LocationSection.jsx";
+import GallerySection from "../components/premium-detail/GallerySection.jsx";
+import DeveloperSection from "../components/premium-detail/DeveloperSection.jsx";
+import FAQsSection from "../components/premium-detail/FAQsSection.jsx";
+import PricingSidebar from "../components/premium-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toPremiumDetail } from "../lib/adapters.js";
-
-const AMENITIES = [
-  { icon: "pool", label: "Swimming Pool" },
-  { icon: "fitness_center", label: "Gym" },
-  { icon: "park", label: "Landscaped Gardens" },
-  { icon: "security", label: "24x7 Security" },
-  { icon: "local_parking", label: "Ample Parking" },
-  { icon: "groups", label: "Clubhouse" },
-];
-
-const PRICE_CHECKLIST = [
-  { label: "RERA Approved", icon: "verified" },
-  { label: "Premium Quality Construction", icon: "apartment" },
-  { label: "Prime Location", icon: "location_on" },
-  { label: "High Appreciation Potential", icon: "trending_up" },
-];
 
 export default function PremiumProjectDetail() {
   const { slug } = useParams({ strict: false });
   const [project, setProject] = useState(null);
   const [loadStatus, setLoadStatus] = useState("loading");
+  const [activeTab, setActiveTab] = useState("Overview");
 
   useEffect(() => {
     let active = true;
@@ -67,8 +62,6 @@ export default function PremiumProjectDetail() {
     );
   }
 
-  const description = `${project.name} by ${project.builder} offers premium residences in ${project.location}, combining thoughtful design, quality construction, and a full suite of modern amenities.`;
-
   return (
     <>
       <PageNavbar />
@@ -88,90 +81,29 @@ export default function PremiumProjectDetail() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <div className="relative h-80 md:h-96">
-                  <img alt={project.name} className="w-full h-full object-cover" src={project.image} />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm">
-                    <span className="text-xs font-bold text-slate-700">{project.builder}</span>
-                  </div>
-                  <span className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                    Premium Project
-                  </span>
-                </div>
-                <div className="p-6 md:p-8">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{project.name}</h1>
-                  <p className="text-sm text-gray-500 flex items-center gap-1 mb-4">
-                    <span className="material-symbols-outlined text-base">location_on</span>
-                    {project.location}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-8">{description}</p>
+              <ProjectHero property={project} />
+              <TabsNav activeTab={activeTab} onChange={setActiveTab} />
 
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button className="flex-1 bg-[#1a6b32] hover:bg-[#145126] text-white text-sm font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                      <span className="material-symbols-outlined text-base">download</span> Download Brochure
-                    </button>
-                    <button className="flex-1 border border-[#1a6b32] text-[#1a6b32] hover:bg-[#eaf4ef] text-sm font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                      <span className="material-symbols-outlined text-base">calendar_today</span> Schedule Site Visit
-                    </button>
+              {activeTab === "Overview" && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <ProjectOverview property={project} />
+                    {project.whyInvest.length > 0 && <WhyThisProject property={project} />}
                   </div>
+                  <FloorPlans property={project} />
+                  <Amenities property={project} />
                 </div>
-              </div>
-
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">Amenities</h3>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-6 text-center">
-                  {AMENITIES.map((item) => (
-                    <div key={item.label} className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 rounded-full bg-[#eaf4ef] flex items-center justify-center text-[#1a6b32]">
-                        <span className="material-symbols-outlined text-xl">{item.icon}</span>
-                      </div>
-                      <span className="text-xs text-gray-600 font-medium">{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
+              {activeTab === "Amenities" && <Amenities property={project} />}
+              {activeTab === "Floor Plans" && <FloorPlans property={project} />}
+              {activeTab === "Location" && <LocationSection property={project} />}
+              {activeTab === "Gallery" && <GallerySection property={project} />}
+              {activeTab === "Developer" && <DeveloperSection property={project} />}
+              {activeTab === "FAQs" && <FAQsSection property={project} />}
             </div>
 
             {/* Sidebar */}
-            <aside className="space-y-6">
-              <div className="bg-[#eaf4ef] rounded-2xl p-6 shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">{project.price}</h2>
-                <p className="text-sm text-gray-500 mb-6">Starting Price</p>
-                <ul className="space-y-3">
-                  {PRICE_CHECKLIST.map((item) => (
-                    <li key={item.label} className="flex items-center gap-2 text-sm text-gray-700">
-                      <span className="material-symbols-outlined text-[#1a6b32] bg-white p-1 rounded-full text-[16px] w-6 h-6 flex items-center justify-center">
-                        {item.icon}
-                      </span>
-                      {item.label}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Enquire About This Project</h3>
-                <EnquiryForm
-                  projectName={project.name}
-                  projectSlug={project.key}
-                  category="premium"
-                  inputClassName="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                  textareaClassName="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                  buttonClassName="w-full bg-[#1a6b32] hover:bg-[#145126] text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-70"
-                  footNoteClassName="text-xs text-center text-gray-500 mt-2"
-                />
-              </div>
-            </aside>
+            <PricingSidebar property={project} />
           </div>
         </div>
       </main>
