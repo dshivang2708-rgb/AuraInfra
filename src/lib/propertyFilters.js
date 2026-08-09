@@ -55,11 +55,15 @@ export function parseListParam(value) {
   return value ? String(value).split(",").filter(Boolean) : [];
 }
 
-// True if `property.typeText` (a lowercased blob of its name/tags/config
-// text — see toCardProps in PropertyGrid.jsx) contains any of the active
-// category tab's keywords. An "all"/unknown/keyword-less tab always matches.
+// True if the property belongs to the active category tab. Prefers the
+// admin-selected `propertyType` (set via the dropdown on the listing form —
+// this is the reliable source once a project has been saved/edited with it).
+// Falls back to keyword matching against `property.typeText` (a lowercased
+// blob of its name/tags/config text — see toCardProps in PropertyGrid.jsx)
+// for older rows that predate the field. An "all" tab always matches.
 export function matchesCategory(property, activeKey, tabs) {
   if (!activeKey || activeKey === "all") return true;
+  if (property.propertyType) return property.propertyType === activeKey;
   const tab = tabs.find((t) => t.key === activeKey);
   if (!tab || !tab.keywords.length) return true;
   const haystack = property.typeText || "";

@@ -17,6 +17,7 @@ export const AMENITIES = [
 export const RESIDENTIAL_PROPERTIES = [
   {
     key: "aura-greens",
+    propertyType: "apartments",
     name: "Aura Greens",
     tagline: "Luxury Homes for a Greener Tomorrow",
     badge: "Premium",
@@ -50,6 +51,7 @@ export const RESIDENTIAL_PROPERTIES = [
   },
   {
     key: "skyline-residency",
+    propertyType: "apartments",
     name: "Skyline Residency",
     tagline: "Elevated Living in the Heart of the City",
     badge: "New Launch",
@@ -82,6 +84,7 @@ export const RESIDENTIAL_PROPERTIES = [
   },
   {
     key: "homeland-avenue",
+    propertyType: "apartments",
     name: "Homeland Avenue",
     tagline: "Spacious Family Living, Redefined",
     badge: "Ready to Move",
@@ -115,6 +118,7 @@ export const RESIDENTIAL_PROPERTIES = [
   },
   {
     key: "aura-grande",
+    propertyType: "apartments",
     name: "Aura Grande",
     tagline: "Grand Living, Timeless Design",
     badge: "Premium",
@@ -147,6 +151,7 @@ export const RESIDENTIAL_PROPERTIES = [
   },
   {
     key: "aurelia-heights",
+    propertyType: "apartments",
     name: "Aurelia Heights",
     tagline: "Modern Comfort, Elevated Standards",
     badge: "New Launch",
@@ -179,6 +184,7 @@ export const RESIDENTIAL_PROPERTIES = [
   },
   {
     key: "elysian-heights",
+    propertyType: "apartments",
     name: "Elysian Heights",
     tagline: "Where Elevated Living Meets Serenity",
     badge: "Premium",

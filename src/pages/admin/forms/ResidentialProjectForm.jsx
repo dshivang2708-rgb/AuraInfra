@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
+import { CATEGORY_TABS } from "../../../components/residential/CategoryTabs.jsx";
 
 const CATEGORY = "residential";
+
+// The "All Residential" tab isn't a real category a project can belong to —
+// it's just the unfiltered view — so exclude it from the dropdown options.
+const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
 const DETAILS_PLACEHOLDER = `{
   "beds": "2, 3 & 4 BHK",
@@ -35,6 +40,7 @@ const emptyForm = {
   gallery_images: [],
   tagsText: "",
   detailsText: "",
+  propertyType: "",
   brochureUrl: "",
   faqs: [],
   floorPlans: DEFAULT_FLOOR_PLANS(),
@@ -43,12 +49,12 @@ const emptyForm = {
   is_upcoming: false,
 };
 
-// brochureUrl / faqs / floorPlans are managed by their own dedicated
-// controls, so strip them out of the raw JSON textarea to avoid editing the
-// same data in two places at once.
+// brochureUrl / faqs / floorPlans / propertyType are managed by their own
+// dedicated controls, so strip them out of the raw JSON textarea to avoid
+// editing the same data in two places at once.
 function detailsTextFor(details) {
   if (!details) return "";
-  const { brochureUrl, faqs, floorPlans, ...rest } = details;
+  const { brochureUrl, faqs, floorPlans, propertyType, ...rest } = details;
   return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
 }
 
@@ -64,6 +70,7 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
         ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ")
         : "",
       detailsText: detailsTextFor(project.details),
+      propertyType: d.propertyType || "",
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
       floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
@@ -193,6 +200,7 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
     }
 
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
+    if (form.propertyType) details.propertyType = form.propertyType;
 
     const cleanFaqs = form.faqs
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
@@ -282,6 +290,29 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
             onChange={(e) => update("tagline", e.target.value)}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Property Type</label>
+        <select
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          value={form.propertyType}
+          onChange={(e) => update("propertyType", e.target.value)}
+          required
+        >
+          <option value="" disabled>
+            Select a category...
+          </option>
+          {PROPERTY_TYPE_OPTIONS.map((opt) => (
+            <option key={opt.key} value={opt.key}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-[11px] text-[#6b7280] mt-1">
+          Determines which tab (All / Apartments / Villas / Plots / ...) this project shows up under on the
+          Residential listing page.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

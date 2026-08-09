@@ -24,9 +24,13 @@ function toCardProps(row) {
     area: row.area_display,
     price: row.price_display,
     priceNote: null,
+    // Canonical category key selected by the admin on the listing form
+    // (e.g. "villas", "plots") — the reliable way matchesCategory() decides
+    // which CategoryTabs tab this property belongs to.
+    propertyType: row.details?.propertyType || null,
     // Lowercased blob of everything that might mention the property's
-    // category (Apartment / Villa / Plot / etc) so CategoryTabs' keyword
-    // matching (matchesCategory) has something to search against.
+    // category (Apartment / Villa / Plot / etc) — fallback for older rows
+    // saved before propertyType existed.
     typeText: `${row.name || ""} ${tagsText} ${row.details?.configurations || ""} ${row.details?.beds || ""}`.toLowerCase(),
   };
 }
