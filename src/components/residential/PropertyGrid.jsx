@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
-import { Heart, MapPin, BedDouble, Maximize2, ArrowRight, Rocket, Sparkles, CircleCheck } from "lucide-react";
+import { Heart, MapPin, BedDouble, Ruler, ArrowRight, Rocket, Sparkles, CircleCheck } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
@@ -54,8 +54,8 @@ function PropertyCard({ property }) {
   const badge = BADGE_STYLES[property.badge];
 
   return (
-    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 p-3">
-      <div className="relative h-40 rounded-2xl overflow-hidden">
+    <div className="property-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div className="relative h-40 overflow-hidden">
         <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
         {property.badge && (
           <span
@@ -75,7 +75,7 @@ function PropertyCard({ property }) {
         </button>
       </div>
 
-      <div className="px-2 pt-3 pb-2">
+      <div className="px-4 pt-3 pb-4">
         <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{property.name}</h4>
 
         <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
@@ -90,7 +90,7 @@ function PropertyCard({ property }) {
             <BedDouble size={15} /> {property.beds || "—"}
           </span>
           <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
-            <Maximize2 size={15} /> {property.area || "—"}
+            <Ruler size={15} /> {property.area || "—"}
           </span>
         </div>
 
@@ -209,7 +209,7 @@ export default function PropertyGrid() {
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {properties.map((property) => (
           <PropertyCard key={property.key} property={property} />
         ))}
