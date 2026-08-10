@@ -10,6 +10,7 @@ import projectsRoutes from "./routes/projects.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import enquiriesRoutes from "./routes/enquiries.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
+import newsletterRoutes from "./routes/newsletter.routes.js";
 import otpRoutes from "./routes/otp.routes.js";
 
 dotenv.config();
@@ -86,6 +87,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/otp", otpLimiter, otpRoutes);
 app.use("/api/enquiries", enquiryLimiter, enquiriesRoutes);
 app.use("/api/contact", enquiryLimiter, contactRoutes);
+app.use("/api/newsletter", enquiryLimiter, newsletterRoutes);
 
 // Fallback error handler
 app.use((err, req, res, next) => {

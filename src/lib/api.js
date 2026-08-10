@@ -52,6 +52,9 @@ export const api = {
   // "Send Us a Message" contact page form — public, no auth required.
   submitContactMessage: (payload) => request("/api/contact", { method: "POST", body: payload }),
 
+  // Footer "Stay Updated" newsletter signup — public, no auth required.
+  subscribeNewsletter: (email) => request("/api/newsletter", { method: "POST", body: { email } }),
+
   // Admin — all require an authenticated admin session
   adminListProjects: (category) =>
     request(`/api/admin/projects${category ? `?category=${category}` : ""}`, { auth: true }),

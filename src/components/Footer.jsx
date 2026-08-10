@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { api } from "../lib/api.js";
 
 const LOGO_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuB16OuZYxLnZ7IzPxfxFrAbCzZGu95GrOYe_I_p2U_U_w2gbmdAMHiDCVL8tolKUMX4-3bJzx7VZCL257ax2cZDIROh76OQi9XAWXoxc39QVm4gxpFSYGSUaRRaUXR4ECzlzxPrC5bGJzDsYNCrvpDRAK0Nst4yrqH-lSLouyj4oQojCi1HsGQROE_tASHbzkuOCazoVbh6-xo19Y8qzR1nu72LVLCejy7i_mW3VBYTnesGEZg6RsXFTjBnLlGLw_TXrSc";
@@ -13,7 +14,7 @@ const EXPLORE_LINKS = [
   { label: "About Us", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
-const RESOURCE_LINKS = ["Blog", "FAQs", "Legal", "Privacy Policy", "Terms & Conditions"];
+const RESOURCE_LINKS = [ "Terms & Conditions","Privacy Policy"];
 
 const SOCIAL_ICONS = ["qr_code_2", "camera", "work", "play_circle"];
 
@@ -33,15 +34,33 @@ function FooterColumn({ title, children }) {
 
 export default function Footer() {
   const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | loading | subscribed | error
+  const [error, setError] = useState("");
 
-  const handleSubscribe = () => {
-    if (!email) return;
-    setSubscribed(true);
-    setTimeout(() => {
-      setSubscribed(false);
-      setEmail("");
-    }, 3000);
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleSubscribe = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !EMAIL_RE.test(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("loading");
+    setError("");
+
+    try {
+      await api.subscribeNewsletter(trimmedEmail);
+      setStatus("subscribed");
+      setTimeout(() => {
+        setStatus("idle");
+        setEmail("");
+      }, 3000);
+    } catch (err) {
+      setError(err.message || "Could not subscribe right now. Please try again.");
+      setStatus("error");
+    }
   };
 
   return (
@@ -131,19 +150,29 @@ export default function Footer() {
           <p className="text-gray-400 mb-6">Subscribe to get the latest news and property offers.</p>
           <div className="relative">
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 transition-all disabled:opacity-60"
               style={{ "--tw-ring-color": ACCENT }}
               placeholder="Email Address"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              disabled={status === "loading"}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (status === "error") setStatus("idle");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSubscribe();
+              }}
             />
             <button
-              className="mt-4 w-full text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 group"
-              style={{ backgroundColor: subscribed ? "#36aa54" : ACCENT }}
+              className="mt-4 w-full text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 group disabled:cursor-not-allowed disabled:opacity-80"
+              style={{ backgroundColor: status === "subscribed" ? "#36aa54" : ACCENT }}
               onClick={handleSubscribe}
+              disabled={status === "loading"}
             >
-              {subscribed ? (
+              {status === "loading" ? (
+                "Subscribing..."
+              ) : status === "subscribed" ? (
                 "Subscribed!"
               ) : (
                 <>
@@ -154,6 +183,9 @@ export default function Footer() {
                 </>
               )}
             </button>
+            {status === "error" && (
+              <p className="mt-2 text-xs text-red-400">{error}</p>
+            )}
           </div>
         </div>
       </div>
