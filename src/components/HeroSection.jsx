@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import Navbar from "./Navbar.jsx";
-import { useCities, useSectors, CATEGORY_ROUTES, CATEGORY_LABELS, parseSearchTerm, cleanSearch } from "../lib/locationFilter.js";
+import { useCities, useSectors, CATEGORY_ROUTES, CATEGORY_LABELS, cleanSearch } from "../lib/locationFilter.js";
 
 const BG_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBAgN-oe97vQhwhideQkshxExcI8nrtA0Fly2luNLLh9BTQeGmwdh3tpm2WpRNcOH3lI5CH9_fjs27UIXzz7V3oRvUesTuUaNmc6ToDOeTMjWRlE_b0qb2OcsEoruLN5QkxapqV_q-2TVgHvTq_wcL0XrngMEuB9260G8vbd1m2CNHq45boHb9mULK89XzPZJGy6W9Ndz4PR7PIXP0L4G4vPnAOOmd31BvxelHBwMXC8T-Vl6kHrBArOeiMlW54B7KQYyQ";
@@ -91,13 +91,6 @@ export default function HeroSection() {
         maxPrice: budgetRange?.maxPrice,
       }),
     });
-  }
-
-  function handlePopularSearch(term) {
-    const { city: parsedCity, sector: parsedSector } = parseSearchTerm(term, cities);
-    setCity(parsedCity || "");
-    setSector(parsedSector || "");
-    runSearch({ city: parsedCity, sector: parsedSector, category: "residential" });
   }
 
   return (
@@ -221,14 +214,12 @@ export default function HeroSection() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <span className="text-white font-semibold">Popular Searches:</span>
           {POPULAR_SEARCHES.map((term) => (
-            <button
+            <span
               key={term}
-              type="button"
-              onClick={() => handlePopularSearch(term)}
-              className="px-4 py-1.5 bg-white/30 backdrop-blur-md rounded-lg text-white text-sm font-medium hover:bg-white/50 transition-all"
+              className="px-4 py-1.5 bg-white/30 backdrop-blur-md rounded-lg text-white text-sm font-medium hover:bg-white/50 transition-all cursor-default"
             >
               {term}
-            </button>
+            </span>
           ))}
         </div>
       </main>
