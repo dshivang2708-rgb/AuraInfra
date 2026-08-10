@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import propertiesNearYouImage from "../assets/properties-near-you-house.png";
 
 const SEGMENTS = [
   { key: "verified", icon: "verified", label: "Verified\nListings" },
@@ -11,18 +12,6 @@ const SEGMENTS = [
 const LocationPinIcon = ({ className = "w-[26px] h-[26px]" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z" />
-  </svg>
-);
-
-const PinDropIcon = () => (
-  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z" />
-  </svg>
-);
-
-const ArrowForwardIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
   </svg>
 );
 
@@ -39,6 +28,39 @@ const DomainIcon = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="1.6"
+    />
+  </svg>
+);
+
+const BuildingIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      d="M4 21V9l6-4v16M13 21V4l7 5v12M4 21h16M8 12h.01M8 16h.01"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+    />
+  </svg>
+);
+
+const ShieldCheckIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      d="M12 3l7 3v6c0 4.97-3 8.5-7 9-4-.5-7-4.03-7-9V6l7-3z M9 12l2 2 4-4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+    />
+  </svg>
+);
+
+const TrendingUpIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      d="M3 17l6-6 4 4 8-8M15 7h6v6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
     />
   </svg>
 );
@@ -95,52 +117,58 @@ export default function ServiceHighlights() {
     <section className="py-10 bg-[#f9f9ff]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-7xl mx-auto px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-          {/* 1. Properties Near You */}
-          <div className="lg:col-span-3 bg-[#f0f3ff] rounded-3xl p-4 relative overflow-hidden group border border-[#c5c6cf]/10 shadow-sm flex flex-col justify-between h-full min-h-[260px]">
+          {/* 1. Better Properties, Better Choices */}
+          <div
+            className="lg:col-span-3 rounded-3xl p-4 relative overflow-hidden border border-[#c5c6cf]/10 shadow-sm flex flex-col h-full min-h-[260px] bg-cover bg-center"
+            style={{ backgroundImage: `url(${propertiesNearYouImage})` }}
+            role="img"
+            aria-label="Modern house illustration"
+          >
+            {/* Dotted pattern accent */}
+            <div className="absolute top-4 right-4 grid grid-cols-4 gap-[3px] opacity-50 pointer-events-none">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <span key={i} className="w-[3px] h-[3px] rounded-full bg-[#5b6fd8]" />
+              ))}
+            </div>
+
+            {/* Icon + heading + description */}
             <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-[#1a6b32] flex items-center justify-center text-white shadow-sm">
-                  <LocationPinIcon className="w-4 h-4" />
-                </div>
-                <h3 className="text-base font-bold text-[#071837]">Properties Near You</h3>
+              <div className="w-10 h-10 rounded-full bg-[#e4e7fb] flex items-center justify-center text-[#5b6fd8] mb-2.5">
+                <BuildingIcon />
               </div>
-              <p className="text-xs text-[#45464e] mb-4">Discover top properties in your surrounding areas</p>
-              <div className="inline-flex items-center gap-1.5 bg-[#dce2f3]/50 backdrop-blur px-2.5 py-1.5 rounded-lg text-[#071837] text-[11px] font-semibold">
-                <PinDropIcon />
-                Sector 82, Mohali
+              <h3 className="text-[15px] font-extrabold text-[#071837] leading-snug mb-1.5">
+                Better Properties,
+                <br />
+                Better Choices
+              </h3>
+              <p className="text-[10.5px] text-[#45464e] leading-snug max-w-[68%]">
+                We curate quality properties to help you make confident decisions.
+              </p>
+            </div>
+
+            {/* Verified Listings pill */}
+            <div className="relative z-10 mt-auto inline-flex items-center gap-2 bg-white/95 backdrop-blur px-2.5 py-1.5 rounded-lg shadow-md w-fit">
+              <span className="text-[#5b6fd8]">
+                <ShieldCheckIcon />
+              </span>
+              <div className="leading-tight">
+                <p className="text-[8.5px] font-bold text-[#071837]">Verified Listings</p>
+                <p className="text-[7.5px] text-[#75777f]">Trusted by thousands</p>
               </div>
             </div>
 
-            {/* Radar graphic */}
-            <div className="absolute bottom-[-10%] right-[-10%] w-full h-2/3 opacity-30 pointer-events-none">
-              <div className="relative w-full h-full">
-                <div className="absolute bottom-[20%] right-[30%]">
-                  <div className="w-4 h-4 bg-[#1a6b32] rounded-full relative z-10" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border-2 border-[#1a6b32] rounded-full radar-pulse" />
-                  <div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 border border-[#1a6b32]/30 rounded-full radar-pulse"
-                    style={{ animationDelay: "1s" }}
-                  />
-                </div>
-                <svg className="w-full h-full text-[#1a6b32]/20" fill="currentColor" viewBox="0 0 100 100">
-                  <path
-                    d="M0 80 L100 60 M0 60 L100 40 M0 40 L100 20 M20 0 L40 100 M60 0 L80 100"
-                    stroke="currentColor"
-                    strokeWidth="0.5"
-                  />
-                </svg>
+            {/* Growing Opportunities pill */}
+            <div className="relative z-10 mt-3 inline-flex items-center gap-2 bg-white/95 backdrop-blur px-2.5 py-1.5 rounded-lg shadow-md w-fit">
+              <div className="w-7 h-7 rounded-full bg-[#e4e7fb] flex items-center justify-center text-[#5b6fd8] shrink-0">
+                <TrendingUpIcon />
               </div>
-            </div>
-
-            <div className="relative z-10 self-end">
-              <button
-                className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-[#071837] group-hover:bg-[#071837] group-hover:text-white transition-all duration-300"
-                aria-label="See properties near you"
-              >
-                <ArrowForwardIcon />
-              </button>
+              <div className="leading-tight">
+                <p className="text-[7.5px] font-bold text-[#071837]">Growing Opportunities</p>
+                <p className="text-[6.5px] text-[#75777f]">More coming soon</p>
+              </div>
             </div>
           </div>
+
 
           {/* 2. Service Highlights Pill */}
           <div className="lg:col-span-6 bg-[#f0f3ff] rounded-3xl lg:rounded-[5rem] p-4 border border-[#c5c6cf]/30 shadow-xl flex items-center justify-center self-center h-fit w-full">
