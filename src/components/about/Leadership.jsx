@@ -78,7 +78,7 @@ export default function Leadership() {
               {TEAM.map((member) => (
                 <div
                   key={member.key}
-                  className="w-[220px] h-[300px] flex-shrink-0 bg-white rounded-xl shadow-sm border border-[#c5c6cf]/10 snap-start group overflow-hidden flex flex-col"
+                  className="w-[260px] min-h-[320px] flex-shrink-0 bg-white rounded-xl shadow-sm border border-[#c5c6cf]/10 snap-start group overflow-hidden flex flex-col"
                 >
                   <div className="w-full h-[220px] relative shrink-0">
                     <img
@@ -87,10 +87,10 @@ export default function Leadership() {
                       src={member.image}
                     />
                   </div>
-                  <div className="p-4 flex justify-between items-start gap-2 h-[80px]">
+                  <div className="p-4 flex justify-between items-start gap-2 flex-1">
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-[#151c27] truncate">{member.name}</h3>
-                      <p className="text-xs text-[#45464e] line-clamp-2">{member.role}</p>
+                      <h3 className="text-sm font-bold text-[#151c27] leading-snug break-words">{member.name}</h3>
+                      <p className="text-xs text-[#45464e] mt-1">{member.role}</p>
                     </div>
                     {/* <div className="text-[#0077b5] shrink-0">
                       <LinkedinIcon />
