@@ -53,8 +53,6 @@ const POPULAR_SEARCHES = [
   "Zirakpur",
   "Chandigarh",
   "Kharar",
-  "Noida",
-  "Gurgaon",
 ];
 
 const BUDGET_OPTIONS = [
