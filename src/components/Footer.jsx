@@ -14,7 +14,7 @@ const EXPLORE_LINKS = [
   { label: "About Us", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
-const RESOURCE_LINKS = [ "Terms & Conditions","Privacy Policy"];
+const RESOURCE_LINKS = ["Blog", "FAQs", "Legal", "Privacy Policy", "Terms & Conditions"];
 
 const SOCIAL_ICONS = ["qr_code_2", "camera", "work", "play_circle"];
 
@@ -69,7 +69,7 @@ export default function Footer() {
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* Main Footer Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1.6fr_1fr] gap-x-8 gap-y-8 px-8 py-10 max-w-[1440px] mx-auto min-w-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1.7fr_0.85fr] gap-x-10 gap-y-8 px-8 py-10 max-w-[1440px] mx-auto min-w-0">
         {/* Column 1: Brand & Socials */}
         <div className="flex flex-col space-y-2">
           <Link to="/" className="flex items-center gap-2">
