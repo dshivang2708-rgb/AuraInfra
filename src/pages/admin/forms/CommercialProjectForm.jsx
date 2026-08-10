@@ -21,6 +21,7 @@ const emptyForm = {
   name: "",
   tagline: "",
   badge: "",
+  developer: "",
   location: "",
   city: "",
   sector: "",
@@ -45,12 +46,12 @@ const emptyForm = {
 };
 
 // brochureUrl / faqs / floorPlans / whyInvest / priceNote / type
-// (Commercial Type) are managed by their own dedicated controls, so strip
-// them out of the raw JSON textarea to avoid editing the same data in two
-// places at once.
+// (Commercial Type) / developer are managed by their own dedicated
+// controls, so strip them out of the raw JSON textarea to avoid editing the
+// same data in two places at once.
 function detailsTextFor(details) {
   if (!details) return "";
-  const { brochureUrl, faqs, floorPlans, whyInvest, priceNote, type, propertyType, ...rest } = details;
+  const { brochureUrl, faqs, floorPlans, whyInvest, priceNote, type, propertyType, developer, ...rest } = details;
   return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
 }
 
@@ -78,6 +79,7 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
       priceNote: d.priceNote || "",
       propertyType: d.propertyType || "",
+      developer: d.developer || "",
     };
   });
   const [uploading, setUploading] = useState(false);
@@ -245,6 +247,8 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       details.type = PROPERTY_TYPE_OPTIONS.find((opt) => opt.key === form.propertyType)?.label || form.propertyType;
     }
 
+    if (form.developer.trim()) details.developer = form.developer.trim();
+
     const tags = form.tagsText
       .split(",")
       .map((t) => t.trim())
@@ -346,6 +350,19 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
         <p className="text-[11px] text-[#6b7280] mt-1">
           Determines which tab (All / Office Space / Retail Shop / ...) this project shows up under on the
           Commercial listing page, and the type badge shown on cards and the detail page.
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Developer Name</label>
+        <input
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          value={form.developer}
+          onChange={(e) => update("developer", e.target.value)}
+          placeholder="e.g. Aura Infra"
+        />
+        <p className="text-[10px] text-[#75777f] mt-1">
+          Powers the "Developer" tab on the project's detail page. Leave blank to default to "Aura Infra".
         </p>
       </div>
 

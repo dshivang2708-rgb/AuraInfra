@@ -100,7 +100,7 @@ export default function ResidentialProjectDetail() {
               {activeTab === "Floor Plans" && <FloorPlans property={property} />}
               {activeTab === "Location" && <LocationSection property={property} />}
               {activeTab === "Gallery" && <GallerySection property={property} />}
-              {activeTab === "Developer" && <DeveloperSection />}
+              {activeTab === "Developer" && <DeveloperSection property={property} />}
               {activeTab === "FAQs" && <FAQsSection property={property} />}
             </div>
 

@@ -28,6 +28,7 @@ const emptyForm = {
   name: "",
   tagline: "",
   badge: "",
+  developer: "",
   location: "",
   city: "",
   sector: "",
@@ -49,12 +50,12 @@ const emptyForm = {
   is_upcoming: false,
 };
 
-// brochureUrl / faqs / floorPlans / propertyType are managed by their own
-// dedicated controls, so strip them out of the raw JSON textarea to avoid
-// editing the same data in two places at once.
+// brochureUrl / faqs / floorPlans / propertyType / developer are managed by
+// their own dedicated controls, so strip them out of the raw JSON textarea
+// to avoid editing the same data in two places at once.
 function detailsTextFor(details) {
   if (!details) return "";
-  const { brochureUrl, faqs, floorPlans, propertyType, ...rest } = details;
+  const { brochureUrl, faqs, floorPlans, propertyType, developer, ...rest } = details;
   return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
 }
 
@@ -71,6 +72,7 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
         : "",
       detailsText: detailsTextFor(project.details),
       propertyType: d.propertyType || "",
+      developer: d.developer || "",
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
       floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
@@ -201,6 +203,7 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
 
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
     if (form.propertyType) details.propertyType = form.propertyType;
+    if (form.developer.trim()) details.developer = form.developer.trim();
 
     const cleanFaqs = form.faqs
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
@@ -312,6 +315,19 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
         <p className="text-[11px] text-[#6b7280] mt-1">
           Determines which tab (All / Apartments / Villas / Plots / ...) this project shows up under on the
           Residential listing page.
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Developer Name</label>
+        <input
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          value={form.developer}
+          onChange={(e) => update("developer", e.target.value)}
+          placeholder="e.g. Aura Infra"
+        />
+        <p className="text-[10px] text-[#75777f] mt-1">
+          Powers the "Developer" tab on the project's detail page. Leave blank to default to "Aura Infra".
         </p>
       </div>
 
