@@ -59,7 +59,7 @@ export default function OurStory() {
             </div>
           </div>
 
-          <div className="lg:w-2/5 relative group">
+          {/* <div className="lg:w-2/5 relative group">
             <div className="rounded-3xl overflow-hidden relative shadow-2xl aspect-[4/3] max-w-[340px] mx-auto">
               <img
                 className="w-full h-full object-cover"
@@ -93,7 +93,7 @@ export default function OurStory() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
