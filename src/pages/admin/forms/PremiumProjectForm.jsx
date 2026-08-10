@@ -86,13 +86,13 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
         ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ")
         : "",
       detailsText: detailsTextFor(project.details),
-      builder: d.builder || "",
-      propertyType: d.propertyType || "",
-      priceNote: d.priceNote || "",
-      totalArea: d.totalArea || "",
-      totalUnits: d.totalUnits || "",
-      configurations: d.configurations || "",
-      overviewSummary: d.overviewSummary || "",
+      builder: d.builder != null ? String(d.builder) : "",
+      propertyType: d.propertyType != null ? String(d.propertyType) : "",
+      priceNote: d.priceNote != null ? String(d.priceNote) : "",
+      totalArea: d.totalArea != null ? String(d.totalArea) : "",
+      totalUnits: d.totalUnits != null ? String(d.totalUnits) : "",
+      configurations: d.configurations != null ? String(d.configurations) : "",
+      overviewSummary: d.overviewSummary != null ? String(d.overviewSummary) : "",
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
       whyInvest: Array.isArray(d.whyInvest) && d.whyInvest.length ? d.whyInvest : [],
@@ -249,30 +249,30 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
       }
     }
 
-    if (form.builder.trim()) details.builder = form.builder.trim();
-    if (form.propertyType.trim()) details.propertyType = form.propertyType.trim();
-    if (form.priceNote.trim()) details.priceNote = form.priceNote.trim();
-    if (form.totalArea.trim()) details.totalArea = form.totalArea.trim();
-    if (form.totalUnits.trim()) details.totalUnits = form.totalUnits.trim();
-    if (form.configurations.trim()) details.configurations = form.configurations.trim();
-    if (form.overviewSummary.trim()) details.overviewSummary = form.overviewSummary.trim();
+    if (String(form.builder).trim()) details.builder = String(form.builder).trim();
+    if (String(form.propertyType).trim()) details.propertyType = String(form.propertyType).trim();
+    if (String(form.priceNote).trim()) details.priceNote = String(form.priceNote).trim();
+    if (String(form.totalArea).trim()) details.totalArea = String(form.totalArea).trim();
+    if (String(form.totalUnits).trim()) details.totalUnits = String(form.totalUnits).trim();
+    if (String(form.configurations).trim()) details.configurations = String(form.configurations).trim();
+    if (String(form.overviewSummary).trim()) details.overviewSummary = String(form.overviewSummary).trim();
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
 
     const cleanFaqs = form.faqs
-      .map((f) => ({ question: (f.question || "").trim(), answer: (f.answer || "").trim() }))
+      .map((f) => ({ question: String(f.question || "").trim(), answer: String(f.answer || "").trim() }))
       .filter((f) => f.question && f.answer);
     if (cleanFaqs.length) details.faqs = cleanFaqs;
 
-    const cleanWhyInvest = form.whyInvest.map((point) => (point || "").trim()).filter(Boolean);
+    const cleanWhyInvest = form.whyInvest.map((point) => String(point || "").trim()).filter(Boolean);
     if (cleanWhyInvest.length) details.whyInvest = cleanWhyInvest;
 
     const cleanAmenities = form.amenities
-      .map((a) => ({ icon: (a.icon || "").trim() || "star", label: (a.label || "").trim() }))
+      .map((a) => ({ icon: String(a.icon || "").trim() || "star", label: String(a.label || "").trim() }))
       .filter((a) => a.label);
     if (cleanAmenities.length) details.amenities = cleanAmenities;
 
     const cleanFloorPlans = form.floorPlans
-      .map((fp) => ({ type: (fp.type || "").trim(), area: (fp.area || "").trim(), image: fp.image }))
+      .map((fp) => ({ type: String(fp.type || "").trim(), area: String(fp.area || "").trim(), image: fp.image }))
       .filter((fp) => fp.type && fp.image);
     if (cleanFloorPlans.length) details.floorPlans = cleanFloorPlans;
 
