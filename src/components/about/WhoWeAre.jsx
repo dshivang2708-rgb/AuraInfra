@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 const CHECKLIST = ["RERA Approved Projects", "Transparent Deals", "Timely Delivery"];
 
 const STATS = [
@@ -33,10 +35,14 @@ export default function WhoWeAre() {
                 </li>
               ))}
             </ul>
-            <button className="bg-[#071837] text-white px-6 py-3 rounded-lg font-bold text-sm flex items-center gap-2 hover:shadow-lg transition-all active:scale-95">
+            <Link
+              to="/"
+              hash="explore-by-category"
+              className="bg-[#071837] text-white px-6 py-3 rounded-lg font-bold text-sm flex items-center gap-2 hover:shadow-lg transition-all active:scale-95"
+            >
               Explore Our Projects
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-            </button>
+            </Link>
           </div>
 
           <div className="lg:w-1/2">
