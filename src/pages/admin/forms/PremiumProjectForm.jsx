@@ -259,20 +259,20 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
 
     const cleanFaqs = form.faqs
-      .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
+      .map((f) => ({ question: (f.question || "").trim(), answer: (f.answer || "").trim() }))
       .filter((f) => f.question && f.answer);
     if (cleanFaqs.length) details.faqs = cleanFaqs;
 
-    const cleanWhyInvest = form.whyInvest.map((point) => point.trim()).filter(Boolean);
+    const cleanWhyInvest = form.whyInvest.map((point) => (point || "").trim()).filter(Boolean);
     if (cleanWhyInvest.length) details.whyInvest = cleanWhyInvest;
 
     const cleanAmenities = form.amenities
-      .map((a) => ({ icon: a.icon.trim() || "star", label: a.label.trim() }))
+      .map((a) => ({ icon: (a.icon || "").trim() || "star", label: (a.label || "").trim() }))
       .filter((a) => a.label);
     if (cleanAmenities.length) details.amenities = cleanAmenities;
 
     const cleanFloorPlans = form.floorPlans
-      .map((fp) => ({ type: fp.type.trim(), area: fp.area.trim(), image: fp.image }))
+      .map((fp) => ({ type: (fp.type || "").trim(), area: (fp.area || "").trim(), image: fp.image }))
       .filter((fp) => fp.type && fp.image);
     if (cleanFloorPlans.length) details.floorPlans = cleanFloorPlans;
 
@@ -622,13 +622,13 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
             >
               <input
                 className="w-full sm:w-40 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                value={plan.type}
+                value={plan.type || ""}
                 onChange={(e) => updateFloorPlan(index, "type", e.target.value)}
                 placeholder="e.g. 4 BHK"
               />
               <input
                 className="w-full sm:w-36 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                value={plan.area}
+                value={plan.area || ""}
                 onChange={(e) => updateFloorPlan(index, "area", e.target.value)}
                 placeholder="e.g. 1800 Sq.ft"
               />
@@ -685,13 +685,13 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
             <div key={index} className="flex items-center gap-2">
               <input
                 className="w-full sm:w-40 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                value={amenity.icon}
+                value={amenity.icon || ""}
                 onChange={(e) => updateAmenity(index, "icon", e.target.value)}
                 placeholder="Icon, e.g. pool"
               />
               <input
                 className="flex-1 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                value={amenity.label}
+                value={amenity.label || ""}
                 onChange={(e) => updateAmenity(index, "label", e.target.value)}
                 placeholder="Label, e.g. Swimming Pool"
               />
@@ -756,7 +756,7 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
               <div className="flex items-center gap-2">
                 <input
                   className="flex-1 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-                  value={faq.question}
+                  value={faq.question || ""}
                   onChange={(e) => updateFaq(index, "question", e.target.value)}
                   placeholder="Question"
                 />
@@ -767,7 +767,7 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
               <textarea
                 className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
                 rows={2}
-                value={faq.answer}
+                value={faq.answer || ""}
                 onChange={(e) => updateFaq(index, "answer", e.target.value)}
                 placeholder="Answer"
               />
