@@ -195,9 +195,12 @@ export default function CitiesAndCollections() {
                   List your property with Aura Infra and reach millions of verified buyers.
                 </p>
               </div>
-              <button className="relative z-10 bg-white text-[#1a6b32] flex items-center justify-between gap-2 px-3 py-1.5 rounded-full font-bold text-[11px] w-fit min-w-[140px] hover:bg-white/90 transition-transform active:scale-95">
+              <a
+                href="#explore-by-category"
+                className="relative z-10 bg-white text-[#1a6b32] flex items-center justify-between gap-2 px-3 py-1.5 rounded-full font-bold text-[11px] w-fit min-w-[140px] hover:bg-white/90 transition-transform active:scale-95"
+              >
                 Find Your Property <ArrowForwardIcon className="w-4 h-4" />
-              </button>
+              </a>
             </div>
           </div>
         </div>

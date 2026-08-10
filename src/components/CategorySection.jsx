@@ -123,7 +123,8 @@ function CategoryCard({ category }) {
 export default function CategorySection() {
   return (
     <section
-      className="pt-20 pb-8 bg-[#f9f9ff]"
+      id="explore-by-category"
+      className="pt-20 pb-8 bg-[#f9f9ff] scroll-mt-14"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       <div className="max-w-7xl mx-auto px-8">

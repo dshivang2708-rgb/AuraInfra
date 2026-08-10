@@ -109,10 +109,13 @@ export default function WhyChooseUs() {
                 At Aura Infra, we don't just build properties, we create spaces that inspire,
                 communities that thrive and futures that last for generations.
               </p>
-              <button className="bg-[#1a6b32] text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity self-start">
+              <a
+                href="#explore-by-category"
+                className="bg-[#1a6b32] text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity self-start"
+              >
                 Explore Our Projects
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </button>
+              </a>
             </div>
 
             {/* Stats */}
