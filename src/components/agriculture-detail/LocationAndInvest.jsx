@@ -16,12 +16,16 @@ export default function LocationAndInvest({ property }) {
             <span className="material-symbols-outlined text-[#1a6b32] text-4xl">location_on</span>
           </div>
           <div className="w-1/2 flex flex-col justify-center gap-3 text-xs text-[#45464e]">
-            {property.nearby.map((item) => (
-              <div key={item.place} className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#1a6b32] text-base">{item.icon}</span>
-                {item.time} <span className="text-[#151c27] truncate">{item.place}</span>
-              </div>
-            ))}
+            {property.nearby.length === 0 ? (
+              <p className="text-[#75777f]">No nearby places added yet.</p>
+            ) : (
+              property.nearby.slice(0, 3).map((item) => (
+                <div key={item.place} className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#1a6b32] text-base">{item.icon}</span>
+                  {item.time} <span className="text-[#151c27] truncate">{item.place}</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -29,14 +33,18 @@ export default function LocationAndInvest({ property }) {
       {/* Why Invest */}
       <div className="bg-[#f0f3ff] p-6 rounded-2xl">
         <h3 className="text-base font-bold text-[#071837] mb-4">Why Invest in {property.name}</h3>
-        <ul className="flex flex-col gap-3 text-sm text-[#45464e]">
-          {property.whyInvest.map((point) => (
-            <li key={point} className="flex items-start gap-2">
-              <span className="material-symbols-outlined text-[#1a6b32] text-[18px] mt-0.5">check</span>
-              <span>{point}</span>
-            </li>
-          ))}
-        </ul>
+        {property.whyInvest.length === 0 ? (
+          <p className="text-sm text-[#75777f]">No investment highlights added yet.</p>
+        ) : (
+          <ul className="flex flex-col gap-3 text-sm text-[#45464e]">
+            {property.whyInvest.map((point) => (
+              <li key={point} className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-[#1a6b32] text-[18px] mt-0.5">check</span>
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
