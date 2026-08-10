@@ -38,7 +38,7 @@ export default function WhoWeAre() {
             <Link
               to="/"
               hash="explore-by-category"
-              className="bg-[#071837] text-white px-6 py-3 rounded-lg font-bold text-sm flex items-center gap-2 hover:shadow-lg transition-all active:scale-95"
+              className="bg-[#071837] text-white px-6 py-3 rounded-lg font-bold text-sm inline-flex items-center gap-2 hover:shadow-lg transition-all active:scale-95 self-start"
             >
               Explore Our Projects
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
