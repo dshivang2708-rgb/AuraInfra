@@ -57,12 +57,19 @@ const POPULAR_SEARCHES = [
   "Gurgaon",
 ];
 
+const BUDGET_OPTIONS = [
+  { label: "10 Lakh - 50 Lakh", minPrice: "10", maxPrice: "50" },
+  { label: "50 Lakh - 1 Cr", minPrice: "50", maxPrice: "100" },
+  { label: "More than 1 Cr", minPrice: "100", maxPrice: undefined },
+];
+
 export default function HeroSection() {
   const navigate = useNavigate();
   const cities = useCities();
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("residential");
   const [sector, setSector] = useState("");
+  const [budget, setBudget] = useState("");
   const sectors = useSectors(city);
 
   function handleCityChange(e) {
@@ -74,10 +81,17 @@ export default function HeroSection() {
     const nextCategory = overrides.category ?? category;
     const nextCity = overrides.city ?? city;
     const nextSector = overrides.sector ?? sector;
+    const nextBudget = overrides.budget ?? budget;
+    const budgetRange = BUDGET_OPTIONS.find((b) => b.label === nextBudget);
 
     navigate({
       to: CATEGORY_ROUTES[nextCategory] || CATEGORY_ROUTES.residential,
-      search: cleanSearch({ city: nextCity, sector: nextSector }),
+      search: cleanSearch({
+        city: nextCity,
+        sector: nextSector,
+        minPrice: budgetRange?.minPrice,
+        maxPrice: budgetRange?.maxPrice,
+      }),
     });
   }
 
@@ -181,8 +195,17 @@ export default function HeroSection() {
           <div className="flex-1 px-4 py-2 flex items-center space-x-3">
             <div className="flex flex-col w-full">
               <span className="text-xs text-gray-400">Budget</span>
-              <select className="bg-transparent border-none p-0 text-sm font-bold text-gray-800 focus:ring-0 cursor-pointer">
-                <option>₹10 L - ₹1 Cr</option>
+              <select
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="bg-transparent border-none p-0 text-sm font-bold text-gray-800 focus:ring-0 cursor-pointer"
+              >
+                <option value="">Any Budget</option>
+                {BUDGET_OPTIONS.map((option) => (
+                  <option key={option.label} value={option.label}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
