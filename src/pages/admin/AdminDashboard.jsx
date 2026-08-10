@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAdminAuth } from "../../context/AdminAuthContext.jsx";
 import RequireAdmin from "../../components/admin/RequireAdmin.jsx";
-import AdminProjectForm from "./AdminProjectForm.jsx";
 import ResidentialProjectForm from "./forms/ResidentialProjectForm.jsx";
 import CommercialProjectForm from "./forms/CommercialProjectForm.jsx";
 import AgricultureProjectForm from "./forms/AgricultureProjectForm.jsx";
+import PremiumProjectForm from "./forms/PremiumProjectForm.jsx";
 import { api } from "../../lib/api.js";
 
 const CATEGORIES = [
@@ -14,8 +14,8 @@ const CATEGORIES = [
   { key: "premium", label: "Premium" },
 ];
 
-// Residential, Commercial, and Agriculture each have their own dedicated form
-// component (see ./forms/). Premium still uses the original generic form.
+// Every category now has its own dedicated form component (see ./forms/)
+// with fields that map 1:1 onto that category's detail-page tabs.
 function formComponentFor(category) {
   switch (category) {
     case "residential":
@@ -24,8 +24,10 @@ function formComponentFor(category) {
       return CommercialProjectForm;
     case "agriculture":
       return AgricultureProjectForm;
+    case "premium":
+      return PremiumProjectForm;
     default:
-      return AdminProjectForm;
+      return ResidentialProjectForm;
   }
 }
 
