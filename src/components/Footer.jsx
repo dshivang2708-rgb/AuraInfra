@@ -24,7 +24,7 @@ const CONTACT_ITEMS = [
 
 function FooterColumn({ title, children }) {
   return (
-    <div>
+    <div className="min-w-0">
       <h4 className="text-sm font-bold text-white mb-4">{title}</h4>
       {children}
     </div>
@@ -50,7 +50,7 @@ export default function Footer() {
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* Main Footer Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1.6fr_1fr] gap-x-8 gap-y-8 px-8 py-10 max-w-[1440px] mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1.6fr_1fr] gap-x-8 gap-y-8 px-8 py-10 max-w-[1440px] mx-auto min-w-0">
         {/* Column 1: Brand & Socials */}
         <div className="flex flex-col space-y-2">
           <Link to="/" className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export default function Footer() {
         {/* Columns 2-4: Explore, Resources, Contact Us — grouped with a
             tighter gap between them than the spacing on either side of the
             group. */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-8 min-w-0">
           {/* Column 2: Explore */}
           <FooterColumn title="Explore">
             <ul className="space-y-2">
@@ -114,11 +114,11 @@ export default function Footer() {
           <FooterColumn title="Contact Us">
             <ul className="space-y-2">
               {CONTACT_ITEMS.map((item) => (
-                <li key={item.icon} className="flex items-start gap-3">
+                <li key={item.icon} className="flex items-start gap-3 min-w-0">
                   <span className="material-symbols-outlined mt-0.5" style={{ color: ACCENT }}>
                     {item.icon}
                   </span>
-                  <span className="text-gray-400 leading-snug">{item.text}</span>
+                  <span className="text-gray-400 leading-snug break-words">{item.text}</span>
                 </li>
               ))}
             </ul>
@@ -126,7 +126,7 @@ export default function Footer() {
         </div>
 
         {/* Column 5: Stay Updated */}
-        <div>
+        <div className="min-w-0">
           <h4 className="text-[18px] font-bold text-white mb-6">Stay Updated</h4>
           <p className="text-gray-400 mb-6">Subscribe to get the latest news and property offers.</p>
           <div className="relative">
