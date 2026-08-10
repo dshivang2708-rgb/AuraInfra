@@ -8,13 +8,13 @@ const LOGO_IMAGE =
 const ACCENT = "#006d33";
 
 const EXPLORE_LINKS = [
-  { label: "Buy Property", href: "#" },
-  { label: "Commercial", href: "#" },
-  { label: "Agriculture", href: "#" },
+  { label: "Residential", href: "/residential" },
+  { label: "Commercial", href: "/commercial" },
+  { label: "Agriculture", href: "/agriculture" },
   { label: "About Us", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
-const RESOURCE_LINKS = ["Blog", "FAQs", "Legal", "Privacy Policy", "Terms & Conditions"];
+const RESOURCE_LINKS = ["Terms & Conditions","Privacy Policy"];
 
 const SOCIAL_ICONS = ["qr_code_2", "camera", "work", "play_circle"];
 
