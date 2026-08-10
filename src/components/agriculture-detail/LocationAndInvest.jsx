@@ -1,4 +1,6 @@
 export default function LocationAndInvest({ property }) {
+  const mapQuery = encodeURIComponent(`${property.name}, ${property.location}`);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Location mini */}
@@ -7,13 +9,23 @@ export default function LocationAndInvest({ property }) {
           <h3 className="text-base font-bold text-[#071837] flex items-center gap-2">
             <span className="material-symbols-outlined text-[#1a6b32] text-[20px]">location_on</span> Location
           </h3>
-          <a className="text-sm font-semibold text-[#1a6b32] hover:underline flex items-center gap-1" href="#">
+          <a
+            className="text-sm font-semibold text-[#1a6b32] hover:underline flex items-center gap-1"
+            href={`https://www.google.com/maps?q=${mapQuery}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             View on Map <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </a>
         </div>
         <div className="flex gap-4">
-          <div className="w-1/2 bg-[#dce2f3] rounded-lg overflow-hidden relative aspect-square flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#1a6b32] text-4xl">location_on</span>
+          <div className="w-1/2 rounded-lg overflow-hidden aspect-square">
+            <iframe
+              title={`Map showing ${property.name}`}
+              className="w-full h-full border-0"
+              loading="lazy"
+              src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+            />
           </div>
           <div className="w-1/2 flex flex-col justify-center gap-3 text-xs text-[#45464e]">
             {property.nearby.length === 0 ? (

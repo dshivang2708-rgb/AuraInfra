@@ -119,15 +119,30 @@ function LandDetailsTab({ property }) {
 }
 
 function LocationTab({ property }) {
+  const mapQuery = encodeURIComponent(`${property.name}, ${property.location}`);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-[#dce2f3] rounded-xl aspect-video flex items-center justify-center">
-        <span className="material-symbols-outlined text-[#1a6b32] text-5xl">location_on</span>
+      <div className="rounded-xl overflow-hidden aspect-video border border-[#c5c6cf]/40">
+        <iframe
+          title={`Map showing ${property.name}`}
+          className="w-full h-full border-0"
+          loading="lazy"
+          src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+        />
       </div>
       <div className="flex flex-col gap-4">
         <div>
           <h3 className="text-sm font-bold text-[#071837] mb-1">Full Address</h3>
           <p className="text-sm text-[#45464e]">{property.location}</p>
+          <a
+            href={`https://www.google.com/maps?q=${mapQuery}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-[#1a6b32] hover:underline inline-flex items-center gap-1 mt-2"
+          >
+            Open in Google Maps <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+          </a>
         </div>
         {property.nearby.length > 0 && (
           <div>
