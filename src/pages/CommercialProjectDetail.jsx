@@ -14,6 +14,7 @@ import FAQsSection from "../components/commercial-detail/FAQsSection.jsx";
 import PricingSidebar from "../components/commercial-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toCommercialDetail } from "../lib/adapters.js";
+import Seo from "../components/Seo.jsx";
 
 export default function CommercialProjectDetail() {
   const { slug } = useParams({ strict: false });
@@ -69,7 +70,12 @@ export default function CommercialProjectDetail() {
     <>
       <PageNavbar />
       <main className="pt-14 bg-gray-50 text-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <Seo
+          title={property.name}
+          description={`${property.name} - commercial property in ${property.location || "Mohali"}. ${property.description ? property.description.slice(0, 140) : "View details, pricing and amenities with Aura Infra."}`}
+          path={`/properties/commercial/${slug}`}
+        />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
             <Link className="hover:text-[#006D32]" to="/">
               Home

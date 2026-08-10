@@ -14,6 +14,7 @@ import FAQsSection from "../components/premium-detail/FAQsSection.jsx";
 import PricingSidebar from "../components/premium-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toPremiumDetail } from "../lib/adapters.js";
+import Seo from "../components/Seo.jsx";
 
 export default function PremiumProjectDetail() {
   const { slug } = useParams({ strict: false });
@@ -66,7 +67,12 @@ export default function PremiumProjectDetail() {
     <>
       <PageNavbar />
       <main className="pt-14 bg-slate-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <Seo
+          title={project.name}
+          description={`${project.name} - premium project in ${project.location || "Mohali"}. ${project.description ? project.description.slice(0, 140) : "View details, pricing and amenities with Aura Infra."}`}
+          path={`/properties/premium-projects/${slug}`}
+        />
+                <div className="max-w-7xl mx-auto px-4 py-6">
           <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
             <Link className="hover:text-[#1a6b32]" to="/">
               Home

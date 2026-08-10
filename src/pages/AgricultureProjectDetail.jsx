@@ -7,6 +7,7 @@ import LocationAndInvest from "../components/agriculture-detail/LocationAndInves
 import PricingSidebar from "../components/agriculture-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toAgricultureDetail } from "../lib/adapters.js";
+import Seo from "../components/Seo.jsx";
 
 export default function AgricultureProjectDetail() {
   const { slug } = useParams({ strict: false });
@@ -59,7 +60,12 @@ export default function AgricultureProjectDetail() {
     <>
       <PageNavbar />
       <main className="pt-14 bg-[#f9f9ff]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-6">
+        <Seo
+          title={property.name}
+          description={`${property.name} - agricultural land in ${property.location || "Mohali"}. ${property.description ? property.description.slice(0, 140) : "View details, pricing and amenities with Aura Infra."}`}
+          path={`/properties/agriculture/${slug}`}
+        />
+                <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-6">
           <nav aria-label="Breadcrumb" className="flex text-sm text-[#45464e] mb-6">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               <li>

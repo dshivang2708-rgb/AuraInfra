@@ -13,6 +13,7 @@ import FAQsSection from "../components/residential-detail/FAQsSection.jsx";
 import PricingSidebar from "../components/residential-detail/PricingSidebar.jsx";
 import { api } from "../lib/api.js";
 import { toResidentialDetail } from "../lib/adapters.js";
+import Seo from "../components/Seo.jsx";
 
 export default function ResidentialProjectDetail() {
   const { slug } = useParams({ strict: false });
@@ -68,7 +69,12 @@ export default function ResidentialProjectDetail() {
     <>
       <PageNavbar />
       <main className="pt-14 bg-slate-50 text-slate-800" style={{ fontFamily: "Inter, sans-serif" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <Seo
+          title={property.name}
+          description={`${property.name} - residential property in ${property.location || "Mohali"}. ${property.description ? property.description.slice(0, 140) : "View details, pricing and amenities with Aura Infra."}`}
+          path={`/properties/residential/${slug}`}
+        />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
             <Link className="hover:text-[#1a6b32]" to="/">
               Home
