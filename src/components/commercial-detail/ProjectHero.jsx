@@ -1,14 +1,35 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 export default function ProjectHero({ property }) {
+  const images = property.images?.length ? property.images : [property.image].filter(Boolean);
+  const [activeImage, setActiveImage] = useState(0);
+
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
       <div className="relative h-80 md:h-96">
-        <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
+        <img alt={property.name} className="w-full h-full object-cover" src={images[activeImage] || property.image} />
         <span className="absolute top-4 left-4 bg-[#006D32] text-white text-xs font-bold px-3 py-1.5 rounded-full">
           {property.badge ? `${property.badge} ${property.type}` : property.type}
         </span>
       </div>
+
+      {images.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto px-6 pt-4">
+          {images.map((src, i) => (
+            <button
+              key={src + i}
+              type="button"
+              onClick={() => setActiveImage(i)}
+              className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                activeImage === i ? "border-[#006D32]" : "border-transparent"
+              }`}
+            >
+              <img alt={`${property.name} view ${i + 1}`} className="w-full h-full object-cover" src={src} />
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="p-6 md:p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">{property.name}</h1>

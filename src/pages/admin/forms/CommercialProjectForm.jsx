@@ -10,9 +10,10 @@ const DETAILS_PLACEHOLDER = `{
   "totalArea": "1.8 Acres",
   "totalUnits": "60+",
   "configurations": "Office Floors, Retail Ground Floor",
-  "overviewSummary": "A short paragraph for the Overview tab...",
-  "whyInvest": ["Prime location", "Grade A construction"]
+  "overviewSummary": "A short paragraph for the Overview tab..."
 }`;
+
+const DEFAULT_FLOOR_PLANS = () => [{ type: "", area: "", image: "" }];
 
 const emptyForm = {
   category: CATEGORY,
@@ -25,6 +26,7 @@ const emptyForm = {
   sector: "",
   price_display: "",
   price_range: "",
+  priceNote: "",
   area_display: "",
   possession: "",
   description: "",
@@ -34,19 +36,21 @@ const emptyForm = {
   detailsText: "",
   brochureUrl: "",
   faqs: [],
+  whyInvest: [],
+  floorPlans: DEFAULT_FLOOR_PLANS(),
   propertyType: "",
   is_published: true,
   is_featured: false,
   is_upcoming: false,
 };
 
-// brochureUrl / faqs / type (Commercial Type) are managed by their own
-// dedicated controls, so strip them out of the raw JSON textarea to avoid
-// editing the same data in two places at once. floorPlans (if any) stay in
-// the JSON textarea since there's no dedicated UI for it here.
+// brochureUrl / faqs / floorPlans / whyInvest / priceNote / type
+// (Commercial Type) are managed by their own dedicated controls, so strip
+// them out of the raw JSON textarea to avoid editing the same data in two
+// places at once.
 function detailsTextFor(details) {
   if (!details) return "";
-  const { brochureUrl, faqs, type, propertyType, ...rest } = details;
+  const { brochureUrl, faqs, floorPlans, whyInvest, priceNote, type, propertyType, ...rest } = details;
   return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
 }
 
@@ -70,6 +74,9 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       detailsText: detailsTextFor(project.details),
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
+      whyInvest: Array.isArray(d.whyInvest) && d.whyInvest.length ? d.whyInvest : [],
+      floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
+      priceNote: d.priceNote || "",
       propertyType: d.propertyType || "",
     };
   });
@@ -144,6 +151,52 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
     }
   };
 
+  // ---- Floor plans (uploaded one unit type at a time) ----
+
+  const updateFloorPlan = (index, key, value) => {
+    setForm((f) => {
+      const next = [...f.floorPlans];
+      next[index] = { ...next[index], [key]: value };
+      return { ...f, floorPlans: next };
+    });
+  };
+
+  const handleFloorPlanImageUpload = async (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const { url } = await api.adminUploadImage(file);
+      updateFloorPlan(index, "image", url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const addFloorPlanRow = () => {
+    setForm((f) => ({ ...f, floorPlans: [...f.floorPlans, { type: "", area: "", image: "" }] }));
+  };
+
+  const removeFloorPlanRow = (index) => {
+    setForm((f) => ({ ...f, floorPlans: f.floorPlans.filter((_, i) => i !== index) }));
+  };
+
+  // ---- Why Invest points ----
+
+  const updateWhyInvest = (index, value) => {
+    setForm((f) => {
+      const next = [...f.whyInvest];
+      next[index] = value;
+      return { ...f, whyInvest: next };
+    });
+  };
+
+  const addWhyInvest = () => setForm((f) => ({ ...f, whyInvest: [...f.whyInvest, ""] }));
+  const removeWhyInvest = (index) => setForm((f) => ({ ...f, whyInvest: f.whyInvest.filter((_, i) => i !== index) }));
+
   // ---- FAQs ----
 
   const updateFaq = (index, key, value) => {
@@ -172,11 +225,20 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
     }
 
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
+    if (form.priceNote.trim()) details.priceNote = form.priceNote.trim();
 
     const cleanFaqs = form.faqs
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
       .filter((f) => f.question && f.answer);
     if (cleanFaqs.length) details.faqs = cleanFaqs;
+
+    const cleanWhyInvest = form.whyInvest.map((point) => point.trim()).filter(Boolean);
+    if (cleanWhyInvest.length) details.whyInvest = cleanWhyInvest;
+
+    const cleanFloorPlans = form.floorPlans
+      .map((fp) => ({ type: fp.type.trim(), area: fp.area.trim(), image: fp.image }))
+      .filter((fp) => fp.type && fp.image);
+    if (cleanFloorPlans.length) details.floorPlans = cleanFloorPlans;
 
     if (form.propertyType) {
       details.propertyType = form.propertyType;
@@ -358,6 +420,20 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
         </div>
       </div>
 
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Price Note</label>
+        <input
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          value={form.priceNote}
+          onChange={(e) => update("priceNote", e.target.value)}
+          placeholder="e.g. Total Price, +GST, Negotiable"
+        />
+        <p className="text-[10px] text-[#75777f] mt-1">
+          Small caption shown under the price on the detail page's pricing sidebar (defaults to "Total Price" if
+          left blank).
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Possession</label>
@@ -469,6 +545,97 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       </div>
 
       <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Floor / Unit Options</label>
+        <p className="text-[10px] text-[#75777f] mb-3">
+          Upload one image per unit type — e.g. Office Floor, Retail Unit, Showroom Bay. Powers the "Floor Plans" tab
+          and the Overview tab on the detail page.
+        </p>
+        <div className="space-y-3">
+          {form.floorPlans.map((plan, index) => (
+            <div
+              key={index}
+              className="flex flex-col sm:flex-row sm:items-center gap-3 border border-[#c5c6cf] rounded-lg p-3"
+            >
+              <input
+                className="w-full sm:w-40 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                value={plan.type}
+                onChange={(e) => updateFloorPlan(index, "type", e.target.value)}
+                placeholder="e.g. Office Floor"
+              />
+              <input
+                className="w-full sm:w-36 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                value={plan.area}
+                onChange={(e) => updateFloorPlan(index, "area", e.target.value)}
+                placeholder="e.g. 1200 Sq.ft"
+              />
+              <div className="flex items-center gap-3 flex-1">
+                {plan.image && (
+                  <img src={plan.image} alt={plan.type} className="w-14 h-14 object-cover rounded-lg border border-[#c5c6cf]" />
+                )}
+                <label className="cursor-pointer text-xs font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-3 py-2 hover:bg-[#eaf4ef] transition-colors whitespace-nowrap">
+                  {plan.image ? "Replace Image" : "Upload Image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleFloorPlanImageUpload(index, e)}
+                    disabled={uploading}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeFloorPlanRow(index)}
+                  className="text-[#ba1a1a] text-xs font-semibold ml-auto"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addFloorPlanRow}
+          className="mt-3 text-sm font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-4 py-2 hover:bg-[#eaf4ef] transition-colors"
+        >
+          + Add Another Unit Type
+        </button>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Why Invest In This Property</label>
+        <p className="text-[10px] text-[#75777f] mb-3">
+          Short bullet points — powers the "Why {"{"}Project Name{"}"}" section on the Overview tab.
+        </p>
+        <div className="space-y-2">
+          {form.whyInvest.map((point, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <input
+                className="flex-1 border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+                value={point}
+                onChange={(e) => updateWhyInvest(index, e.target.value)}
+                placeholder="e.g. Prime business location"
+              />
+              <button
+                type="button"
+                onClick={() => removeWhyInvest(index)}
+                className="text-[#ba1a1a] text-xs font-semibold"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addWhyInvest}
+          className="mt-3 text-sm font-semibold text-[#1a6b32] border border-[#1a6b32] rounded-lg px-4 py-2 hover:bg-[#eaf4ef] transition-colors"
+        >
+          + Add Point
+        </button>
+      </div>
+
+      <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">FAQs</label>
         <p className="text-[10px] text-[#75777f] mb-3">Powers the "FAQs" tab on the project's detail page.</p>
         <div className="space-y-3">
@@ -516,7 +683,8 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
           placeholder={DETAILS_PLACEHOLDER}
         />
         <p className="text-[10px] text-[#75777f] mt-1">
-          Leave blank to skip. Property Type, brochure and FAQs are managed by the dedicated fields above — no need to repeat them here.
+          Leave blank to skip. Property Type, brochure, floor/unit options, "Why Invest" points and FAQs are managed
+          by the dedicated fields above — no need to repeat them here.
         </p>
       </div>
 

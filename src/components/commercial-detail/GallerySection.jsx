@@ -1,5 +1,6 @@
 export default function GallerySection({ property }) {
-  const images = [property.image, ...(property.gallery || [])].filter(Boolean);
+  const mainImages = property.images?.length ? property.images : [property.image].filter(Boolean);
+  const images = [...mainImages, ...(property.gallery || [])];
 
   if (images.length === 0) {
     return (
