@@ -71,14 +71,14 @@ export default function PremiumProjectsHero() {
 
   return (
     <section
-      className="min-h-[500px] flex flex-col justify-center items-center px-4 pt-12 pb-24 text-white relative"
+      className="min-h-[360px] flex flex-col justify-center items-center px-4 pt-8 pb-16 text-white relative"
       style={{
         background:
           "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)) center center / cover no-repeat, url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvP3xZRgalAn9bZbHEMwatQuz-SHF9bE8LWZlHJZRWGMFnfwKRzGGvk9jtc8QDLmjqEoYQEb1upwCjHl1okuzBbC3jy6U1Olhcx00rOsIM-i50svnkcqfD7Dn049LwXf3sT6EPrcM_HRmPnVMlOTm6LZgCNoJpk2x_vEREZgFgzgXSAnHvDVvVed2n-zgyfK3ovz0oNpG2FfUpQfA_ecyZ6_0UiyLhMTK3P5TOXPrUGvKI472mYWe4n-r0ILTV0O1Pyw=w2400')",
       }}
     >
       <div className="container mx-auto max-w-7xl">
-        <nav className="flex text-sm mb-6 text-slate-300">
+        <nav className="flex text-sm mb-4 text-slate-300">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li>
               <Link to="/" className="hover:text-white">
@@ -95,14 +95,14 @@ export default function PremiumProjectsHero() {
           </ol>
         </nav>
 
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+        <div className="mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">
             Premium <span className="text-[#1a6b32] brightness-150">Projects</span>
           </h1>
-          <p className="text-lg text-slate-200">Exceptional spaces. Timeless value. A better tomorrow.</p>
+          <p className="text-base text-slate-200">Exceptional spaces. Timeless value. A better tomorrow.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           {STATS.map((stat) => (
             <div key={stat.label} className="flex items-center space-x-3">
               <div className="p-2 border border-white/20 rounded-lg">

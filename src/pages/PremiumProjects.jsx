@@ -9,7 +9,7 @@ export default function PremiumProjects() {
       <PageNavbar />
       <main className="pt-14 bg-slate-50">
         <PremiumProjectsHero />
-        <div className="container mx-auto max-w-7xl px-4 mt-28 mb-20">
+        <div className="container mx-auto max-w-7xl px-4 mt-24 mb-20">
           <ProjectGrid />
         </div>
         <TrustBanner />
