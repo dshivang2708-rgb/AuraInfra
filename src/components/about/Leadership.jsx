@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import virendraFounderImage from "../../assets/honey-director.png";
-import sarabjitDirectorImage from "../../assets/Sarabjit-director.png";
+import virendraFounderImage from "../../assets/honey-director-opt.webp";
+import sarabjitDirectorImage from "../../assets/sarabjit-director.webp";
 
 const TEAM = [
   {
@@ -85,6 +85,10 @@ export default function Leadership() {
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                       alt={member.alt}
                       src={member.image}
+                      width="260"
+                      height="220"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div className="p-4 flex justify-between items-start gap-2 flex-1">

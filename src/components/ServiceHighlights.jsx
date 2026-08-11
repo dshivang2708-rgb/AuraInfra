@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import propertiesNearYouImage from "../assets/properties-near-you-house.png";
+import propertiesNearYouImage from "../assets/properties-near-you-house-opt.webp";
 
 const SEGMENTS = [
   { key: "verified", icon: "verified", label: "Verified\nListings" },

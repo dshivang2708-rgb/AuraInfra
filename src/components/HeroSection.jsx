@@ -100,7 +100,11 @@ export default function HeroSection() {
         <img
           alt="Modern Luxury Property"
           className="w-full h-full object-cover object-top"
-          src={`${BG_IMAGE}=s1920`}
+          src={`${BG_IMAGE}=s1600`}
+          srcSet={`${BG_IMAGE}=s640 640w, ${BG_IMAGE}=s1024 1024w, ${BG_IMAGE}=s1600 1600w, ${BG_IMAGE}=s1920 1920w`}
+          sizes="100vw"
+          fetchpriority="high"
+          decoding="async"
         />
       </div>
 

@@ -1,19 +1,5 @@
 import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router";
 import Home from "./pages/Home.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
-import ResidentialProperties from "./pages/ResidentialProperties.jsx";
-import ResidentialProjectDetail from "./pages/ResidentialProjectDetail.jsx";
-import CommercialProperties from "./pages/CommercialProperties.jsx";
-import CommercialProjectDetail from "./pages/CommercialProjectDetail.jsx";
-import AgricultureProperties from "./pages/AgricultureProperties.jsx";
-import AgricultureProjectDetail from "./pages/AgricultureProjectDetail.jsx";
-import PremiumProjects from "./pages/PremiumProjects.jsx";
-import PremiumProjectDetail from "./pages/PremiumProjectDetail.jsx";
-import UpcomingProjects from "./pages/UpcomingProjects.jsx";
-import AdminSignIn from "./pages/admin/AdminSignIn.jsx";
-import AdminSignUp from "./pages/admin/AdminSignUp.jsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import Footer from "./components/Footer.jsx";
 
 const rootRoute = createRootRoute({
@@ -25,6 +11,9 @@ const rootRoute = createRootRoute({
   ),
 });
 
+// Home loads eagerly (it's the initial paint for most visitors).
+// Every other route is code-split into its own chunk and only
+// downloaded when the visitor actually navigates there.
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -34,86 +23,72 @@ const homeRoute = createRoute({
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/about",
-  component: About,
-});
+}).lazy(() => import("./pages/About.lazy.jsx"));
 
 const contactRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/contact",
-  component: Contact,
-});
+}).lazy(() => import("./pages/Contact.lazy.jsx"));
 
 const residentialRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/residential",
-  component: ResidentialProperties,
-});
+}).lazy(() => import("./pages/ResidentialProperties.lazy.jsx"));
 
 const residentialDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/residential/$slug",
-  component: ResidentialProjectDetail,
-});
+}).lazy(() => import("./pages/ResidentialProjectDetail.lazy.jsx"));
 
 const commercialRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/commercial",
-  component: CommercialProperties,
-});
+}).lazy(() => import("./pages/CommercialProperties.lazy.jsx"));
 
 const commercialDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/commercial/$slug",
-  component: CommercialProjectDetail,
-});
+}).lazy(() => import("./pages/CommercialProjectDetail.lazy.jsx"));
 
 const agricultureRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/agriculture",
-  component: AgricultureProperties,
-});
+}).lazy(() => import("./pages/AgricultureProperties.lazy.jsx"));
 
 const agricultureDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/agriculture/$slug",
-  component: AgricultureProjectDetail,
-});
+}).lazy(() => import("./pages/AgricultureProjectDetail.lazy.jsx"));
 
 const premiumProjectsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/premium-projects",
-  component: PremiumProjects,
-});
+}).lazy(() => import("./pages/PremiumProjects.lazy.jsx"));
 
 const premiumProjectDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/premium-projects/$slug",
-  component: PremiumProjectDetail,
-});
+}).lazy(() => import("./pages/PremiumProjectDetail.lazy.jsx"));
 
 const upcomingProjectsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/properties/upcoming",
-  component: UpcomingProjects,
-});
+}).lazy(() => import("./pages/UpcomingProjects.lazy.jsx"));
 
 const adminSignInRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin/login",
-  component: AdminSignIn,
-});
+}).lazy(() => import("./pages/admin/AdminSignIn.lazy.jsx"));
 
 const adminSignUpRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin/signup",
-  component: AdminSignUp,
-});
+}).lazy(() => import("./pages/admin/AdminSignUp.lazy.jsx"));
 
 const adminDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin/dashboard",
-  component: AdminDashboard,
-});
+}).lazy(() => import("./pages/admin/AdminDashboard.lazy.jsx"));
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
