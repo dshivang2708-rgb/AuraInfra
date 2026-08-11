@@ -194,18 +194,6 @@ export default function Footer() {
       <div className="border-t border-white/5 py-4 px-8">
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs">
           <p>© 2026 Aura Infra. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            {/* <div className="flex items-center gap-1">
-              Made with <span className="text-[#ba1a1a]">❤️</span> for a better tomorrow
-            </div> */}
-            <Link
-              to="/admin/login"
-              className="flex items-center gap-1.5 border border-white/15 rounded-full px-3 py-1 text-white/70 hover:text-white hover:border-white/30 transition-colors"
-            >
-              <span className="material-symbols-outlined text-[14px]">admin_panel_settings</span>
-              Admin
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
