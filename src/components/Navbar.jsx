@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 // TODO: replace with the real Aura Infra logo once the file re-uploads correctly
@@ -28,9 +28,21 @@ const CATEGORY_LINKS = [
 // every other page already relies on.
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 px-6 py-3 md:px-12">
+    <header
+      className={`fixed top-0 left-0 w-full z-50 px-6 py-3 md:px-12 transition-all duration-300 ${
+        scrolled ? "bg-white shadow-md" : "bg-transparent"
+      }`}
+    >
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex-shrink-0">
           <Link to="/">
