@@ -111,7 +111,7 @@ export default function HeroSection() {
       <Navbar />
 
       {/* Hero content */}
-      <main className="relative z-10 flex-grow flex flex-col justify-center px-6 md:px-12 max-w-7xl mx-auto w-full pb-4 md:pb-6 pt-0 min-h-0">
+      <main className="relative z-10 flex-grow flex flex-col justify-center px-6 md:px-12 max-w-7xl mx-auto w-full pb-4 md:pb-6 pt-20 md:pt-28 min-h-0">
         <div className="max-w-2xl">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-brand-navy leading-tight">
             Find Your Perfect <br />

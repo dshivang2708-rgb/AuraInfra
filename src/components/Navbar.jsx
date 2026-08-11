@@ -19,15 +19,22 @@ const CATEGORY_LINKS = [
   { label: "Agriculture", to: "/properties/agriculture" },
 ];
 
+// This navbar is now built exactly like PageNavbar (the header used on
+// About/Residential/Commercial/etc, where the mobile menu already works
+// correctly): a `fixed` header sitting completely outside the page's normal
+// layout flow, with the mobile dropdown as a plain block inside it. Because
+// the header is fixed, growing it to show the dropdown can never collide
+// with or get clipped by the hero section behind it — the same guarantee
+// every other page already relies on.
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="relative z-10 w-full px-6 pt-0 pb-2 md:px-12 -mt-2">
+    <header className="fixed top-0 left-0 w-full z-50 px-6 py-3 md:px-12">
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex-shrink-0">
           <Link to="/">
-            <img alt="Aura Infra Logo" className="h-20 md:h-28 w-auto object-contain" src={LOGO_IMAGE} />
+            <img alt="Aura Infra Logo" className="h-14 md:h-20 w-auto object-contain" src={LOGO_IMAGE} />
           </Link>
         </div>
 
