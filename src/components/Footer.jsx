@@ -137,7 +137,7 @@ export default function Footer() {
                   <span className="material-symbols-outlined mt-0.5" style={{ color: ACCENT }}>
                     {item.icon}
                   </span>
-                  <span className="text-gray-400 leading-snug break-words">{item.text}</span>
+                  <span className="text-gray-400 leading-snug break-all">{item.text}</span>
                 </li>
               ))}
             </ul>
