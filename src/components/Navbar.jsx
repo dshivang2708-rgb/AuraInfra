@@ -39,14 +39,18 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 px-6 py-3 md:px-12 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md" : "bg-transparent"
+      className={`fixed top-0 left-0 w-full z-50 px-6 md:px-12 transition-all duration-300 ${
+        scrolled ? "h-12 bg-white shadow-md" : "h-24 md:h-28 bg-transparent"
       }`}
     >
-      <nav className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto h-full flex items-center justify-between">
         <div className="flex-shrink-0">
           <Link to="/">
-            <img alt="Aura Infra Logo" className="h-14 md:h-20 w-auto object-contain" src={LOGO_IMAGE} />
+            <img
+              alt="Aura Infra Logo"
+              className={`w-auto object-contain transition-all duration-300 ${scrolled ? "h-16" : "h-16 md:h-24"}`}
+              src={LOGO_IMAGE}
+            />
           </Link>
         </div>
 

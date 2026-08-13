@@ -4,11 +4,11 @@ const FEATURES = [
     title: "Trusted & Reliable",
     description: "Years of experience and a strong reputation for delivering what we promise.",
   },
-  {
-    icon: "award_star",
-    title: "Quality Construction",
-    description: "We use premium materials and follow the highest standards of construction.",
-  },
+  // {
+  //   icon: "award_star",
+  //   title: "Quality Construction",
+  //   description: "We use premium materials and follow the highest standards of construction.",
+  // },
   {
     icon: "location_on",
     title: "Prime Locations",
@@ -32,8 +32,8 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { icon: "domain", value: "25+", label: "Projects Delivered" },
-  { icon: "groups", value: "500+", label: "Happy Families" },
+  { icon: "domain", value: "70+", label: "Projects Delivered" },
+  { icon: "groups", value: "50+", label: "Happy Families" },
   { icon: "verified_user", value: "10+", label: "Years of Excellence" },
 ];
 
