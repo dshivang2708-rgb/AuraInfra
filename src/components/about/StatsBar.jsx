@@ -1,9 +1,9 @@
 const STATS = [
-  { icon: "domain", value: "25+", label: "Projects Delivered" },
-  { icon: "family_restroom", value: "500+", label: "Happy Families" },
+  { icon: "domain", value: "70+", label: "Project Deals" },
+  { icon: "family_restroom", value: "50+", label: "Happy Families" },
   { icon: "location_on", value: "8+", label: "Prime Locations" },
   { icon: "workspace_premium", value: "10+", label: "Years Experience" },
-  { icon: "engineering", value: "50+", label: "Expert Professionals" },
+  { icon: "engineering", value: "10+", label: "Expert Professionals" },
 ];
 
 export default function StatsBar() {

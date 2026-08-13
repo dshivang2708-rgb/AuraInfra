@@ -3,7 +3,7 @@ import propertiesNearYouImage from "../assets/properties-near-you-house-opt.webp
 
 const SEGMENTS = [
   { key: "verified", icon: "verified", label: "Verified\nListings" },
-  { key: "brokerage", icon: "handshake", label: "No\nBrokerage" },
+  { key: "brokerage", icon: "handshake", label: "Happy\nFamilies" },
   { key: "location", icon: "location", label: "Location Based\nSearch" },
   { key: "owner", icon: "person", label: "Direct Owner\nContact" },
   { key: "safe", icon: "shield", label: "Safe &\nReliable" },
