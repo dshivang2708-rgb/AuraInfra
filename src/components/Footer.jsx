@@ -132,14 +132,26 @@ export default function Footer() {
           {/* Column 4: Contact Us */}
           <FooterColumn title="Contact Us">
             <ul className="space-y-2">
-              {CONTACT_ITEMS.map((item) => (
-                <li key={item.icon} className="flex items-start gap-3 min-w-0">
-                  <span className="material-symbols-outlined mt-0.5" style={{ color: ACCENT }}>
-                    {item.icon}
-                  </span>
-                  <span className="text-gray-400 leading-snug break-all">{item.text}</span>
-                </li>
-              ))}
+              {CONTACT_ITEMS.map((item) => {
+                const isEmail = item.icon === "mail";
+                const [emailUser, emailDomain] = isEmail ? item.text.split("@") : [];
+                return (
+                  <li key={item.icon} className="flex items-start gap-3 min-w-0">
+                    <span className="material-symbols-outlined mt-0.5" style={{ color: ACCENT }}>
+                      {item.icon}
+                    </span>
+                    {isEmail ? (
+                      <span className="text-gray-400 leading-snug break-all">
+                        {emailUser}@
+                        <br />
+                        {emailDomain}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 leading-snug break-all">{item.text}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </FooterColumn>
         </div>
