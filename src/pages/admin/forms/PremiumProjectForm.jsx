@@ -10,10 +10,6 @@ const DEFAULT_FLOOR_PLANS = () => [
 
 const DEFAULT_AMENITIES = () => [{ icon: "pool", label: "" }];
 
-const DETAILS_PLACEHOLDER = `{
-  "overviewSummary": "A short paragraph for the Overview tab..."
-}`;
-
 const emptyForm = {
   category: CATEGORY,
   slug: "",
@@ -38,7 +34,7 @@ const emptyForm = {
   main_image: "",
   gallery_images: [],
   tagsText: "",
-  detailsText: "",
+  notes: "",
   brochureUrl: "",
   faqs: [],
   whyInvest: [],
@@ -48,31 +44,6 @@ const emptyForm = {
   is_featured: false,
   is_upcoming: false,
 };
-
-// brochureUrl / faqs / floorPlans / whyInvest / amenities / builder /
-// propertyType / priceNote / totalArea / totalUnits / configurations /
-// overviewSummary are all managed by their own dedicated controls, so strip
-// them out of the raw JSON textarea to avoid editing the same data in two
-// places at once.
-function detailsTextFor(details) {
-  if (!details) return "";
-  const {
-    brochureUrl,
-    faqs,
-    floorPlans,
-    whyInvest,
-    amenities,
-    builder,
-    propertyType,
-    priceNote,
-    totalArea,
-    totalUnits,
-    configurations,
-    overviewSummary,
-    ...rest
-  } = details;
-  return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
-}
 
 export default function PremiumProjectForm({ project, onSaved, onCancel }) {
   const [form, setForm] = useState(() => {
@@ -85,7 +56,7 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
       tagsText: Array.isArray(project.tags)
         ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ")
         : "",
-      detailsText: detailsTextFor(project.details),
+      notes: d.notes != null ? String(d.notes) : "",
       builder: d.builder != null ? String(d.builder) : "",
       propertyType: d.propertyType != null ? String(d.propertyType) : "",
       priceNote: d.priceNote != null ? String(d.priceNote) : "",
@@ -239,16 +210,8 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
     e.preventDefault();
     setError("");
 
-    let details = {};
-    if (form.detailsText.trim()) {
-      try {
-        details = JSON.parse(form.detailsText);
-      } catch {
-        setError("Additional Details must be valid JSON — check the syntax.");
-        return;
-      }
-    }
-
+    const details = {};
+    if (String(form.notes).trim()) details.notes = String(form.notes).trim();
     if (String(form.builder).trim()) details.builder = String(form.builder).trim();
     if (String(form.propertyType).trim()) details.propertyType = String(form.propertyType).trim();
     if (String(form.priceNote).trim()) details.priceNote = String(form.priceNote).trim();
@@ -784,20 +747,18 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">
-          Additional Details (JSON) — for anything not covered above
-        </label>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Additional Notes</label>
         <textarea
-          className="w-full border-[#c5c6cf] rounded-lg text-xs font-mono focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-          rows={6}
-          value={form.detailsText}
-          onChange={(e) => update("detailsText", e.target.value)}
-          placeholder={DETAILS_PLACEHOLDER}
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          rows={4}
+          value={form.notes}
+          onChange={(e) => update("notes", e.target.value)}
+          placeholder="Any extra info for the Overview tab that isn't covered by the fields above..."
         />
         <p className="text-[10px] text-[#75777f] mt-1">
-          Leave blank to skip. Builder, Property Type, Price Note, Total Area, Total Units, Configurations,
-          Overview Summary, brochure, floor/unit options, amenities, "Why Invest" points and FAQs are all managed
-          by the dedicated fields above — no need to repeat them here.
+          Plain text, shown at the bottom of the Overview tab. Leave blank to skip. Builder, Property Type, Price
+          Note, Total Area, Total Units, Configurations, Overview Summary, brochure, floor/unit options, amenities,
+          "Why Invest" points and FAQs are all managed by the dedicated fields above — no need to repeat them here.
         </p>
       </div>
 

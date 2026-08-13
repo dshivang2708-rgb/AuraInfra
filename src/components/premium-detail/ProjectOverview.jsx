@@ -33,6 +33,11 @@ export default function ProjectOverview({ property }) {
           ))}
         </ul>
       )}
+      {property.notes && (
+        <p className="text-sm text-gray-600 mt-6 pt-4 border-t border-dashed border-gray-200 leading-relaxed">
+          {property.notes}
+        </p>
+      )}
     </div>
   );
 }

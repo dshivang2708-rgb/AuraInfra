@@ -124,6 +124,7 @@ export function toPremiumDetail(row) {
     floorPlans: d.floorPlans || [],
     whyInvest: d.whyInvest || [],
     amenities: d.amenities || [],
+    notes: d.notes || null,
     gallery: row.gallery_images || [],
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],

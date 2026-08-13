@@ -6,14 +6,14 @@ export const CATEGORY_ROUTES = {
   residential: "/properties/residential",
   commercial: "/properties/commercial",
   agriculture: "/properties/agriculture",
-  premium: "/properties/premium-projects",
+  upcoming: "/properties/upcoming",
 };
 
 export const CATEGORY_LABELS = {
   residential: "Residential",
   commercial: "Commercial",
   agriculture: "Agriculture",
-  premium: "Premium Projects",
+  upcoming: "Upcoming Projects",
 };
 
 // Fetches the list of cities that currently have published projects.

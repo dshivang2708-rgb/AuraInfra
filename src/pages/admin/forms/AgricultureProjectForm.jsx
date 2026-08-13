@@ -6,10 +6,6 @@ const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
 const CATEGORY = "agriculture";
 
-const DETAILS_PLACEHOLDER = `{
-  "priceNote": "Negotiable"
-}`;
-
 const emptyForm = {
   category: CATEGORY,
   slug: "",
@@ -27,7 +23,7 @@ const emptyForm = {
   main_image: "",
   gallery_images: [],
   tagsText: "",
-  detailsText: "",
+  priceNote: "",
   brochureUrl: "",
   faqs: [],
   propertyType: "",
@@ -45,29 +41,6 @@ const emptyForm = {
   is_upcoming: false,
 };
 
-// brochureUrl / faqs are managed by their own dedicated controls, so strip
-// them out of the raw JSON textarea to avoid editing the same data in two
-// places at once.
-function detailsTextFor(details) {
-  if (!details) return "";
-  const {
-    brochureUrl,
-    faqs,
-    propertyType,
-    soilType,
-    waterSource,
-    irrigationType,
-    soilWaterNotes,
-    areaOptions,
-    nearby,
-    whyInvest,
-    landDetails,
-    documents,
-    ...rest
-  } = details;
-  return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
-}
-
 export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
   const [form, setForm] = useState(() => {
     if (!project) return emptyForm;
@@ -79,7 +52,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
       tagsText: Array.isArray(project.tags)
         ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ")
         : "",
-      detailsText: detailsTextFor(project.details),
+      priceNote: d.priceNote != null ? String(d.priceNote) : "",
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
       propertyType: d.propertyType || "",
@@ -260,18 +233,10 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
     e.preventDefault();
     setError("");
 
-    let details = {};
-    if (form.detailsText.trim()) {
-      try {
-        details = JSON.parse(form.detailsText);
-      } catch {
-        setError("Additional Details must be valid JSON — check the syntax.");
-        return;
-      }
-    }
-
+    const details = {};
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
     if (form.propertyType) details.propertyType = form.propertyType;
+    if (form.priceNote.trim()) details.priceNote = form.priceNote.trim();
     if (form.soilType.trim()) details.soilType = form.soilType.trim();
     if (form.waterSource.trim()) details.waterSource = form.waterSource.trim();
     if (form.irrigationType.trim()) details.irrigationType = form.irrigationType.trim();
@@ -870,20 +835,15 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">
-          Additional Details (JSON) — powers the detail page's Overview tab
-        </label>
-        <textarea
-          className="w-full border-[#c5c6cf] rounded-lg text-xs font-mono focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-          rows={8}
-          value={form.detailsText}
-          onChange={(e) => update("detailsText", e.target.value)}
-          placeholder={DETAILS_PLACEHOLDER}
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Price Note</label>
+        <input
+          className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+          value={form.priceNote}
+          onChange={(e) => update("priceNote", e.target.value)}
+          placeholder="e.g. Negotiable"
         />
         <p className="text-[10px] text-[#75777f] mt-1">
-          Leave blank to skip. Property Type, Soil &amp; Water, Area Options, Land Details, Nearby Places, Why
-          Invest, Documents, brochure, and FAQs are all managed by the dedicated fields above — no need to
-          repeat them here. Use this only for a one-off extra field (e.g. priceNote).
+          Shown next to the price on the project's detail page. Leave blank to skip.
         </p>
       </div>
 

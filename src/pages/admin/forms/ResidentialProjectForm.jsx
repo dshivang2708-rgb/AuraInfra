@@ -8,14 +8,6 @@ const CATEGORY = "residential";
 // it's just the unfiltered view — so exclude it from the dropdown options.
 const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
-const DETAILS_PLACEHOLDER = `{
-  "beds": "2, 3 & 4 BHK",
-  "totalArea": "5.8 Acres",
-  "totalUnits": "280+",
-  "configurations": "2 BHK, 3 BHK, 4 BHK",
-  "overviewSummary": "A short paragraph for the Overview tab..."
-}`;
-
 const DEFAULT_FLOOR_PLANS = () => [
   { type: "2 BHK", area: "", image: "" },
   { type: "3 BHK", area: "", image: "" },
@@ -40,7 +32,11 @@ const emptyForm = {
   main_image: "",
   gallery_images: [],
   tagsText: "",
-  detailsText: "",
+  beds: "",
+  totalArea: "",
+  totalUnits: "",
+  configurations: "",
+  overviewSummary: "",
   propertyType: "",
   brochureUrl: "",
   faqs: [],
@@ -49,15 +45,6 @@ const emptyForm = {
   is_featured: false,
   is_upcoming: false,
 };
-
-// brochureUrl / faqs / floorPlans / propertyType / developer are managed by
-// their own dedicated controls, so strip them out of the raw JSON textarea
-// to avoid editing the same data in two places at once.
-function detailsTextFor(details) {
-  if (!details) return "";
-  const { brochureUrl, faqs, floorPlans, propertyType, developer, ...rest } = details;
-  return Object.keys(rest).length ? JSON.stringify(rest, null, 2) : "";
-}
 
 export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
   const [form, setForm] = useState(() => {
@@ -70,7 +57,11 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
       tagsText: Array.isArray(project.tags)
         ? project.tags.map((t) => (typeof t === "string" ? t : t.label)).join(", ")
         : "",
-      detailsText: detailsTextFor(project.details),
+      beds: d.beds != null ? String(d.beds) : "",
+      totalArea: d.totalArea != null ? String(d.totalArea) : "",
+      totalUnits: d.totalUnits != null ? String(d.totalUnits) : "",
+      configurations: d.configurations != null ? String(d.configurations) : "",
+      overviewSummary: d.overviewSummary != null ? String(d.overviewSummary) : "",
       propertyType: d.propertyType || "",
       developer: d.developer || "",
       brochureUrl: d.brochureUrl || "",
@@ -191,19 +182,15 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
     e.preventDefault();
     setError("");
 
-    let details = {};
-    if (form.detailsText.trim()) {
-      try {
-        details = JSON.parse(form.detailsText);
-      } catch {
-        setError("Additional Details must be valid JSON — check the syntax.");
-        return;
-      }
-    }
-
+    const details = {};
     if (form.brochureUrl) details.brochureUrl = form.brochureUrl;
     if (form.propertyType) details.propertyType = form.propertyType;
     if (form.developer.trim()) details.developer = form.developer.trim();
+    if (form.beds.trim()) details.beds = form.beds.trim();
+    if (form.totalArea.trim()) details.totalArea = form.totalArea.trim();
+    if (form.totalUnits.trim()) details.totalUnits = form.totalUnits.trim();
+    if (form.configurations.trim()) details.configurations = form.configurations.trim();
+    if (form.overviewSummary.trim()) details.overviewSummary = form.overviewSummary.trim();
 
     const cleanFaqs = form.faqs
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
@@ -588,20 +575,57 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">
-          Additional Details (JSON) — powers the detail page's Overview tab
-        </label>
-        <textarea
-          className="w-full border-[#c5c6cf] rounded-lg text-xs font-mono focus:ring-[#1a6b32] focus:border-[#1a6b32]"
-          rows={8}
-          value={form.detailsText}
-          onChange={(e) => update("detailsText", e.target.value)}
-          placeholder={DETAILS_PLACEHOLDER}
-        />
-        <p className="text-[10px] text-[#75777f] mt-1">
-          Leave blank to skip. Floor plans, brochure and FAQs are managed by the dedicated fields above — no need to
-          repeat them here.
-        </p>
+        <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Overview Details</label>
+        <p className="text-[10px] text-[#75777f] mb-3">Powers the "Overview" tab on the project's detail page.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Beds</label>
+            <input
+              className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+              value={form.beds}
+              onChange={(e) => update("beds", e.target.value)}
+              placeholder="e.g. 2, 3 & 4 BHK"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Configurations</label>
+            <input
+              className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+              value={form.configurations}
+              onChange={(e) => update("configurations", e.target.value)}
+              placeholder="e.g. 2 BHK, 3 BHK, 4 BHK"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Total Area</label>
+            <input
+              className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+              value={form.totalArea}
+              onChange={(e) => update("totalArea", e.target.value)}
+              placeholder="e.g. 5.8 Acres"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Total Units</label>
+            <input
+              className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+              value={form.totalUnits}
+              onChange={(e) => update("totalUnits", e.target.value)}
+              placeholder="e.g. 280+"
+            />
+          </div>
+        </div>
+        <div className="mt-4">
+          <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Overview Summary</label>
+          <textarea
+            className="w-full border-[#c5c6cf] rounded-lg text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32]"
+            rows={4}
+            value={form.overviewSummary}
+            onChange={(e) => update("overviewSummary", e.target.value)}
+            placeholder="A short paragraph for the Overview tab..."
+          />
+          <p className="text-[10px] text-[#75777f] mt-1">Leave blank to fall back to the Description above.</p>
+        </div>
       </div>
 
       <label className="flex items-center gap-2 text-sm">
