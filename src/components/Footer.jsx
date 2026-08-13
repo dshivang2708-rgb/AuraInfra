@@ -8,9 +8,9 @@ const LOGO_IMAGE =
 const ACCENT = "#006d33";
 
 const EXPLORE_LINKS = [
-  { label: "Residential", href: "/residential" },
-  { label: "Commercial", href: "/commercial" },
-  { label: "Agriculture", href: "/agriculture" },
+  { label: "Residential", to: "/residential" },
+  { label: "Commercial", to: "/commercial" },
+  { label: "Agriculture", to: "/agriculture" },
   { label: "About Us", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
