@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { MapPin, Ruler, ArrowRight } from "lucide-react";
+import { MapPin, Ruler, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "../lib/api.js";
 import { toFeaturedCard } from "../lib/adapters.js";
 import { CATEGORY_DETAIL_ROUTES } from "../lib/categoryRoutes.js";
@@ -62,6 +62,7 @@ export default function FeaturedProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const scrollerRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -79,6 +80,14 @@ export default function FeaturedProperties() {
   // entirely rather than showing an empty/broken block on the homepage.
   if (!loading && (error || properties.length === 0)) return null;
 
+  const scrollByCard = (direction) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector("[data-card]");
+    const amount = (card?.offsetWidth || 300) + 16; // card width + gap
+    el.scrollBy({ left: direction * amount, behavior: "smooth" });
+  };
+
   return (
     <section className="py-10 bg-[#f9f9ff]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-7xl mx-auto px-8">
@@ -87,14 +96,52 @@ export default function FeaturedProperties() {
             <h2 className="text-2xl font-bold text-[#151c27]">Featured Properties</h2>
             <div className="h-1 w-12 bg-[#4d8efe] mt-2 rounded-full" />
           </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/properties/residential"
+              className="flex items-center gap-1.5 text-sm font-bold text-[#1a6b32] hover:text-[#145528] whitespace-nowrap flex-shrink-0"
+            >
+              See All <ArrowRight size={16} />
+            </Link>
+            {properties.length > 1 && (
+              <div className="hidden sm:flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollByCard(-1)}
+                  aria-label="Scroll left"
+                  className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-[#151c27] hover:bg-[#1a6b32] hover:text-white hover:border-[#1a6b32] transition-colors"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollByCard(1)}
+                  aria-label="Scroll right"
+                  className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-[#151c27] hover:bg-[#1a6b32] hover:text-white hover:border-[#1a6b32] transition-colors"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (
           <p className="text-sm text-[#75777f]">Loading...</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div
+            ref={scrollerRef}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-8 px-8
+              [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]"
+          >
             {properties.map((property) => (
-              <PropertyCard key={property.key} property={property} />
+              <div
+                key={property.key}
+                data-card
+                className="w-[78%] sm:w-[45%] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start"
+              >
+                <PropertyCard property={property} />
+              </div>
             ))}
           </div>
         )}
