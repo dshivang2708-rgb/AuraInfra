@@ -5,7 +5,7 @@ const SEGMENTS = [
   { key: "verified", icon: "verified", label: "Verified\nListings" },
   { key: "brokerage", icon: "handshake", label: "Happy\nFamilies" },
   { key: "location", icon: "location", label: "Location Based\nSearch" },
-  { key: "owner", icon: "person", label: "Direct Owner\nContact" },
+  { key: "owner", icon: "person", label: "Direct Deal\nAccess" },
   { key: "safe", icon: "shield", label: "Safe &\nReliable" },
 ];
 
