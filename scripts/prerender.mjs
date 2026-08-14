@@ -75,10 +75,12 @@ async function main() {
   }
 
   console.log(`Starting preview server on ${BASE_URL} ...`);
+  // shell: true is required on Windows, where "npx" actually resolves to
+  // "npx.cmd" and Node's spawn() won't find it without going through a shell.
   const server = spawn(
     "npx",
     ["vite", "preview", "--port", String(PORT), "--host", HOST, "--strictPort"],
-    { stdio: "inherit" }
+    { stdio: "inherit", shell: true }
   );
 
   const cleanupAndExit = (code) => {
