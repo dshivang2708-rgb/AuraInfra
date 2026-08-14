@@ -1,6 +1,9 @@
 {
   "rewrites": [
-    { "source": "/((?!sitemap\\.xml|robots\\.txt|assets/.*).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!sitemap\\.xml$|robots\\.txt$|assets/.*|about/?$|contact/?$|properties/residential/?$|properties/commercial/?$|properties/agriculture/?$|properties/premium-projects/?$|properties/upcoming/?$|terms-and-conditions/?$|privacy-policy/?$).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
