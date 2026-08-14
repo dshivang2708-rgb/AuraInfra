@@ -2,25 +2,25 @@ const TIMELINE = [
   {
     year: "2014",
     label: "Founded",
-    text: "Our journey began with a simple vision to provide quality homes.",
+    text: "Our journey began with a simple vision — to guide buyers and investors to the right property with honest, expert advice.",
     dot: "bg-[#005ac1]",
   },
   {
     year: "2016",
-    label: "First Project",
-    text: "Delivered our first landmark residential project ahead of schedule.",
+    label: "First Partnership",
+    text: "Closed our first major brokerage deal and forged lasting partnerships with trusted developers across the region.",
     dot: "bg-[#005ac1]",
   },
   {
     year: "2019",
     label: "Expansion",
-    text: "Expanded into multiple cities and diversified into commercial spaces.",
+    text: "Expanded into multiple cities, grew our developer network, and diversified our consulting into commercial and agricultural properties.",
     dot: "bg-[#005ac1]",
   },
   {
     year: "2024+",
     label: "Growth Ahead",
-    text: "Continuing to build sustainable futures and smarter living spaces.",
+    text: "Continuing to guide clients toward smarter investments and build lasting relationships across North India.",
     dot: "bg-[#6ddd81]",
   },
 ];
@@ -36,12 +36,13 @@ export default function OurStory() {
             </span>
             <h2 className="text-2xl md:text-3xl font-bold text-[#071837] mb-4 leading-tight">
               From A Vision to <br />
-              <span className="text-[#005ac1]">Vibrant Communities</span>
+              <span className="text-[#005ac1]">Trusted Guidance</span>
             </h2>
             <p className="text-sm text-[#45464e] mb-8 leading-relaxed">
-              Founded with a vision to redefine real estate by combining innovation, quality, and
-              integrity, Aura Infra has grown into a trusted name in the industry. We believe in
-              building long-term relationships through honesty, commitment, and excellence.
+              Founded with a vision to redefine real estate consulting by combining market insight,
+              transparency, and integrity, Aura Infra has grown into a trusted advisory and brokerage
+              partner. We connect buyers, investors, and developers, guiding every relationship with
+              honesty, commitment, and excellence.
             </p>
 
             <div className="relative pl-6 border-l-2 border-[#dce2f3] space-y-8">
