@@ -27,6 +27,7 @@ export function toResidentialDetail(row) {
     gallery: row.gallery_images || [],
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],
+    highlights: d.highlights || [],
     image: row.main_image,
   };
 }
@@ -57,6 +58,7 @@ export function toCommercialDetail(row) {
     gallery: row.gallery_images || [],
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],
+    highlights: d.highlights || [],
     image: row.main_image,
     images: row.main_images?.length ? row.main_images : row.main_image ? [row.main_image] : [],
   };
@@ -90,6 +92,7 @@ export function toAgricultureDetail(row) {
     gallery: row.gallery_images || [],
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],
+    highlights: d.highlights || [],
     image: row.main_image,
   };
 }
@@ -128,6 +131,7 @@ export function toPremiumDetail(row) {
     gallery: row.gallery_images || [],
     brochureUrl: d.brochureUrl || null,
     faqs: d.faqs || [],
+    highlights: d.highlights || [],
     image: row.main_image,
   };
 }

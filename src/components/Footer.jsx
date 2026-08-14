@@ -141,11 +141,14 @@ export default function Footer() {
                       {item.icon}
                     </span>
                     {isEmail ? (
-                      <span className="text-gray-400 leading-snug break-all">
+                      <a
+                        href={`mailto:${item.text}`}
+                        className="text-gray-400 leading-snug break-all hover:text-white transition-colors"
+                      >
                         {emailUser}@
                         <br />
                         {emailDomain}
-                      </span>
+                      </a>
                     ) : (
                       <span className="text-gray-400 leading-snug break-all">{item.text}</span>
                     )}

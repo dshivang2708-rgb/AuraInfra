@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
 import { CATEGORY_TABS } from "../../../components/agriculture/CategoryTabs.jsx";
+import HighlightsEditor from "../../../components/admin/HighlightsEditor.jsx";
+import { HIGHLIGHT_PRESETS } from "../../../lib/highlightPresets.js";
 
 const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
@@ -36,6 +38,7 @@ const emptyForm = {
   whyInvest: [],
   landDetails: [],
   documents: [],
+  highlights: [],
   is_published: true,
   is_featured: false,
   is_upcoming: false,
@@ -65,6 +68,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
       whyInvest: Array.isArray(d.whyInvest) && d.whyInvest.length ? d.whyInvest : [],
       landDetails: Array.isArray(d.landDetails) && d.landDetails.length ? d.landDetails : [],
       documents: Array.isArray(d.documents) && d.documents.length ? d.documents : [],
+      highlights: Array.isArray(d.highlights) ? d.highlights : [],
     };
   });
   const [uploading, setUploading] = useState(false);
@@ -269,6 +273,11 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
       .filter((f) => f.question && f.answer);
     if (cleanFaqs.length) details.faqs = cleanFaqs;
+
+    const cleanHighlights = form.highlights
+      .map((h) => ({ label: h.label.trim(), icon: h.icon }))
+      .filter((h) => h.label);
+    if (cleanHighlights.length) details.highlights = cleanHighlights;
 
     const tags = form.tagsText
       .split(",")
@@ -797,6 +806,12 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
         </label>
         <p className="text-[10px] text-[#75777f] mt-1">Powers the "Gallery" tab on the project's detail page.</p>
       </div>
+
+      <HighlightsEditor
+        presets={HIGHLIGHT_PRESETS.agriculture}
+        value={form.highlights}
+        onChange={(next) => update("highlights", next)}
+      />
 
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">FAQs</label>

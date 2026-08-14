@@ -72,11 +72,21 @@ export default function ConnectSection() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold mb-0.5 text-[#151c27]">{card.title}</h4>
-                  {card.lines.map((line) => (
-                    <p key={line} className="text-[#45464e] text-xs leading-relaxed">
-                      {line}
-                    </p>
-                  ))}
+                  {card.lines.map((line) =>
+                    card.icon === "mail" ? (
+                      <a
+                        key={line}
+                        href={`mailto:${line}`}
+                        className="text-[#45464e] text-xs leading-relaxed hover:text-[#1a6b32] hover:underline transition-colors break-all"
+                      >
+                        {line}
+                      </a>
+                    ) : (
+                      <p key={line} className="text-[#45464e] text-xs leading-relaxed">
+                        {line}
+                      </p>
+                    )
+                  )}
                   {card.note && <p className="text-[#75777f] text-[11px] mt-0.5">{card.note}</p>}
                 </div>
               </div>

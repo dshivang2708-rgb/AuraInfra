@@ -9,6 +9,7 @@ const PRICE_CHECKLIST = [
 ];
 
 export default function PricingSidebar({ property }) {
+  const checklist = property.highlights?.length ? property.highlights : PRICE_CHECKLIST;
   return (
     <aside className="w-full lg:w-1/4 xl:w-[280px] mx-auto">
       <div className="lg:sticky lg:top-28 flex flex-col gap-6">
@@ -19,7 +20,7 @@ export default function PricingSidebar({ property }) {
             <p className="text-[11px] text-[#45464e]">Price Range</p>
           </div>
           <ul className="flex flex-col gap-3 text-sm text-[#151c27]">
-            {PRICE_CHECKLIST.map((item) => (
+            {checklist.map((item) => (
               <li key={item.label} className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-[#1a6b32] bg-[#1a6b32]/20 rounded-full p-1 text-[16px]">
                   {item.icon}

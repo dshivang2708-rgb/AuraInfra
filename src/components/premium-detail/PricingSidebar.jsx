@@ -8,13 +8,14 @@ const PRICE_CHECKLIST = [
 ];
 
 export default function PricingSidebar({ property }) {
+  const checklist = property.highlights?.length ? property.highlights : PRICE_CHECKLIST;
   return (
     <aside className="space-y-6">
       <div className="bg-[#eaf4ef] rounded-2xl p-6 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-900 mb-1">{property.priceRange || property.price}</h2>
         <p className="text-sm text-gray-500 mb-6">{property.priceNote || "Starting Price"}</p>
         <ul className="space-y-3">
-          {PRICE_CHECKLIST.map((item) => (
+          {checklist.map((item) => (
             <li key={item.label} className="flex items-center gap-2 text-sm text-gray-700">
               <span className="material-symbols-outlined text-[#1a6b32] bg-white p-1 rounded-full text-[16px] w-6 h-6 flex items-center justify-center">
                 {item.icon}

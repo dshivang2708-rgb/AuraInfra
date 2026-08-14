@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
 import { CATEGORY_TABS } from "../../../components/commercial/CategoryTabs.jsx";
+import HighlightsEditor from "../../../components/admin/HighlightsEditor.jsx";
+import { HIGHLIGHT_PRESETS } from "../../../lib/highlightPresets.js";
 
 const PROPERTY_TYPE_OPTIONS = CATEGORY_TABS.filter((t) => t.key !== "all");
 
@@ -34,6 +36,7 @@ const emptyForm = {
   brochureUrl: "",
   faqs: [],
   whyInvest: [],
+  highlights: [],
   floorPlans: DEFAULT_FLOOR_PLANS(),
   propertyType: "",
   is_published: true,
@@ -65,6 +68,7 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
       whyInvest: Array.isArray(d.whyInvest) && d.whyInvest.length ? d.whyInvest : [],
+      highlights: Array.isArray(d.highlights) ? d.highlights : [],
       floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
       priceNote: d.priceNote || "",
       propertyType: d.propertyType || "",
@@ -220,6 +224,11 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
 
     const cleanWhyInvest = form.whyInvest.map((point) => point.trim()).filter(Boolean);
     if (cleanWhyInvest.length) details.whyInvest = cleanWhyInvest;
+
+    const cleanHighlights = form.highlights
+      .map((h) => ({ label: h.label.trim(), icon: h.icon }))
+      .filter((h) => h.label);
+    if (cleanHighlights.length) details.highlights = cleanHighlights;
 
     const cleanFloorPlans = form.floorPlans
       .map((fp) => ({ type: fp.type.trim(), area: fp.area.trim(), image: fp.image }))
@@ -635,6 +644,12 @@ export default function CommercialProjectForm({ project, onSaved, onCancel }) {
           + Add Point
         </button>
       </div>
+
+      <HighlightsEditor
+        presets={HIGHLIGHT_PRESETS.commercial}
+        value={form.highlights}
+        onChange={(next) => update("highlights", next)}
+      />
 
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">FAQs</label>

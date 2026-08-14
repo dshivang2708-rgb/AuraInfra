@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
 import { CATEGORY_TABS } from "../../../components/residential/CategoryTabs.jsx";
+import HighlightsEditor from "../../../components/admin/HighlightsEditor.jsx";
+import { HIGHLIGHT_PRESETS } from "../../../lib/highlightPresets.js";
 
 const CATEGORY = "residential";
 
@@ -41,6 +43,7 @@ const emptyForm = {
   brochureUrl: "",
   faqs: [],
   floorPlans: DEFAULT_FLOOR_PLANS(),
+  highlights: [],
   is_published: true,
   is_featured: false,
   is_upcoming: false,
@@ -67,6 +70,7 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
       brochureUrl: d.brochureUrl || "",
       faqs: Array.isArray(d.faqs) && d.faqs.length ? d.faqs : [],
       floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
+      highlights: Array.isArray(d.highlights) ? d.highlights : [],
     };
   });
   const [uploading, setUploading] = useState(false);
@@ -201,6 +205,11 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
       .map((fp) => ({ type: fp.type.trim(), area: fp.area.trim(), image: fp.image }))
       .filter((fp) => fp.type && fp.image);
     if (cleanFloorPlans.length) details.floorPlans = cleanFloorPlans;
+
+    const cleanHighlights = form.highlights
+      .map((h) => ({ label: h.label.trim(), icon: h.icon }))
+      .filter((h) => h.label);
+    if (cleanHighlights.length) details.highlights = cleanHighlights;
 
     const tags = form.tagsText
       .split(",")
@@ -537,6 +546,12 @@ export default function ResidentialProjectForm({ project, onSaved, onCancel }) {
           + Add Another Configuration
         </button>
       </div>
+
+      <HighlightsEditor
+        presets={HIGHLIGHT_PRESETS.residential}
+        value={form.highlights}
+        onChange={(next) => update("highlights", next)}
+      />
 
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">FAQs</label>

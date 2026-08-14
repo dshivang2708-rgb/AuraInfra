@@ -57,12 +57,12 @@ export default function WhyChooseUs() {
         </p>
       </div>
 
-      {/* 6-Column Feature Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+      {/* Feature Cards */}
+      <div className="flex flex-wrap justify-center gap-4 mb-10">
         {FEATURES.map((feature) => (
           <div
             key={feature.title}
-            className="bg-white p-4 rounded-xl border border-[#c5c6cf]/30 text-center flex flex-col items-center hover:shadow-lg transition-shadow duration-300"
+            className="w-full sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(20%-13px)] bg-white p-4 rounded-xl border border-[#c5c6cf]/30 text-center flex flex-col items-center hover:shadow-lg transition-shadow duration-300"
           >
             <div className="w-16 h-16 rounded-full bg-[#1a6b32]/10 flex items-center justify-center mb-3">
               <span

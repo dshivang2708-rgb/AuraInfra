@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { api } from "../../../lib/api.js";
+import HighlightsEditor from "../../../components/admin/HighlightsEditor.jsx";
+import { HIGHLIGHT_PRESETS } from "../../../lib/highlightPresets.js";
 
 const CATEGORY = "premium";
 
@@ -40,6 +42,7 @@ const emptyForm = {
   whyInvest: [],
   amenities: DEFAULT_AMENITIES(),
   floorPlans: DEFAULT_FLOOR_PLANS(),
+  highlights: [],
   is_published: true,
   is_featured: false,
   is_upcoming: false,
@@ -69,6 +72,7 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
       whyInvest: Array.isArray(d.whyInvest) && d.whyInvest.length ? d.whyInvest : [],
       amenities: Array.isArray(d.amenities) && d.amenities.length ? d.amenities : DEFAULT_AMENITIES(),
       floorPlans: Array.isArray(d.floorPlans) && d.floorPlans.length ? d.floorPlans : DEFAULT_FLOOR_PLANS(),
+      highlights: Array.isArray(d.highlights) ? d.highlights : [],
     };
   });
   const [uploading, setUploading] = useState(false);
@@ -238,6 +242,11 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
       .map((fp) => ({ type: String(fp.type || "").trim(), area: String(fp.area || "").trim(), image: fp.image }))
       .filter((fp) => fp.type && fp.image);
     if (cleanFloorPlans.length) details.floorPlans = cleanFloorPlans;
+
+    const cleanHighlights = form.highlights
+      .map((h) => ({ label: String(h.label || "").trim(), icon: h.icon }))
+      .filter((h) => h.label);
+    if (cleanHighlights.length) details.highlights = cleanHighlights;
 
     const tags = form.tagsText
       .split(",")
@@ -709,6 +718,12 @@ export default function PremiumProjectForm({ project, onSaved, onCancel }) {
           + Add Point
         </button>
       </div>
+
+      <HighlightsEditor
+        presets={HIGHLIGHT_PRESETS.premium}
+        value={form.highlights}
+        onChange={(next) => update("highlights", next)}
+      />
 
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">FAQs</label>
