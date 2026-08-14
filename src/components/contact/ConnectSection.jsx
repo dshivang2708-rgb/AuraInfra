@@ -16,6 +16,9 @@ const CONTACT_CARDS = [
   
 ];
 
+const PHONE_NUMBER = "9670000093";
+const PHONE_NUMBER_INTL = "91" + PHONE_NUMBER;
+
 const SOCIAL_ICONS = ["public", "photo_camera", "work", "smart_display"];
 
 const SUBJECTS = ["Property Inquiry", "Business Partnership", "Legal Support", "Other"];
@@ -78,6 +81,34 @@ export default function ConnectSection() {
                 </div>
               </div>
             ))}
+
+            <div className="bg-white p-4 rounded-xl border border-[#c5c6cf] flex items-start gap-3 hover:shadow-lg transition-all duration-300">
+              <div className="w-10 h-10 shrink-0 rounded-lg bg-[#1a6b32]/10 flex items-center justify-center text-[#1a6b32]">
+                <span className="material-symbols-outlined text-[20px]">call</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold mb-0.5 text-[#151c27]">Call or WhatsApp Us</h4>
+                <p className="text-[#45464e] text-xs leading-relaxed mb-2">+91 {PHONE_NUMBER}</p>
+                <div className="flex gap-2">
+                  <a
+                    href={`tel:+${PHONE_NUMBER_INTL}`}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#1a6b32] text-white text-[11px] font-semibold hover:bg-[#154f26] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">call</span>
+                    Call Now
+                  </a>
+                  <a
+                    href={`https://wa.me/${PHONE_NUMBER_INTL}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#25D366] text-white text-[11px] font-semibold hover:bg-[#1ebe5b] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">chat</span>
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+            </div>
 
             <div className="pt-4">
               <p className="text-[18px] font-bold mb-4 text-[#151c27]">Follow Us</p>
