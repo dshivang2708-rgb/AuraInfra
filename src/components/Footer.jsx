@@ -2,6 +2,16 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { api } from "../lib/api.js";
 
+function InstagramIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
 const LOGO_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuB16OuZYxLnZ7IzPxfxFrAbCzZGu95GrOYe_I_p2U_U_w2gbmdAMHiDCVL8tolKUMX4-3bJzx7VZCL257ax2cZDIROh76OQi9XAWXoxc39QVm4gxpFSYGSUaRRaUXR4ECzlzxPrC5bGJzDsYNCrvpDRAK0Nst4yrqH-lSLouyj4oQojCi1HsGQROE_tASHbzkuOCazoVbh6-xo19Y8qzR1nu72LVLCejy7i_mW3VBYTnesGEZg6RsXFTjBnLlGLw_TXrSc";
 
@@ -19,7 +29,14 @@ const RESOURCE_LINKS = [
   { label: "Privacy Policy", to: "/privacy-policy" },
 ];
 
-const SOCIAL_ICONS = ["qr_code_2", "camera", "work", "play_circle"];
+const INSTAGRAM_URL = "https://www.instagram.com/aurainframohali/";
+
+const SOCIAL_ICONS = [
+  { key: "qr_code_2", icon: "qr_code_2", href: "#", label: "QR Code" },
+  { key: "instagram", href: INSTAGRAM_URL, label: "Instagram", isInstagram: true },
+  { key: "work", icon: "work", href: "#", label: "Work" },
+  { key: "play_circle", icon: "play_circle", href: "#", label: "Play" },
+];
 
 const CONTACT_ITEMS = [
   { icon: "mail", text: "aurainfraadmin@gmail.com" },
@@ -83,14 +100,19 @@ export default function Footer() {
             estate and infrastructure solutions.
           </p>
           <div className="flex items-center gap-3">
-            {SOCIAL_ICONS.map((icon) => (
+            {SOCIAL_ICONS.map((social) => (
               <a
-                key={icon}
+                key={social.key}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 hover:-translate-y-1 flex items-center justify-center transition-all duration-300"
-                href="#"
-                aria-label={icon}
+                href={social.href}
+                aria-label={social.label}
+                {...(social.isInstagram ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
-                <span className="material-symbols-outlined text-white text-xl">{icon}</span>
+                {social.isInstagram ? (
+                  <InstagramIcon className="text-white" />
+                ) : (
+                  <span className="material-symbols-outlined text-white text-xl">{social.icon}</span>
+                )}
               </a>
             ))}
           </div>
