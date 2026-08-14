@@ -40,7 +40,7 @@ const SOCIAL_ICONS = [
 
 const CONTACT_ITEMS = [
   { icon: "mail", text: "aurainfraadmin@gmail.com" },
-  { icon: "location_on", text: "SCO 16, 1st Floor, Sector 82-A, JLPL, SAS Nagar, Mohali, Punjab 140306 India" },
+  { icon: "location_on", text: "SCO 16, 1st Floor,Sector 82-A,JLPL,SAS Nagar,Mohali, Punjab 140306 /nIndia" },
 ];
 
 function FooterColumn({ title, children }) {
