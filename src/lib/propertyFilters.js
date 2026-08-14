@@ -80,3 +80,25 @@ export function withinRange(value, min, max) {
   if (max != null && value > max) return false;
   return true;
 }
+
+// Sorts a list of properties by price, given a `priceKey` function that
+// extracts a comparable Lakh value from each item (usually
+// `(p) => priceToLakh(p.price)`). `order` is one of:
+//   "newest"     - no re-sort; the list already arrives newest-first from
+//                  the API (rows are ordered by created_at desc server-side)
+//   "price-asc"  - cheapest first
+//   "price-desc" - most expensive first
+// Items whose price couldn't be parsed (null) are pushed to the end
+// regardless of direction, rather than sorting unpredictably around them.
+export function sortByPrice(list, order, priceKey) {
+  if (order !== "price-asc" && order !== "price-desc") return list;
+  const sorted = [...list].sort((a, b) => {
+    const pa = priceKey(a);
+    const pb = priceKey(b);
+    if (pa == null && pb == null) return 0;
+    if (pa == null) return 1;
+    if (pb == null) return -1;
+    return order === "price-asc" ? pa - pb : pb - pa;
+  });
+  return sorted;
+}

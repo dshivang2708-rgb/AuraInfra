@@ -1,4 +1,5 @@
 import { Building2, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export default function ConsultationCTA() {
   return (
@@ -17,10 +18,13 @@ export default function ConsultationCTA() {
             </p>
           </div>
         </div>
-        <button className="bg-[#1a6b32] hover:bg-[#145126] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shrink-0">
+        <Link
+          to="/contact"
+          className="bg-[#1a6b32] hover:bg-[#145126] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shrink-0"
+        >
           Contact Our Expert
           <ArrowRight size={20} />
-        </button>
+        </Link>
       </div>
     </section>
   );

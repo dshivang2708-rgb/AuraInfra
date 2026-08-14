@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, BedDouble, Ruler, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
-import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
+import { matchesAnySelected, matchesCategory, parseListParam, priceToLakh, sortByPrice, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
 // Every badge (New Launch, Premium, Ready to Move, etc) now uses the same
@@ -98,6 +98,7 @@ function PropertyCard({ property }) {
 
 export default function PropertyGrid() {
   const [gridView, setGridView] = useState(true);
+  const [sortBy, setSortBy] = useState("newest");
   const [rawProperties, setRawProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -128,14 +129,15 @@ export default function PropertyGrid() {
   // BHK, Possession Status and Price Range are filtered client-side (no
   // need to re-fetch — city/sector already narrowed things down server-side).
   const properties = useMemo(() => {
-    return rawProperties.filter((property) => {
+    const filtered = rawProperties.filter((property) => {
       if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (!matchesBhk(property, bhk)) return false;
       if (!matchesAnySelected(property.possession, possession)) return false;
       if (!withinRange(priceToLakh(property.price), minPrice, maxPrice)) return false;
       return true;
     });
-  }, [rawProperties, activeCategory, bhk, possession, minPrice, maxPrice]);
+    return sortByPrice(filtered, sortBy, (p) => priceToLakh(p.price));
+  }, [rawProperties, activeCategory, bhk, possession, minPrice, maxPrice, sortBy]);
 
   return (
     <div className="flex-1">
@@ -152,10 +154,14 @@ export default function PropertyGrid() {
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">Sort by:</span>
-          <select className="border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32] py-1.5 pl-3 pr-8">
-            <option>Newest First</option>
-            <option>Price Low to High</option>
-            <option>Price High to Low</option>
+          <select
+            className="border-gray-200 rounded-md text-sm focus:ring-[#1a6b32] focus:border-[#1a6b32] py-1.5 pl-3 pr-8"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="newest">Newest First</option>
+            <option value="price-asc">Price Low to High</option>
+            <option value="price-desc">Price High to Low</option>
           </select>
           <div className="flex border border-gray-200 rounded overflow-hidden">
             <button

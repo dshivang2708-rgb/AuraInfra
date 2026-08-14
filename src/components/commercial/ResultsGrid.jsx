@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, Square, LayoutGrid, List, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
-import { firstNumber, matchesCategory, parseListParam, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
+import { firstNumber, matchesCategory, parseListParam, priceToLakh, sortByPrice, withinRange } from "../../lib/propertyFilters.js";
 import { CARPET_AREA_BUCKETS } from "../../lib/commercialFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
@@ -86,6 +86,7 @@ function PropertyCard({ property }) {
 
 export default function ResultsGrid() {
   const [gridView, setGridView] = useState(true);
+  const [sortBy, setSortBy] = useState("newest");
   const [rawProperties, setRawProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -114,7 +115,7 @@ export default function ResultsGrid() {
   // filtered client-side (no need to re-fetch — city/sector already
   // narrowed things down on the server).
   const properties = useMemo(() => {
-    return rawProperties.filter((property) => {
+    const filtered = rawProperties.filter((property) => {
       if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (areas.length > 0) {
         const num = firstNumber(property.area);
@@ -127,7 +128,8 @@ export default function ResultsGrid() {
       if (!withinRange(priceToLakh(property.priceRange), minPrice, maxPrice)) return false;
       return true;
     });
-  }, [rawProperties, activeCategory, areas, minPrice, maxPrice]);
+    return sortByPrice(filtered, sortBy, (p) => priceToLakh(p.priceRange));
+  }, [rawProperties, activeCategory, areas, minPrice, maxPrice, sortBy]);
 
   return (
     <div className="flex-1">
@@ -145,10 +147,14 @@ export default function ResultsGrid() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-gray-500">Sort By:</span>
-            <select className="border-gray-200 rounded-lg text-sm font-medium py-1.5 focus:ring-[#1a6b32]">
-              <option>Newest First</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
+            <select
+              className="border-gray-200 rounded-lg text-sm font-medium py-1.5 focus:ring-[#1a6b32]"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
             </select>
           </div>
           <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1">

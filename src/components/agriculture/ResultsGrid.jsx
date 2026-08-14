@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, Ruler, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
-import { firstNumber, matchesCategory, priceToLakh, withinRange } from "../../lib/propertyFilters.js";
+import { firstNumber, matchesCategory, priceToLakh, sortByPrice, withinRange } from "../../lib/propertyFilters.js";
 import { CATEGORY_TABS } from "./CategoryTabs.jsx";
 
 function toCardProps(row) {
@@ -75,6 +75,7 @@ function PropertyCard({ property }) {
 
 export default function ResultsGrid() {
   const [gridView, setGridView] = useState(true);
+  const [sortBy, setSortBy] = useState("newest");
   const [rawProperties, setRawProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -104,13 +105,14 @@ export default function ResultsGrid() {
   // filtered client-side (no need to re-fetch — city/sector already
   // narrowed things down on the server).
   const properties = useMemo(() => {
-    return rawProperties.filter((property) => {
+    const filtered = rawProperties.filter((property) => {
       if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
       if (!withinRange(firstNumber(property.area), minArea, maxArea)) return false;
       if (!withinRange(priceToLakh(property.price), minPrice, maxPrice)) return false;
       return true;
     });
-  }, [rawProperties, activeCategory, minArea, maxArea, minPrice, maxPrice]);
+    return sortByPrice(filtered, sortBy, (p) => priceToLakh(p.price));
+  }, [rawProperties, activeCategory, minArea, maxArea, minPrice, maxPrice, sortBy]);
 
   return (
     <section className="flex-1">
@@ -127,10 +129,14 @@ export default function ResultsGrid() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 font-bold whitespace-nowrap">Sort By:</span>
-            <select className="text-xs border-gray-200 rounded-lg focus:ring-[#1a6b32] focus:border-[#1a6b32] py-1 pr-8">
-              <option>Newest First</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
+            <select
+              className="text-xs border-gray-200 rounded-lg focus:ring-[#1a6b32] focus:border-[#1a6b32] py-1 pr-8"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
             </select>
           </div>
           <div className="flex border border-gray-200 rounded-lg overflow-hidden">

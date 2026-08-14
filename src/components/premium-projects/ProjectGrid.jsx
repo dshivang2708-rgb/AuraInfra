@@ -3,7 +3,7 @@ import { Link, useSearch } from "@tanstack/react-router";
 import { MapPin, Building2, ArrowRight } from "lucide-react";
 import { api } from "../../lib/api.js";
 import { toPremiumCard } from "../../lib/adapters.js";
-import { priceToLakh, withinRange, looselyMatches } from "../../lib/propertyFilters.js";
+import { priceToLakh, withinRange, looselyMatches, sortByPrice } from "../../lib/propertyFilters.js";
 
 function ProjectCard({ project }) {
   return (
@@ -63,6 +63,7 @@ function ProjectCard({ project }) {
 
 export default function ProjectGrid() {
   const [gridView, setGridView] = useState(true);
+  const [sortBy, setSortBy] = useState("newest");
   const [rawProjects, setRawProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -91,14 +92,15 @@ export default function ProjectGrid() {
   // on the hero bar (mirrors how category filtering works on the Upcoming
   // Projects page) — city/sector are the only params narrowed server-side.
   const projects = useMemo(() => {
-    return rawProjects.filter((p) => {
+    const filtered = rawProjects.filter((p) => {
       const priceLakh = priceToLakh(p.priceRange) ?? priceToLakh(p.price);
       if (!withinRange(priceLakh, minPrice, maxPrice)) return false;
       if (status && !looselyMatches(p.possession, status)) return false;
       if (builder && !looselyMatches(p.builder, builder)) return false;
       return true;
     });
-  }, [rawProjects, minPrice, maxPrice, status, builder]);
+    return sortByPrice(filtered, sortBy, (p) => priceToLakh(p.priceRange) ?? priceToLakh(p.price));
+  }, [rawProjects, minPrice, maxPrice, status, builder, sortBy]);
 
   return (
     <>
@@ -111,8 +113,14 @@ export default function ProjectGrid() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500">Sort by:</span>
-            <select className="border-slate-200 rounded-lg text-sm font-semibold focus:ring-green-500">
-              <option>Newest First</option>
+            <select
+              className="border-slate-200 rounded-lg text-sm font-semibold focus:ring-green-500"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
             </select>
           </div>
           <div className="flex border border-slate-200 rounded-lg overflow-hidden">
