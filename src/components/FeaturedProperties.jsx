@@ -97,12 +97,6 @@ export default function FeaturedProperties() {
             <div className="h-1 w-12 bg-[#4d8efe] mt-2 rounded-full" />
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              to="/properties/residential"
-              className="flex items-center gap-1.5 text-sm font-bold text-[#1a6b32] hover:text-[#145528] whitespace-nowrap flex-shrink-0"
-            >
-              See All <ArrowRight size={16} />
-            </Link>
             {properties.length > 1 && (
               <div className="hidden sm:flex items-center gap-2">
                 <button

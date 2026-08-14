@@ -32,7 +32,7 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { icon: "domain", value: "70+", label: "Projects Delivered" },
+  { icon: "domain", value: "70+", label: "Project Deals" },
   { icon: "groups", value: "50+", label: "Happy Families" },
   { icon: "verified_user", value: "10+", label: "Years of Excellence" },
 ];

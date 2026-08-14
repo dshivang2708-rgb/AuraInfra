@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { api } from "../../lib/api.js";
 
 const CONTACT_CARDS = [
@@ -235,13 +236,13 @@ export default function ConnectSection() {
                 />
                 <label className="text-sm text-[#45464e] leading-tight" htmlFor="terms">
                   I agree to the{" "}
-                  <a className="text-[#1a6b32] font-semibold hover:underline" href="#">
+                  <Link className="text-[#1a6b32] font-semibold hover:underline" to="/terms-and-conditions">
                     Terms &amp; Conditions
-                  </a>{" "}
+                  </Link>{" "}
                   and{" "}
-                  <a className="text-[#1a6b32] font-semibold hover:underline" href="#">
+                  <Link className="text-[#1a6b32] font-semibold hover:underline" to="/privacy-policy">
                     Privacy Policy
-                  </a>
+                  </Link>
                   .
                 </label>
               </div>

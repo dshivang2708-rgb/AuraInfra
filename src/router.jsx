@@ -75,6 +75,16 @@ const upcomingProjectsRoute = createRoute({
   path: "/properties/upcoming",
 }).lazy(() => import("./pages/UpcomingProjects.lazy.jsx").then((d) => d.Route));
 
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/terms-and-conditions",
+}).lazy(() => import("./pages/TermsConditions.lazy.jsx").then((d) => d.Route));
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy-policy",
+}).lazy(() => import("./pages/PrivacyPolicy.lazy.jsx").then((d) => d.Route));
+
 const adminSignInRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin/login",
@@ -103,6 +113,8 @@ const routeTree = rootRoute.addChildren([
   premiumProjectsRoute,
   premiumProjectDetailRoute,
   upcomingProjectsRoute,
+  termsRoute,
+  privacyRoute,
   adminSignInRoute,
   adminSignUpRoute,
   adminDashboardRoute,

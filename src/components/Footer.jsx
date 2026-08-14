@@ -14,7 +14,10 @@ const EXPLORE_LINKS = [
   { label: "About Us", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
-const RESOURCE_LINKS = ["Terms & Conditions","Privacy Policy"];
+const RESOURCE_LINKS = [
+  { label: "Terms & Conditions", to: "/terms-and-conditions" },
+  { label: "Privacy Policy", to: "/privacy-policy" },
+];
 
 const SOCIAL_ICONS = ["qr_code_2", "camera", "work", "play_circle"];
 
@@ -120,10 +123,10 @@ export default function Footer() {
           <FooterColumn title="Resources">
             <ul className="space-y-2">
               {RESOURCE_LINKS.map((link) => (
-                <li key={link}>
-                  <a className="text-gray-400 hover:text-white transition-colors" href="#">
-                    {link}
-                  </a>
+                <li key={link.label}>
+                  <Link className="text-gray-400 hover:text-white transition-colors" to={link.to}>
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
