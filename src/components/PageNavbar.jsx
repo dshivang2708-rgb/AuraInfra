@@ -90,7 +90,7 @@ export default function PageNavbar() {
       </div>
 
       {mobileOpen && (
-        <ul className="lg:hidden bg-white shadow-lg p-4 space-y-3 font-semibold text-[#151c27]">
+        <ul className="lg:hidden bg-white shadow-lg border-t border-gray-200 p-4 space-y-3 font-semibold text-[#151c27]">
           {SIMPLE_LINKS.map((item) => (
             <li key={item.label} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
               <Link to={item.to} onClick={() => setMobileOpen(false)}>
