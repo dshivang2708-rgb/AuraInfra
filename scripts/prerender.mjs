@@ -23,7 +23,38 @@
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import puppeteer from "puppeteer";
+
+// Vercel's build container doesn't ship the shared libraries (libnss3.so
+// and friends) that a normal downloaded Chromium binary needs, so the
+// full `puppeteer` package's bundled browser can't launch there — it
+// only works on a full desktop/CI Linux image. `@sparticuz/chromium` is
+// a Chromium build compiled specifically for serverless/build
+// environments like Vercel and AWS Lambda that has no missing native
+// deps, paired with `puppeteer-core` (same API, no bundled browser).
+// Locally (and in any other CI that has real Chrome deps installed) we
+// keep using the full `puppeteer` package's bundled browser as before.
+const isVercel = !!process.env.VERCEL;
+
+async function launchBrowser() {
+  if (isVercel) {
+    const [{ default: chromium }, { default: puppeteerCore }] = await Promise.all([
+      import("@sparticuz/chromium"),
+      import("puppeteer-core"),
+    ]);
+    return puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+  }
+
+  const { default: puppeteer } = await import("puppeteer");
+  return puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+}
 
 const PORT = 4321;
 const HOST = "127.0.0.1";
@@ -91,10 +122,7 @@ async function main() {
   try {
     await waitForServer(BASE_URL);
 
-    const browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    const browser = await launchBrowser();
 
     for (const route of ROUTES) {
       const page = await browser.newPage();
