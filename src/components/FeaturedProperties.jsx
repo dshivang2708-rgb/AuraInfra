@@ -125,7 +125,7 @@ export default function FeaturedProperties() {
         ) : (
           <div
             ref={scrollerRef}
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-8 px-8
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-8 px-8 scroll-pl-8 scroll-pr-8
               [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]"
           >
             {properties.map((property) => (
