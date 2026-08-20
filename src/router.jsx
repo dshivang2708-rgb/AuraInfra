@@ -1,10 +1,12 @@
 import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router";
 import Home from "./pages/Home.jsx";
 import Footer from "./components/Footer.jsx";
+import ScrollToTopOnSameLink from "./components/ScrollToTopOnSameLink.jsx";
 
 const rootRoute = createRootRoute({
   component: () => (
     <>
+      <ScrollToTopOnSameLink />
       <Outlet />
       <Footer />
     </>
@@ -120,4 +122,4 @@ const routeTree = rootRoute.addChildren([
   adminDashboardRoute,
 ]);
 
-export const router = createRouter({ routeTree });
+export const router = createRouter({ routeTree, scrollRestoration: true });
