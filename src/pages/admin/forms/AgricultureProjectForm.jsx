@@ -323,7 +323,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[#c5c6cf]/30 p-6 space-y-6">
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[#c5c6cf]/30 p-4 sm:p-6 space-y-6">
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">{error}</div>
       )}
@@ -749,7 +749,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
 
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Main Image</label>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {form.main_image && (
             <img src={form.main_image} alt="" className="w-24 h-24 object-cover rounded-lg border border-[#c5c6cf]" />
           )}
@@ -762,7 +762,7 @@ export default function AgricultureProjectForm({ project, onSaved, onCancel }) {
 
       <div>
         <label className="block text-xs font-bold text-[#151c27] mb-1 uppercase">Project Brochure (PDF)</label>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {form.brochureUrl && (
             <a
               href={form.brochureUrl}
