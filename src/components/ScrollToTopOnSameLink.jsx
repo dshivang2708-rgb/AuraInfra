@@ -12,7 +12,7 @@ export default function ScrollToTopOnSameLink() {
   useEffect(() => {
     const handleClick = (e) => {
       // Ignore modified clicks (new tab / new window) and non-primary buttons.
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 
       const anchor = e.target.closest("a");
       if (!anchor) return;
