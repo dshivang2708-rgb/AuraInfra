@@ -1,157 +1,218 @@
 // scripts/prerender.mjs
 //
-// Runs after `vite build`. Boots the production build locally with
-// `vite preview`, visits each real route with a headless browser,
-// waits for React (and any data fetching + react-helmet-async) to
-// finish, then writes the fully-rendered HTML to disk as a static
-// file for that route.
+// Runs after `vite build` (now wired into the actual "build" script — see
+// package.json). Writes a real, per-route static HTML file for every
+// static marketing/listing route, with the correct <title>/<meta
+// description>/<link rel="canonical">/OG tags baked directly into the raw
+// HTML. No headless browser required.
 //
-// Why: this is a client-only React SPA, so every URL is served the
-// same generic index.html and the real <title>/<meta description>
-// only appear after JS runs (see src/components/Seo.jsx). Crawlers
-// that don't wait for that end up indexing the generic homepage
-// title/description for every page. Prerendering bakes the correct
-// tags into the actual HTML file served for each route, so no JS
-// execution is required to see them.
+// WHY THIS REPLACED THE OLD PUPPETEER-BASED VERSION:
+// The previous version booted `vite preview` and used
+// Puppeteer/@sparticuz-chromium to visit each route in a headless browser
+// and snapshot the post-JS DOM. Two problems:
+//   1. It was only ever wired up as a separate "build:with-prerender"
+//      script. Vercel's actual build command was plain "vite build", so
+//      the prerender step never ran in production at all.
+//   2. Even if it had been wired up, headless Chromium is fragile inside
+//      Vercel's build container (missing shared libs, launch timeouts).
 //
-// Detail pages (/properties/<category>/:slug) are intentionally
-// NOT prerendered here — their slugs are dynamic/data-driven and
-// would need a separate "fetch all slugs, then render each" step.
-// The static marketing/listing routes below are what showed up
-// wrong in Google, so they're the priority.
+// The practical effect: every route (/about, /properties/residential,
+// /properties/commercial, etc.) served the exact same generic
+// index.html — same <title>, same <meta description>, and critically
+// the same hardcoded <link rel="canonical" href="https://aurainfra.co.in/">.
+// Googlebot's raw HTML fetch (before/independent of JS execution) saw
+// identical content with a canonical tag pointing every route back to
+// "/", so it folded all the inner pages into the homepage and only ever
+// indexed "/". This script removes that failure mode entirely: the tags
+// below are static strings pulled straight from each page's <Seo ... />
+// props (see src/pages/*.jsx), so there's nothing that can fail to
+// launch, time out, or silently get skipped.
+//
+// Detail pages (/properties/<category>/:slug) are NOT covered here —
+// their slugs are dynamic/data-driven (Supabase). Admin routes are
+// skipped (noindex via robots.txt, behind auth). If detail pages need
+// indexing later, generate them the same way: fetch the slugs, then
+// add an entry per slug below (or loop and call writeRoute()).
 
-import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-// Vercel's build container doesn't ship the shared libraries (libnss3.so
-// and friends) that a normal downloaded Chromium binary needs, so the
-// full `puppeteer` package's bundled browser can't launch there — it
-// only works on a full desktop/CI Linux image. `@sparticuz/chromium` is
-// a Chromium build compiled specifically for serverless/build
-// environments like Vercel and AWS Lambda that has no missing native
-// deps, paired with `puppeteer-core` (same API, no bundled browser).
-// Locally (and in any other CI that has real Chrome deps installed) we
-// keep using the full `puppeteer` package's bundled browser as before.
-const isVercel = !!process.env.VERCEL;
-
-async function launchBrowser() {
-  if (isVercel) {
-    const [{ default: chromium }, { default: puppeteerCore }] = await Promise.all([
-      import("@sparticuz/chromium"),
-      import("puppeteer-core"),
-    ]);
-    return puppeteerCore.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-  }
-
-  const { default: puppeteer } = await import("puppeteer");
-  return puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-}
-
-const PORT = 4321;
-const HOST = "127.0.0.1";
-const BASE_URL = `http://${HOST}:${PORT}`;
+const SITE_URL = "https://aurainfra.co.in";
+const SITE_NAME = "Aura Infra";
 const DIST_DIR = path.resolve("dist");
+const TEMPLATE_PATH = path.join(DIST_DIR, "index.html");
 
-// Every static route worth prerendering (no dynamic :slug params).
+// Keep these in sync with the <Seo title=... description=... path=... />
+// props on each page component in src/pages/. Plain strings only — this
+// script has zero runtime dependencies beyond Node's fs.
 const ROUTES = [
-  "/",
-  "/about",
-  "/contact",
-  "/properties/residential",
-  "/properties/commercial",
-  "/properties/agriculture",
-  "/properties/premium-projects",
-  "/properties/upcoming",
-  "/terms-and-conditions",
-  "/privacy-policy",
+  {
+    path: "/",
+    // Home.jsx now omits `title` (see src/pages/Home.jsx), so Seo.jsx's
+    // default applies — keep this identical to that default AND to the
+    // static <title> already in index.html.
+    title: `${SITE_NAME} - Residential, Commercial & Agricultural Properties in Mohali`,
+    description:
+      "Aura Infra is a Mohali-based real estate company offering premium residential, commercial and agricultural properties across Mohali, Chandigarh and North India. Building spaces, creating futures.",
+  },
+  {
+    path: "/about",
+    title: `About Us | ${SITE_NAME}`,
+    description:
+      "Learn about Aura Infra's journey, values and leadership. A Mohali-based real estate company building spaces and creating futures across North India.",
+  },
+  {
+    path: "/contact",
+    title: `Contact Us | ${SITE_NAME}`,
+    description:
+      "Get in touch with Aura Infra. Visit us at SCO 16, Sector 82-A, JLPL, SAS Nagar, Mohali, Punjab, or reach out online to discuss your next property.",
+  },
+  {
+    path: "/properties/residential",
+    title: `Residential Properties in Mohali | ${SITE_NAME}`,
+    description:
+      "Browse premium residential properties, flats and villas in Mohali, Sector 82, Aerocity and more with Aura Infra.",
+  },
+  {
+    path: "/properties/commercial",
+    title: `Commercial Properties in Mohali | ${SITE_NAME}`,
+    description:
+      "Explore commercial spaces, office towers and retail units in Mohali and Chandigarh tricity with Aura Infra.",
+  },
+  {
+    path: "/properties/agriculture",
+    title: `Agricultural Land in Mohali & Punjab | ${SITE_NAME}`,
+    description:
+      "Find agricultural land, farmhouse plots and fertile land for sale in Mohali, Kharar and across Punjab with Aura Infra.",
+  },
+  {
+    path: "/properties/premium-projects",
+    title: `Premium Projects | ${SITE_NAME}`,
+    description:
+      "Discover Aura Infra's curated premium real estate projects, offering elevated design and prime locations across Mohali and North India.",
+  },
+  {
+    path: "/properties/upcoming",
+    title: `Upcoming Projects | ${SITE_NAME}`,
+    description:
+      "Get an early look at Aura Infra's upcoming residential, commercial and agricultural projects across Mohali and North India.",
+  },
+  {
+    path: "/terms-and-conditions",
+    title: `Terms & Conditions | ${SITE_NAME}`,
+    description:
+      "Terms & Conditions for using the Aura Infra website and real estate consulting, sales and brokerage services.",
+  },
+  {
+    path: "/privacy-policy",
+    title: `Privacy Policy | ${SITE_NAME}`,
+    description:
+      "How Aura Infra collects, uses, and protects your personal information across our website and consulting, sales and brokerage services.",
+  },
 ];
 
-function waitForServer(url, timeoutMs = 20000) {
-  const start = Date.now();
-  return new Promise((resolve, reject) => {
-    const attempt = async () => {
-      try {
-        const res = await fetch(url);
-        if (res.ok || res.status === 404) return resolve();
-      } catch {
-        // server not up yet
-      }
-      if (Date.now() - start > timeoutMs) {
-        return reject(new Error(`Timed out waiting for ${url}`));
-      }
-      setTimeout(attempt, 300);
-    };
-    attempt();
-  });
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-function outputPathFor(route) {
-  if (route === "/") return path.join(DIST_DIR, "index.html");
-  return path.join(DIST_DIR, route.replace(/^\//, ""), "index.html");
+function replaceTag(html, regex, replacement) {
+  if (!regex.test(html)) {
+    throw new Error(`Expected tag not found in template (pattern: ${regex})`);
+  }
+  return html.replace(regex, replacement);
 }
 
-async function main() {
-  if (!existsSync(DIST_DIR)) {
-    console.error("dist/ not found — run `vite build` before prerendering.");
+function buildHtmlForRoute(template, route) {
+  const canonicalUrl = `${SITE_URL}${route.path === "/" ? "/" : route.path}`;
+  const title = escapeHtml(route.title);
+  const description = escapeHtml(route.description);
+
+  let html = template;
+
+  html = replaceTag(html, /<title>[^<]*<\/title>/, `<title>${title}</title>`);
+  html = replaceTag(
+    html,
+    /<meta name="title" content="[^"]*" \/>/,
+    `<meta name="title" content="${title}" />`
+  );
+  html = replaceTag(
+    html,
+    /<meta name="description" content="[^"]*" \/>/,
+    `<meta name="description" content="${description}" />`
+  );
+  html = replaceTag(
+    html,
+    /<link rel="canonical" href="[^"]*" \/>/,
+    `<link rel="canonical" href="${canonicalUrl}" />`
+  );
+  html = replaceTag(
+    html,
+    /<meta property="og:url" content="[^"]*" \/>/,
+    `<meta property="og:url" content="${canonicalUrl}" />`
+  );
+  html = replaceTag(
+    html,
+    /<meta property="og:title" content="[^"]*" \/>/,
+    `<meta property="og:title" content="${title}" />`
+  );
+  html = replaceTag(
+    html,
+    /<meta property="og:description" content="[^"]*" \/>/,
+    `<meta property="og:description" content="${description}" />`
+  );
+  html = replaceTag(
+    html,
+    /<meta name="twitter:title" content="[^"]*" \/>/,
+    `<meta name="twitter:title" content="${title}" />`
+  );
+  html = replaceTag(
+    html,
+    /<meta name="twitter:description" content="[^"]*" \/>/,
+    `<meta name="twitter:description" content="${description}" />`
+  );
+
+  return html;
+}
+
+function outputPathFor(routePath) {
+  if (routePath === "/") return path.join(DIST_DIR, "index.html");
+  return path.join(DIST_DIR, routePath.replace(/^\//, ""), "index.html");
+}
+
+function main() {
+  if (!existsSync(TEMPLATE_PATH)) {
+    console.error("dist/index.html not found — run `vite build` before prerendering.");
     process.exit(1);
   }
 
-  console.log(`Starting preview server on ${BASE_URL} ...`);
-  // shell: true is required on Windows, where "npx" actually resolves to
-  // "npx.cmd" and Node's spawn() won't find it without going through a shell.
-  const server = spawn(
-    "npx",
-    ["vite", "preview", "--port", String(PORT), "--host", HOST, "--strictPort"],
-    { stdio: "inherit", shell: true }
-  );
+  const template = readFileSync(TEMPLATE_PATH, "utf-8");
+  let failures = 0;
 
-  const cleanupAndExit = (code) => {
-    server.kill();
-    process.exit(code);
-  };
-
-  try {
-    await waitForServer(BASE_URL);
-
-    const browser = await launchBrowser();
-
-    for (const route of ROUTES) {
-      const page = await browser.newPage();
-      const url = `${BASE_URL}${route}`;
-      console.log(`Prerendering ${route} ...`);
-
-      try {
-        await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
-        // Small extra settle time for react-helmet-async's effect to flush.
-        await new Promise((r) => setTimeout(r, 150));
-
-        const html = await page.content();
-        const outPath = outputPathFor(route);
-        mkdirSync(path.dirname(outPath), { recursive: true });
-        writeFileSync(outPath, html, "utf-8");
-        console.log(`  -> wrote ${path.relative(process.cwd(), outPath)}`);
-      } catch (err) {
-        console.error(`  ! failed to prerender ${route}:`, err.message);
-      } finally {
-        await page.close();
-      }
+  for (const route of ROUTES) {
+    try {
+      const html = buildHtmlForRoute(template, route);
+      const outPath = outputPathFor(route.path);
+      mkdirSync(path.dirname(outPath), { recursive: true });
+      writeFileSync(outPath, html, "utf-8");
+      console.log(`Prerendered ${route.path} -> ${path.relative(process.cwd(), outPath)}`);
+    } catch (err) {
+      failures += 1;
+      console.error(`! Failed to prerender ${route.path}: ${err.message}`);
     }
-
-    await browser.close();
-    cleanupAndExit(0);
-  } catch (err) {
-    console.error("Prerender failed:", err);
-    cleanupAndExit(1);
   }
+
+  if (failures > 0) {
+    // Fail the build loudly instead of silently shipping pages with a
+    // wrong/duplicate canonical tag again.
+    console.error(`\n${failures} route(s) failed to prerender. Failing the build.`);
+    process.exit(1);
+  }
+
+  console.log(`\nAll ${ROUTES.length} static routes prerendered successfully.`);
 }
 
 main();

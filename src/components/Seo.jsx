@@ -21,7 +21,9 @@ export default function Seo({
   image = DEFAULT_IMAGE,
   noindex = false,
 }) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} - Building Spaces, Creating Futures`;
+    const fullTitle = title
+    ? `${title} | ${SITE_NAME}`
+    : `${SITE_NAME} - Residential, Commercial & Agricultural Properties in Mohali`;
   const url = `${SITE_URL}${path}`;
 
   return (

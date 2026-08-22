@@ -12,7 +12,6 @@ export default function Home() {
   return (
     <main>
       <Seo
-        title="Home"
         description="Aura Infra is a Mohali-based real estate company offering premium residential, commercial and agricultural properties across Mohali, Chandigarh and North India. Building spaces, creating futures."
         path="/"
       />
