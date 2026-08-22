@@ -19,7 +19,7 @@
 // The practical effect: every route (/about, /properties/residential,
 // /properties/commercial, etc.) served the exact same generic
 // index.html — same <title>, same <meta description>, and critically
-// the same hardcoded <link rel="canonical" href="https://aurainfra.co.in/">.
+// the same hardcoded <link rel="canonical" href="https://www.aurainfra.co.in/">.
 // Googlebot's raw HTML fetch (before/independent of JS execution) saw
 // identical content with a canonical tag pointing every route back to
 // "/", so it folded all the inner pages into the homepage and only ever
@@ -37,7 +37,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-const SITE_URL = "https://aurainfra.co.in";
+const SITE_URL = "https://www.aurainfra.co.in";
 const SITE_NAME = "Aura Infra";
 const DIST_DIR = path.resolve("dist");
 const TEMPLATE_PATH = path.join(DIST_DIR, "index.html");

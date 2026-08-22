@@ -3,150 +3,150 @@
 
   <!-- Core pages -->
   <url>
-    <loc>https://aurainfra.co.in/</loc>
+    <loc>https://www.aurainfra.co.in/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/about</loc>
+    <loc>https://www.aurainfra.co.in/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/contact</loc>
+    <loc>https://www.aurainfra.co.in/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/terms-and-conditions</loc>
+    <loc>https://www.aurainfra.co.in/terms-and-conditions</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/privacy-policy</loc>
+    <loc>https://www.aurainfra.co.in/privacy-policy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <!-- Property listing pages -->
   <url>
-    <loc>https://aurainfra.co.in/properties/residential</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/premium-projects</loc>
+    <loc>https://www.aurainfra.co.in/properties/premium-projects</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/upcoming</loc>
+    <loc>https://www.aurainfra.co.in/properties/upcoming</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Residential project detail pages -->
   <url>
-    <loc>https://aurainfra.co.in/properties/residential/aura-greens</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential/aura-greens</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/residential/skyline-residency</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential/skyline-residency</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/residential/homeland-avenue</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential/homeland-avenue</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/residential/aura-grande</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential/aura-grande</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/residential/aurelia-heights</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential/aurelia-heights</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/residential/elysian-heights</loc>
+    <loc>https://www.aurainfra.co.in/properties/residential/elysian-heights</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Commercial project detail pages -->
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial/corporate-tower</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial/corporate-tower</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial/high-street-retail</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial/high-street-retail</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial/nextgen-coworks</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial/nextgen-coworks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial/industrial-warehouse</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial/industrial-warehouse</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial/premium-showroom</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial/premium-showroom</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/commercial/business-park-office</loc>
+    <loc>https://www.aurainfra.co.in/properties/commercial/business-park-office</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Agriculture project detail pages -->
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture/premium-agri-land</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture/premium-agri-land</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture/farmhouse-land</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture/farmhouse-land</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture/mango-plantation</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture/mango-plantation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture/horticulture-land</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture/horticulture-land</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture/dairy-farm-land</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture/dairy-farm-land</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aurainfra.co.in/properties/agriculture/fertile-agri-land</loc>
+    <loc>https://www.aurainfra.co.in/properties/agriculture/fertile-agri-land</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

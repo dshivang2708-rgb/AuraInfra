@@ -2,8 +2,8 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.aurainfra.co.in" }],
-      "destination": "https://aurainfra.co.in/$1",
+      "has": [{ "type": "host", "value": "aura-infra.vercel.app" }],
+      "destination": "https://www.aurainfra.co.in/$1",
       "permanent": true
     }
   ],

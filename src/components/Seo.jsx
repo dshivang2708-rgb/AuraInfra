@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 const SITE_NAME = "Aura Infra";
-const SITE_URL = "https://aurainfra.co.in";
+const SITE_URL = "https://www.aurainfra.co.in";
 const DEFAULT_IMAGE = `${SITE_URL}/icons/og-image.jpg`;
 
 /**
@@ -21,7 +21,7 @@ export default function Seo({
   image = DEFAULT_IMAGE,
   noindex = false,
 }) {
-    const fullTitle = title
+  const fullTitle = title
     ? `${title} | ${SITE_NAME}`
     : `${SITE_NAME} - Residential, Commercial & Agricultural Properties in Mohali`;
   const url = `${SITE_URL}${path}`;
