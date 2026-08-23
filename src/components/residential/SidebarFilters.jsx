@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCities, useSectors, cleanSearch } from "../../lib/locationFilter.js";
 import { parseListParam } from "../../lib/propertyFilters.js";
-
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
 const POSSESSION_OPTIONS = ["Ready to Move", "Under Construction", "New Launch"];
 
@@ -21,13 +20,14 @@ export default function SidebarFilters() {
   const navigate = useNavigate();
   const search = useSearch({ strict: false });
 
+  // Controls the slide-in drawer on small screens. Desktop (lg+) ignores
+  // this entirely and always shows the sidebar in place.
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   // These filters are staged locally and only pushed into the URL (which is
   // what PropertyGrid actually reads from) when "Apply Filters" is clicked.
   const [draft, setDraft] = useState(() => draftFromSearch(search));
 
-  // If the URL changes from outside this component (Clear All below,
-  // browser back/forward, a category tab reset, etc), re-sync the draft so
-  // it doesn't show stale selections.
   useEffect(() => {
     setDraft(draftFromSearch(search));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,7 +50,6 @@ export default function SidebarFilters() {
   }
 
   function handleCityChange(e) {
-    // Changing city clears sector — sectors only make sense within a city.
     updateDraft({ city: e.target.value, sector: "" });
   }
 
@@ -84,6 +83,7 @@ export default function SidebarFilters() {
       }),
       replace: true,
     });
+    setMobileOpen(false);
   }
 
   function clearAll() {
@@ -104,14 +104,50 @@ export default function SidebarFilters() {
   }
 
   return (
-    <aside className="w-full lg:w-72 flex-shrink-0">
-      <div className="bg-white p-5 rounded-lg border border-gray-200 lg:sticky lg:top-32">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="font-bold text-lg">Filter Properties</h2>
-          <button onClick={clearAll} className="text-[#1a6b32] text-xs font-semibold uppercase">
-            Clear All
-          </button>
-        </div>
+    <>
+      {/* Mobile trigger — the sidebar below is hidden by default on small
+          screens and only slides in once this is tapped. */}
+      <div className="lg:hidden mb-4">
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 font-bold text-sm py-3 rounded-lg shadow-sm"
+        >
+          <i className="fa-solid fa-filter" /> Filters
+        </button>
+      </div>
+
+      {/* Backdrop — mobile only, shown while the drawer is open. */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-[85%] max-w-sm transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:static lg:z-auto lg:w-72 lg:flex-shrink-0 lg:max-w-none lg:translate-x-0 lg:transition-none lg:overflow-visible`}
+      >
+        <div className="bg-white p-5 rounded-lg lg:border lg:border-gray-200 lg:sticky lg:top-32 min-h-full lg:min-h-0">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-bold text-lg">Filter Properties</h2>
+            <div className="flex items-center gap-4">
+              <button onClick={clearAll} className="text-[#1a6b32] text-xs font-semibold uppercase">
+                Clear All
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="lg:hidden text-gray-400 hover:text-gray-600"
+                aria-label="Close filters"
+              >
+                <i className="fa-solid fa-xmark text-lg" />
+              </button>
+            </div>
+          </div>
 
         {/* City Filter */}
         <div className="mb-6">
@@ -244,6 +280,7 @@ export default function SidebarFilters() {
           <i className="fa-solid fa-rotate-left" /> Reset All
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

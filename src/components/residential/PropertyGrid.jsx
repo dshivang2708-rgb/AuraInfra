@@ -23,20 +23,11 @@ function toCardProps(row) {
     area: row.area_display,
     price: row.price_display,
     priceNote: null,
-    // Canonical category key selected by the admin on the listing form
-    // (e.g. "villas", "plots") — the reliable way matchesCategory() decides
-    // which CategoryTabs tab this property belongs to.
     propertyType: row.details?.propertyType || null,
-    // Lowercased blob of everything that might mention the property's
-    // category (Apartment / Villa / Plot / etc) — fallback for older rows
-    // saved before propertyType existed.
     typeText: `${row.name || ""} ${tagsText} ${row.details?.configurations || ""} ${row.details?.beds || ""}`.toLowerCase(),
   };
 }
 
-// A property matches a selected BHK if either its "beds" summary text
-// mentions it (e.g. "2, 3 & 4 BHK") or one of its individual floor plans is
-// that exact configuration.
 function matchesBhk(property, selectedBhks) {
   if (!selectedBhks.length) return true;
   const beds = (property.beds || "").toLowerCase();
@@ -96,6 +87,61 @@ function PropertyCard({ property }) {
   );
 }
 
+// Horizontal card used when the "List view" toggle is active — same data,
+// laid out as a row (image left, details right) instead of a stacked tile.
+function PropertyListRow({ property }) {
+  return (
+    <div className="property-card bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col sm:flex-row">
+      <div className="relative sm:w-64 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
+        <img alt={property.name} className="w-full h-full object-cover" src={property.image} />
+        {property.badge && (
+          <span
+            className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide shadow-sm ${BADGE_STYLE}`}
+          >
+            {property.badge}
+          </span>
+        )}
+      </div>
+
+      <div className="flex-1 px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <h4 className="font-extrabold text-xl text-gray-900 mb-1.5">{property.name}</h4>
+
+          <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+            <span className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+              <MapPin size={13} className="text-[#1a6b32]" />
+            </span>
+            {property.location}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+              <BedDouble size={15} /> {property.beds || "—"}
+            </span>
+            <span className="flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl px-3 py-2">
+              <Ruler size={15} /> {property.area || "—"}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex sm:flex-col sm:items-end justify-between sm:justify-center gap-2 sm:border-l sm:border-gray-100 sm:pl-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+          <div className="min-w-0">
+            <span className="text-[#1a6b32] font-extrabold text-sm block">{property.price}</span>
+            {property.priceNote && <span className="text-gray-400 text-xs font-medium">{property.priceNote}</span>}
+          </div>
+          <Link
+            to="/properties/residential/$slug"
+            params={{ slug: property.key }}
+            className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 bg-[#1a6b32] hover:bg-[#145528] text-white text-xs font-bold px-4 py-2.5 rounded-full transition-colors"
+          >
+            View Details <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PropertyGrid() {
   const [gridView, setGridView] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
@@ -126,8 +172,6 @@ export default function PropertyGrid() {
     };
   }, [city, sector]);
 
-  // BHK, Possession Status and Price Range are filtered client-side (no
-  // need to re-fetch — city/sector already narrowed things down server-side).
   const properties = useMemo(() => {
     const filtered = rawProperties.filter((property) => {
       if (!matchesCategory(property, activeCategory, CATEGORY_TABS)) return false;
@@ -196,11 +240,15 @@ export default function PropertyGrid() {
         </div>
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {properties.map((property) => (
-          <PropertyCard key={property.key} property={property} />
-        ))}
+      {/* Grid / List */}
+      <div className={gridView ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
+        {properties.map((property) =>
+          gridView ? (
+            <PropertyCard key={property.key} property={property} />
+          ) : (
+            <PropertyListRow key={property.key} property={property} />
+          )
+        )}
       </div>
     </div>
   );
