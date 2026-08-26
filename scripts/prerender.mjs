@@ -126,6 +126,34 @@ function replaceTag(html, regex, replacement) {
   return html.replace(regex, replacement);
 }
 
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Whitespace/newline-tolerant matcher for a self-closing <meta> tag, e.g.
+//   <meta property="og:title" content="..." />
+// or the same tag reformatted (e.g. by Prettier) across multiple lines with
+// attributes in either order:
+//   <meta
+//     property="og:title"
+//     content="..."
+//   />
+// \s already matches newlines in JS regex, so no extra flags are needed.
+function metaTagRegex(attrName, attrValue) {
+  const name = escapeRegex(attrName);
+  const value = escapeRegex(attrValue);
+  return new RegExp(
+    `<meta\\s+(?:${name}="${value}"\\s+content="[^"]*"|content="[^"]*"\\s+${name}="${value}")\\s*\\/>`
+  );
+}
+
+function linkTagRegex(relValue) {
+  const rel = escapeRegex(relValue);
+  return new RegExp(
+    `<link\\s+(?:rel="${rel}"\\s+href="[^"]*"|href="[^"]*"\\s+rel="${rel}")\\s*\\/>`
+  );
+}
+
 function buildHtmlForRoute(template, route) {
   const canonicalUrl = `${SITE_URL}${route.path === "/" ? "/" : route.path}`;
   const title = escapeHtml(route.title);
@@ -133,45 +161,42 @@ function buildHtmlForRoute(template, route) {
 
   let html = template;
 
+  // Note: index.html no longer has a separate <meta name="title" />
+  // tag — only <title> carries the page title now. Don't re-add one.
   html = replaceTag(html, /<title>[^<]*<\/title>/, `<title>${title}</title>`);
   html = replaceTag(
     html,
-    /<meta name="title" content="[^"]*" \/>/,
-    `<meta name="title" content="${title}" />`
-  );
-  html = replaceTag(
-    html,
-    /<meta name="description" content="[^"]*" \/>/,
+    metaTagRegex("name", "description"),
     `<meta name="description" content="${description}" />`
   );
   html = replaceTag(
     html,
-    /<link rel="canonical" href="[^"]*" \/>/,
+    linkTagRegex("canonical"),
     `<link rel="canonical" href="${canonicalUrl}" />`
   );
   html = replaceTag(
     html,
-    /<meta property="og:url" content="[^"]*" \/>/,
+    metaTagRegex("property", "og:url"),
     `<meta property="og:url" content="${canonicalUrl}" />`
   );
   html = replaceTag(
     html,
-    /<meta property="og:title" content="[^"]*" \/>/,
+    metaTagRegex("property", "og:title"),
     `<meta property="og:title" content="${title}" />`
   );
   html = replaceTag(
     html,
-    /<meta property="og:description" content="[^"]*" \/>/,
+    metaTagRegex("property", "og:description"),
     `<meta property="og:description" content="${description}" />`
   );
   html = replaceTag(
     html,
-    /<meta name="twitter:title" content="[^"]*" \/>/,
+    metaTagRegex("name", "twitter:title"),
     `<meta name="twitter:title" content="${title}" />`
   );
   html = replaceTag(
     html,
-    /<meta name="twitter:description" content="[^"]*" \/>/,
+    metaTagRegex("name", "twitter:description"),
     `<meta name="twitter:description" content="${description}" />`
   );
 
