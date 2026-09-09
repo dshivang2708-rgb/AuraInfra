@@ -1,8 +1,14 @@
-import { supabase } from "./supabaseClient.js";
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
+// Dynamically imported instead of a top-level `import { supabase } from
+// "./supabaseClient.js"` — this file is imported by public, unauthenticated
+// pages too (e.g. the homepage's FeaturedProperties, which just calls
+// listProjects()), and a top-level import would have pulled the entire
+// @supabase/supabase-js client into every visitor's initial bundle just to
+// support the `auth: true` admin calls below. This way it's only fetched
+// the moment an authenticated call is actually made.
 async function authHeaders() {
+  const { supabase } = await import("./supabaseClient.js");
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   return token ? { Authorization: `Bearer ${token}` } : {};
