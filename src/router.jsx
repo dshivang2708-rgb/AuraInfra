@@ -123,3 +123,9 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 export const router = createRouter({ routeTree, scrollRestoration: true });
+
+// Exported separately so scripts/prerender.mjs (and any future SSR entry)
+// can spin up a fresh router instance per request/route instead of reusing
+// the singleton `router` above, which is stateful and only safe for the
+// single long-lived browser session it's created for.
+export { routeTree };
